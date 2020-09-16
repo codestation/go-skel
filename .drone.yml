@@ -1,0 +1,47 @@
+---
+kind: pipeline
+name: linux-amd64
+type: docker
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+  - name: test
+    image: golang:1.15
+    commands:
+      - go mod download
+      - go install golang.org/x/lint/golint
+      - go vet ./...
+      - go test -v ./...
+      - golint -set_exit_status `find . -type d -not -path "./vendor*" -not -path "./.git*"`
+    environment:
+      GOPROXY: https://proxy.golang.org,direct
+
+  - name: build
+    image: plugins/docker
+    settings:
+      repo: registry.megpoid.xyz/app
+      tags: "${DRONE_BRANCH}"
+      mirror: http://mirror:5000
+      build_args:
+        - CI_TAG=${DRONE_TAG}
+        - BUILD_NUMBER=${DRONE_BUILD_NUMBER}
+        - BUILD_COMMIT_SHORT=${DRONE_COMMIT_SHA:0:8}
+        - CI_BUILD_CREATED=${DRONE_BUILD_CREATED}
+        - GOPROXY=https://proxy.golang.org,direct
+      registry: registry.megpoid.xyz
+      username:
+        from_secret: docker_username
+      password:
+        from_secret: docker_password
+    when:
+      event:
+        - push
+        - tag
+
+trigger:
+  branch:
+    - master
+    - testing
