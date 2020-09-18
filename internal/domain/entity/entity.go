@@ -14,18 +14,26 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package helper
+package entity
 
 import (
-	"regexp"
-	"strings"
+	"database/sql"
+	"time"
 )
 
-var matchFirstCap = regexp.MustCompile("(.)([A-Z][a-z]+)")
-var matchAllCap = regexp.MustCompile("([a-z0-9])([A-Z])")
+// ID is used as a alias for the model primary key to avoid using some int by mistake.
+type ID int
 
-func ToSnakeCase(str string) string {
-	snake := matchFirstCap.ReplaceAllString(str, "${1}_${2}")
-	snake = matchAllCap.ReplaceAllString(snake, "${1}_${2}")
-	return strings.ToLower(snake)
+// Entity is the base that will be used by other entity who need a primary key and timestamps.
+type Entity struct {
+	ID        ID           `json:"-"`
+	CreatedAt time.Time    `json:"created_at"`
+	UpdatedAt time.Time    `json:"updated_at"`
+	DeletedAt sql.NullTime `json:"-"`
+}
+
+// SetTimestamps configures the time on created/updated fields. Only call this method on new entity.
+func (m *Entity) SetTimestamps(now time.Time) {
+	m.CreatedAt = now
+	m.UpdatedAt = now
 }

@@ -14,18 +14,33 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package helper
+package repository
 
 import (
-	"regexp"
-	"strings"
+	"errors"
+	"fmt"
 )
 
-var matchFirstCap = regexp.MustCompile("(.)([A-Z][a-z]+)")
-var matchAllCap = regexp.MustCompile("([a-z0-9])([A-Z])")
+type RepoError struct {
+	Err      error
+	internal error
+}
 
-func ToSnakeCase(str string) string {
-	snake := matchFirstCap.ReplaceAllString(str, "${1}_${2}")
-	snake = matchAllCap.ReplaceAllString(snake, "${1}_${2}")
-	return strings.ToLower(snake)
+var ErrBackend = errors.New("repo: backend error")
+var ErrNotFound = errors.New("repo: entity not found")
+var ErrDuplicated = errors.New("repo: duplicated entity")
+
+func NewRepoError(err, internal error) error {
+	return &RepoError{internal: internal, Err: err}
+}
+
+func (r *RepoError) Error() string {
+	if r.internal != nil {
+		return fmt.Sprintf("%s: %s", r.Err, r.internal)
+	}
+	return r.Err.Error()
+}
+
+func (r *RepoError) Unwrap() error {
+	return r.Err
 }

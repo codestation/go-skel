@@ -14,18 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package helper
+package domain
 
-import (
-	"regexp"
-	"strings"
-)
+import "errors"
 
-var matchFirstCap = regexp.MustCompile("(.)([A-Z][a-z]+)")
-var matchAllCap = regexp.MustCompile("([a-z0-9])([A-Z])")
+//ErrNotFound not found
+var ErrNotFound = errors.New("not found")
 
-func ToSnakeCase(str string) string {
-	snake := matchFirstCap.ReplaceAllString(str, "${1}_${2}")
-	snake = matchAllCap.ReplaceAllString(snake, "${1}_${2}")
-	return strings.ToLower(snake)
-}
+// ErrUnexpected something failed in another layer
+var ErrUnexpected = errors.New("unexpected error")

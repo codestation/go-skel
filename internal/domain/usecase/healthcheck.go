@@ -14,18 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package helper
+package usecase
 
-import (
-	"regexp"
-	"strings"
-)
+import "context"
 
-var matchFirstCap = regexp.MustCompile("(.)([A-Z][a-z]+)")
-var matchAllCap = regexp.MustCompile("([a-z0-9])([A-Z])")
-
-func ToSnakeCase(str string) string {
-	snake := matchFirstCap.ReplaceAllString(str, "${1}_${2}")
-	snake = matchAllCap.ReplaceAllString(snake, "${1}_${2}")
-	return strings.ToLower(snake)
+func (uc *usecase) HealthCheck(ctx context.Context) error {
+	return uc.repo.HealthCheck.HealthCheck(ctx)
 }

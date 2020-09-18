@@ -11,6 +11,7 @@ WORKDIR /src
 
 COPY go.mod go.sum /src/
 RUN go mod download
+RUN packr2
 COPY . /src/
 RUN go build -o release/app \
    -ldflags "-w -s \

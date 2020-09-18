@@ -1,3 +1,5 @@
+//go:generate mockgen -source=$GOFILE -destination=mocks/${GOFILE} -package=mocks
+//go:generate mockgen  -destination=mocks/uuid.go -package=mocks github.com/gofrs/uuid Generator
 /*
 Copyright © 2020 codestation <codestation404@gmail.com>
 
@@ -14,32 +16,34 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package internal
+package usecase
 
 import (
+	"context"
+	"github.com/gofrs/uuid"
+
 	"megpoid.xyz/go/go-skel/internal/config"
-	"megpoid.xyz/go/go-skel/internal/delivery"
 	"megpoid.xyz/go/go-skel/internal/domain/repository"
-	"megpoid.xyz/go/go-skel/internal/domain/usecase"
-	"megpoid.xyz/go/go-skel/pkg/sql/connection"
 )
 
-type Module struct {
-	Usecase    usecase.UseCase
-	Repository *repository.Repository
-	Handler    *delivery.HTTPHandler
-	Config     *config.Config
+type HealthCheck interface {
+	HealthCheck(ctx context.Context) error
 }
 
-func New(db connection.SQLConnection, cfg *config.Config) *Module {
-	repo := repository.NewRepository(db)
-	uc := usecase.NewUseCase(repo, cfg)
-	handler := delivery.NewHTTPHandler(uc, cfg)
+type UseCase interface {
+	HealthCheck
+}
 
-	return &Module{
-		Usecase:    uc,
-		Repository: repo,
-		Handler:    handler,
-		Config:     cfg,
+type usecase struct {
+	repo    *repository.Repository
+	cfg     *config.Config
+	uuidGen uuid.Generator
+}
+
+func NewUseCase(repo *repository.Repository, cfg *config.Config) UseCase {
+	return &usecase{
+		repo:    repo,
+		cfg:     cfg,
+		uuidGen: uuid.NewGen(),
 	}
 }

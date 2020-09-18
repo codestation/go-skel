@@ -1,20 +1,35 @@
 //go:generate mockgen -destination=mocks/echo.go -package=mocks github.com/labstack/echo/v4 Context
+/*
+Copyright © 2020 codestation <codestation404@gmail.com>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 
 package delivery
 
 import (
 	"fmt"
-	"github.com/labstack/echo/v4/middleware"
 	"net/http"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"megpoid.xyz/go/go-skel/internal/config"
-	"megpoid.xyz/go/go-skel/internal/usecases"
+	"megpoid.xyz/go/go-skel/internal/domain/usecase"
 )
 
 type HTTPHandler struct {
-	uc  usecase.APIUsecase
+	uc  usecase.UseCase
 	cfg *config.Config
 }
 
@@ -29,7 +44,7 @@ func (h *HTTPHandler) getClaim(c echo.Context, key string) (string, error) {
 	return value, nil
 }
 
-func NewHTTPHandler(uc usecase.APIUsecase, cfg *config.Config) *HTTPHandler {
+func NewHTTPHandler(uc usecase.UseCase, cfg *config.Config) *HTTPHandler {
 	return &HTTPHandler{uc: uc, cfg: cfg}
 }
 

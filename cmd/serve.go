@@ -37,8 +37,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var defaultDSN = "host=127.0.0.1 port=5432 user=postgres password=secret dbname=app"
-
 // serveCmd represents the serve command
 var serveCmd = &cobra.Command{
 	Use:   "serve",
@@ -65,11 +63,8 @@ to quickly create a Cobra application.`,
 		if cfg.JWTSecret == nil {
 			return errors.New("no jwt secret key specified")
 		}
-		if cfg.DSN == "" {
-			return errors.New("no dsn specified")
-		}
 
-		db, err := sql.NewDatabase(ctx, cfg.DSN, sql.Config{MaxOpenConnections: 5})
+		db, err := sql.NewDatabase(ctx, cfg.GetDSN(), sql.Config{MaxOpenConnections: 5})
 		if err != nil {
 			return err
 		}
@@ -119,7 +114,12 @@ func init() {
 	serveCmd.Flags().StringP("jwt-secret", "", "", "JWT secret key")
 	serveCmd.Flags().StringP("master-key", "", "", "Application master key")
 	serveCmd.Flags().StringP("listen", "l", ":8000", "Listen address")
-	serveCmd.Flags().StringP("dsn", "n", defaultDSN, "Database connection string")
+	serveCmd.Flags().StringP("dsn", "n", "", "Database connection string. Setting the DSN ignores the db-* settings")
+	serveCmd.Flags().StringP("db-host", "H", "localhost", "Database host")
+	serveCmd.Flags().StringP("db-port", "p", "5432", "Database port")
+	serveCmd.Flags().StringP("db-name", "m", "", "Database name")
+	serveCmd.Flags().StringP("db-user", "u", "postgres", "Database user")
+	serveCmd.Flags().StringP("db-password", "w", "", "Database password")
 	err := viper.BindPFlags(serveCmd.Flags())
 	if err != nil {
 		panic(err)

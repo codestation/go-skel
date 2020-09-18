@@ -14,32 +14,27 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package internal
+package repository
 
 import (
-	"megpoid.xyz/go/go-skel/internal/config"
-	"megpoid.xyz/go/go-skel/internal/delivery"
-	"megpoid.xyz/go/go-skel/internal/domain/repository"
-	"megpoid.xyz/go/go-skel/internal/domain/usecase"
+	"context"
+
 	"megpoid.xyz/go/go-skel/pkg/sql/connection"
 )
 
-type Module struct {
-	Usecase    usecase.UseCase
-	Repository *repository.Repository
-	Handler    *delivery.HTTPHandler
-	Config     *config.Config
+type healthRepo struct {
+	db connection.SQLConnection
 }
 
-func New(db connection.SQLConnection, cfg *config.Config) *Module {
-	repo := repository.NewRepository(db)
-	uc := usecase.NewUseCase(repo, cfg)
-	handler := delivery.NewHTTPHandler(uc, cfg)
+// NewHealthCheck creates a new repository with methods to check its health
+func NewHealthCheck(db connection.SQLConnection) HealthCheck {
+	return &healthRepo{db}
+}
 
-	return &Module{
-		Usecase:    uc,
-		Repository: repo,
-		Handler:    handler,
-		Config:     cfg,
+// HealthCheck returns an error if the database doesn't respond
+func (r *healthRepo) HealthCheck(ctx context.Context) error {
+	if err := r.db.PingContext(ctx); err != nil {
+		return NewRepoError(ErrBackend, err)
 	}
+	return nil
 }
