@@ -59,7 +59,7 @@ to quickly create a Cobra application.`,
 			}
 		}()
 
-		migrate.SetTable("govote_migrations")
+		migrate.SetTable("app_migrations")
 
 		if viper.GetBool("rollback") || viper.GetBool("redo") {
 			n, err := migrate.Exec(db.DB, "postgres", migrations, migrate.Down)
@@ -86,6 +86,7 @@ func init() {
 	migrateCmd.Flags().BoolP("rollback", "r", false, "Rollback last migration")
 	migrateCmd.Flags().BoolP("redo", "e", false, "Rollback last migration then migrate again")
 	migrateCmd.Flags().StringP("dsn", "n", "", "Database connection string. Setting the DSN ignores the db-* settings")
+	migrateCmd.Flags().StringP("db-adapter", "a", "postgres", "Database adapter")
 	migrateCmd.Flags().StringP("db-host", "h", "localhost", "Database host")
 	migrateCmd.Flags().StringP("db-port", "p", "5432", "Database port")
 	migrateCmd.Flags().StringP("db-name", "m", "", "Database name")

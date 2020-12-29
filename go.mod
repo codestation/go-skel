@@ -13,6 +13,7 @@ require (
 	github.com/lib/pq v1.9.0
 	github.com/magiconair/properties v1.8.4 // indirect
 	github.com/mattn/go-colorable v0.1.8 // indirect
+	github.com/mattn/go-sqlite3 v1.12.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.4.0
 	github.com/pelletier/go-toml v1.8.1 // indirect

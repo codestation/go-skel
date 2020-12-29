@@ -18,6 +18,7 @@ package cmd
 import (
 	"crypto/rand"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"github.com/spf13/viper"
 	"io/ioutil"
@@ -25,7 +26,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// ApplicationKeySize bust be 32 bytes to be used as a key by AES-256
+// ApplicationKeySize must be 32 bytes to be used as a key by AES-256
 const ApplicationKeySize = 32
 
 // genkeyCmd represents the genkey command
@@ -39,7 +40,12 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		key := make([]byte, ApplicationKeySize)
+		length := viper.GetInt("length")
+		if length < 8 || length > 8192 {
+			return errors.New("key length must be between 8 and 8192")
+		}
+
+		key := make([]byte, length)
 		_, err := rand.Read(key)
 		if err != nil {
 			return err
@@ -66,6 +72,7 @@ to quickly create a Cobra application.`,
 func init() {
 	rootCmd.AddCommand(genkeyCmd)
 	genkeyCmd.Flags().StringP("output", "o", "", "Save generated key to file")
+	genkeyCmd.Flags().IntP("length", "l", ApplicationKeySize, "Use an specific key length")
 	err := viper.BindPFlags(genkeyCmd.Flags())
 	if err != nil {
 		panic(err)

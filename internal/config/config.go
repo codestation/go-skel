@@ -24,6 +24,7 @@ type Config struct {
 	Debug      bool
 	Addr       string `mapstructure:"listen"`
 	DSN        string
+	DBAdapter  string `m̀apstructure:"db-adapter"`
 	DBHost     string `mapstructure:"db-host"`
 	DBPort     string `mapstructure:"db-port"`
 	DBUser     string `mapstructure:"db-user"`
@@ -37,6 +38,10 @@ type Config struct {
 func (c *Config) GetDSN() string {
 	if c.DSN != "" {
 		return c.DSN
+	}
+
+	if c.DBAdapter == "sqlite3" {
+		return fmt.Sprintf("file=%s", c.DBName)
 	}
 
 	var sslMode string

@@ -19,7 +19,6 @@ package delivery
 
 import (
 	"fmt"
-	"net/http"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo/v4"
@@ -49,17 +48,10 @@ func NewHTTPHandler(uc usecase.UseCase, cfg *config.Config) *HTTPHandler {
 }
 
 func (h *HTTPHandler) Register(e *echo.Echo) {
-	apiGroup := e.Group("/api")
-	v1 := apiGroup.Group("/v1")
-	v1.GET("/stat/health", h.HealthCheck)
+	app := e.Group("/apis/apps/v1")
+	app.GET("/status/livez", h.LiveCheck)
+	app.GET("/status/readyz", h.ReadyCheck)
 
-	app := v1.Group("/app")
-	app.Use(middleware.JWT(h.cfg.JWTSecret))
-}
-
-func (h *HTTPHandler) HealthCheck(c echo.Context) error {
-	if err := h.uc.HealthCheck(c.Request().Context()); err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err)
-	}
-	return c.NoContent(http.StatusNoContent)
+	x := app.Group("/app")
+	x.Use(middleware.JWT(h.cfg.JWTSecret))
 }
