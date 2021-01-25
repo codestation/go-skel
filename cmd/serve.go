@@ -19,22 +19,23 @@ package cmd
 import (
 	"context"
 	"errors"
+	"log"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	_ "github.com/mattn/go-sqlite3"
+	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"log"
 	"megpoid.xyz/go/go-skel/internal"
 	"megpoid.xyz/go/go-skel/internal/config"
 	"megpoid.xyz/go/go-skel/internal/services"
 	"megpoid.xyz/go/go-skel/pkg/hooks"
 	"megpoid.xyz/go/go-skel/pkg/sql"
 	"megpoid.xyz/go/go-skel/pkg/sql/connection"
-	"os"
-	"os/signal"
-	"syscall"
-	"time"
-
-	"github.com/spf13/cobra"
 )
 
 // serveCmd represents the serve command
@@ -115,7 +116,7 @@ func init() {
 	serveCmd.Flags().StringP("master-key", "", "", "Application master key")
 	serveCmd.Flags().StringP("listen", "l", ":8000", "Listen address")
 	serveCmd.Flags().StringP("dsn", "n", "", "Database connection string. Setting the DSN ignores the db-* settings")
-	serveCmd.Flags().StringP("db-adapter", "a", "postgres", "Database adapter")
+	serveCmd.Flags().StringP("db-adapter", "a", "sqlite3", "Database adapter")
 	serveCmd.Flags().StringP("db-host", "H", "localhost", "Database host")
 	serveCmd.Flags().StringP("db-port", "p", "5432", "Database port")
 	serveCmd.Flags().StringP("db-name", "m", "", "Database name")

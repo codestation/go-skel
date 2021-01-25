@@ -24,7 +24,7 @@ type Config struct {
 	Debug      bool
 	Addr       string `mapstructure:"listen"`
 	DSN        string
-	DBAdapter  string `m̀apstructure:"db-adapter"`
+	DBAdapter  string `mapstructure:"db-adapter"`
 	DBHost     string `mapstructure:"db-host"`
 	DBPort     string `mapstructure:"db-port"`
 	DBUser     string `mapstructure:"db-user"`

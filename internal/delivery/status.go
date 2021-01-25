@@ -17,8 +17,9 @@ limitations under the License.
 package delivery
 
 import (
-	"github.com/labstack/echo/v4"
 	"net/http"
+
+	"github.com/labstack/echo/v4"
 )
 
 func (h *HTTPHandler) LiveCheck(c echo.Context) error {

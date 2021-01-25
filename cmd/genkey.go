@@ -20,10 +20,10 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"github.com/spf13/viper"
 	"io/ioutil"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // ApplicationKeySize must be 32 bytes to be used as a key by AES-256

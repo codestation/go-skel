@@ -20,8 +20,8 @@ package usecase
 
 import (
 	"context"
-	"github.com/gofrs/uuid"
 
+	"github.com/gofrs/uuid"
 	"megpoid.xyz/go/go-skel/internal/config"
 	"megpoid.xyz/go/go-skel/internal/domain/repository"
 )

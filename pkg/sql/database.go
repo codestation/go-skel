@@ -21,8 +21,6 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
-	_ "github.com/mattn/go-sqlite3"
 	"megpoid.xyz/go/go-skel/pkg/sql/helper"
 )
 

@@ -18,14 +18,13 @@ package cmd
 import (
 	"log"
 
-	"megpoid.xyz/go/go-skel/internal/config"
-	"megpoid.xyz/go/go-skel/pkg/hooks"
-
 	"github.com/gobuffalo/packr/v2"
 	"github.com/jmoiron/sqlx"
 	migrate "github.com/rubenv/sql-migrate"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"megpoid.xyz/go/go-skel/internal/config"
+	"megpoid.xyz/go/go-skel/pkg/hooks"
 )
 
 // migrateCmd represents the migrate command
