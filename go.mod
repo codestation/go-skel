@@ -7,7 +7,7 @@ require (
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/gobuffalo/packr/v2 v2.8.1
 	github.com/gofrs/uuid v4.0.0+incompatible
-	github.com/jmoiron/sqlx v1.3.0
+	github.com/jmoiron/sqlx v1.3.1
 	github.com/karrick/godirwalk v1.16.1 // indirect
 	github.com/labstack/echo/v4 v4.1.17
 	github.com/lib/pq v1.9.0
