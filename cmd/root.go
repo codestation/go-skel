@@ -21,7 +21,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -35,19 +34,20 @@ var rootCmd = &cobra.Command{
 	Long: `A longer description that spans multiple lines and likely contains
 examples and usage of using your application. For example:
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+GoApp is a CLI library for Go that empowers applications.
+This application is a samble to be used as a base
+to quickly create an application.`,
 	SilenceUsage: true,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
-	//	Run: func(cmd *cobra.Command, args []string) { },
+	// Run: func(cmd *cobra.Command, args []string) { },
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
-	if err := rootCmd.Execute(); err != nil {
+	err := rootCmd.Execute()
+	if err != nil {
 		os.Exit(1)
 	}
 }
@@ -61,11 +61,11 @@ func init() {
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.go-skel.yaml)")
 
+	// Cobra also supports local flags, which will only run
+	// when this action is called directly.
 	rootCmd.PersistentFlags().BoolP("debug", "d", false, "Enable debug mode")
 	err := viper.BindPFlag("debug", rootCmd.PersistentFlags().Lookup("debug"))
-	if err != nil {
-		panic(err)
-	}
+	cobra.CheckErr(err)
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -75,14 +75,12 @@ func initConfig() {
 		viper.SetConfigFile(cfgFile)
 	} else {
 		// Find home directory.
-		home, err := homedir.Dir()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
+		home, err := os.UserHomeDir()
+		cobra.CheckErr(err)
 
 		// Search config in home directory with name ".goapp" (without extension).
 		viper.AddConfigPath(home)
+		viper.SetConfigType("yaml")
 		viper.SetConfigName(".goapp")
 	}
 
@@ -92,6 +90,6 @@ func initConfig() {
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
+		_, _ = fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
 	}
 }

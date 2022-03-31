@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
 package cmd
 
 import (
@@ -32,13 +33,8 @@ const ApplicationKeySize = 32
 // genkeyCmd represents the genkey command
 var genkeyCmd = &cobra.Command{
 	Use:   "genkey",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Generate a random key",
+	Long:  `Generate a random key to be used as a secret for other configurations`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		length := viper.GetInt("length")
 		if length < 8 || length > 8192 {
@@ -51,17 +47,23 @@ to quickly create a Cobra application.`,
 			return err
 		}
 
-		hexkey := hex.EncodeToString(key)
+		hexKey := hex.EncodeToString(key)
 
 		outputFile := viper.GetString("output")
 		if outputFile == "" {
-			fmt.Printf("Generated key: %s\n", hexkey)
+			if viper.GetBool("quiet") {
+				fmt.Printf("%s\n", hexKey)
+			} else {
+				fmt.Printf("Generated key: %s\n", hexKey)
+			}
 		} else {
-			err = ioutil.WriteFile(outputFile, []byte(hexkey+"\n"), 0600)
+			err = ioutil.WriteFile(outputFile, []byte(hexKey+"\n"), 0600)
 			if err != nil {
 				return err
 			}
-			fmt.Printf("Saved generated key to file %s\n", outputFile)
+			if !viper.GetBool("quiet") {
+				fmt.Printf("Saved generated key to file %s\n", outputFile)
+			}
 		}
 
 		return nil
@@ -72,9 +74,8 @@ to quickly create a Cobra application.`,
 func init() {
 	rootCmd.AddCommand(genkeyCmd)
 	genkeyCmd.Flags().StringP("output", "o", "", "Save generated key to file")
+	genkeyCmd.Flags().BoolP("quiet", "q", false, "Do not print extra messages")
 	genkeyCmd.Flags().IntP("length", "l", ApplicationKeySize, "Use an specific key length")
 	err := viper.BindPFlags(genkeyCmd.Flags())
-	if err != nil {
-		panic(err)
-	}
+	cobra.CheckErr(err)
 }

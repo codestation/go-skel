@@ -41,7 +41,7 @@ func (c *Config) GetDSN() string {
 	}
 
 	if c.DBAdapter == "sqlite3" {
-		return fmt.Sprintf("file=%s", c.DBName)
+		return c.DBName
 	}
 
 	var sslMode string
