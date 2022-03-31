@@ -28,7 +28,7 @@ type HealthCheck interface {
 	HealthCheck(ctx context.Context) error
 }
 
-// Transaction allow to call multiple repository methods and make their execution atomic
+// Transaction allow calling multiple repository methods and make their execution atomic
 type Transaction interface {
 	WithTransaction(ctx context.Context, txFunc func(repo *Repository) error) error
 }

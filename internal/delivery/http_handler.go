@@ -27,6 +27,8 @@ import (
 	"megpoid.xyz/go/go-skel/internal/domain/usecase"
 )
 
+const apiVersion = "v1"
+
 type HTTPHandler struct {
 	uc  usecase.UseCase
 	cfg *config.Config
@@ -48,10 +50,11 @@ func NewHTTPHandler(uc usecase.UseCase, cfg *config.Config) *HTTPHandler {
 }
 
 func (h *HTTPHandler) Register(e *echo.Echo) {
-	app := e.Group("/apis/apps/v1")
+	app := e.Group("/apis/goapp/" + apiVersion)
 	app.GET("/status/livez", h.LiveCheck)
 	app.GET("/status/readyz", h.ReadyCheck)
 
-	x := app.Group("/app")
-	x.Use(middleware.JWT(h.cfg.JWTSecret))
+	protected := app.Group("")
+	protected.Use(middleware.JWT(h.cfg.JWTSecret))
+	protected.GET("/hello", h.Hello)
 }

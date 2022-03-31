@@ -21,8 +21,8 @@ import (
 	"time"
 )
 
-// ID is used as a alias for the model primary key to avoid using some int by mistake.
-type ID int
+// ID is used as an alias for the model primary key to avoid using some int by mistake.
+type ID int64
 
 // Entity is the base that will be used by other entity who need a primary key and timestamps.
 type Entity struct {
@@ -36,4 +36,10 @@ type Entity struct {
 func (m *Entity) SetTimestamps(now time.Time) {
 	m.CreatedAt = now
 	m.UpdatedAt = now
+}
+
+func NewEntity(now time.Time) *Entity {
+	e := &Entity{}
+	e.SetTimestamps(now)
+	return e
 }

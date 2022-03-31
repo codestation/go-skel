@@ -28,7 +28,7 @@ func (h *HTTPHandler) LiveCheck(c echo.Context) error {
 
 func (h *HTTPHandler) ReadyCheck(c echo.Context) error {
 	if err := h.uc.HealthCheck(c.Request().Context()); err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err)
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 	return c.NoContent(http.StatusNoContent)
 }
