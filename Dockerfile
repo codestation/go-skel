@@ -11,7 +11,7 @@ COPY go.mod go.sum /src/
 RUN go mod download
 COPY . /src/
 
-RUN set -ex \
+RUN set -ex; \
     CGO_ENABLED=0 go build -o release/goapp \
     -trimpath \
     -ldflags "-w -s \
@@ -22,6 +22,12 @@ LABEL maintainer="codestation <codestation404@gmail.com>"
 
 RUN apk add --no-cache ca-certificates tzdata
 
-COPY --from=builder /src/release/app /usr/local/bin/goapp
+RUN set -eux; \
+    addgroup -S runner -g 1000; \
+    adduser -S runner -G runner -u 1000
 
-ENTRYPOINT ["/usr/local/bin/goapp"]
+COPY --from=builder /src/release/goapp /usr/local/bin/goapp
+
+USER runner
+
+CMD ["/usr/local/bin/goapp", "serve"]

@@ -1,6 +1,3 @@
-.git/
-.gitignore
-.idea/
-.drone.yml
-Dockerfile
-*packr.go
+/.idea
+/.vscode
+*.sqlite
