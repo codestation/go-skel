@@ -7,10 +7,10 @@ import (
 	"megpoid.xyz/go/go-skel/internal/version"
 )
 
-const versionFormatter = "GoApp version: %s, commit: %s, date: %s, modified: %t\n"
+const versionFormatter = "GoApp version: %s, commit: %s, date: %s, clean build: %t\n"
 
 func printVersion() {
-	fmt.Printf(versionFormatter, version.Tag, version.Revision, version.LastCommit, version.Modified)
+	fmt.Printf(versionFormatter, version.Tag, version.Revision, version.LastCommit, !version.Modified)
 }
 
 // versionCmd represents the version command
