@@ -44,6 +44,8 @@ var serveCmd = &cobra.Command{
 	Short: "Start service",
 	Long:  `Starts the HTTP endpoint and other services`,
 	RunE: func(cmd *cobra.Command, args []string) error {
+		printVersion()
+
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
 
