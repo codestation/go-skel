@@ -16,7 +16,10 @@ limitations under the License.
 
 package config
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 // Config holds all the program arguments and environment variables passed to the application.
 // The variables set will depend on the command used.
@@ -60,5 +63,15 @@ func (c *Config) GetDSN() string {
 		c.DBName,
 		sslMode,
 	)
+}
 
+func (c *Config) Validate() error {
+	if c.MasterKey == nil {
+		return errors.New("no application master key specified")
+	}
+	if c.JWTSecret == nil {
+		return errors.New("no jwt secret key specified")
+	}
+
+	return nil
 }

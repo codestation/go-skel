@@ -24,18 +24,28 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+const (
+	readTimeout     = 30 * time.Second
+	writeTimeout    = 30 * time.Second
+	shutdownTimeout = 30 * time.Second
+)
+
 type httpServer struct {
 	HTTPServer *http.Server
 	e          *echo.Echo
+	notify     chan error
 }
 
 func NewHTTPServer(addr string, e *echo.Echo) *httpServer {
 	svr := &http.Server{
 		Addr:         addr,
-		ReadTimeout:  30 * time.Second,
-		WriteTimeout: 30 * time.Second,
+		ReadTimeout:  readTimeout,
+		WriteTimeout: writeTimeout,
 	}
-	return &httpServer{HTTPServer: svr, e: e}
+	server := &httpServer{HTTPServer: svr, e: e}
+	server.start()
+
+	return server
 }
 
 func (h *httpServer) Serve() error {
@@ -45,6 +55,22 @@ func (h *httpServer) Serve() error {
 	return nil
 }
 
+func (h *httpServer) start() {
+	go func() {
+		if err := h.e.StartServer(h.HTTPServer); err != nil && err != http.ErrServerClosed {
+			h.notify <- err
+		}
+		close(h.notify)
+	}()
+}
+
+func (h *httpServer) Notify() <-chan error {
+	return h.notify
+}
+
 func (h *httpServer) Shutdown(ctx context.Context) error {
-	return h.e.Shutdown(ctx)
+	shutdownCtx, cancel := context.WithTimeout(ctx, shutdownTimeout)
+	defer cancel()
+
+	return h.e.Shutdown(shutdownCtx)
 }

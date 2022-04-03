@@ -18,7 +18,6 @@ package cmd
 
 import (
 	"context"
-	"errors"
 	"log"
 	"os"
 	"os/signal"
@@ -46,22 +45,20 @@ var serveCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		printVersion()
 
-		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-		defer cancel()
-
+		// load config
 		var cfg config.Config
-		err := viper.Unmarshal(&cfg, viper.DecodeHook(hooks.HexStringToByteArray()))
-		if err != nil {
+		if err := viper.Unmarshal(&cfg, viper.DecodeHook(hooks.HexStringToByteArray())); err != nil {
+			return err
+		}
+		if err := cfg.Validate(); err != nil {
 			return err
 		}
 
-		if cfg.MasterKey == nil {
-			return errors.New("no application master key specified")
-		}
-		if cfg.JWTSecret == nil {
-			return errors.New("no jwt secret key specified")
-		}
+		// Context initialization
+		ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("timeout"))
+		defer cancel()
 
+		// Database initialization
 		db, err := sql.NewDatabase(ctx, cfg.DBAdapter, cfg.GetDSN(), sql.MaxOpenConns(5))
 		if err != nil {
 			return err
@@ -73,11 +70,13 @@ var serveCmd = &cobra.Command{
 			}
 		}()
 
+		// HTTP server initialization
 		e := echo.New()
 		e.HideBanner = true
 		e.Debug = cfg.Debug
 		e.Use(middleware.Gzip())
 		e.Use(middleware.Recover())
+		e.Use(middleware.BodyLimit("1M"))
 
 		if e.Debug {
 			e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
@@ -85,22 +84,26 @@ var serveCmd = &cobra.Command{
 			}))
 		}
 
-		svr := services.NewHTTPServer(cfg.Addr, e)
+		httpServer := services.NewHTTPServer(cfg.Addr, e)
 		module := internal.New(connection.NewPostgresConn(db), &cfg)
 		module.Handler.Register(e)
 
-		go func() {
-			if err := svr.Serve(); err != nil {
-				log.Fatal(err)
-			}
-		}()
-
 		quit := make(chan os.Signal, 1)
 		signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
-		<-quit
 
-		if err := svr.Shutdown(ctx); err != nil {
-			log.Fatal(err)
+		// wait until process is stopped or a service fails
+		select {
+		case s := <-quit:
+			log.Printf("Received signal: %s", s.String())
+		case err = <-httpServer.Notify():
+			if err != nil {
+				log.Printf("httpServer notify: %s", err.Error())
+			}
+		}
+
+		if err := httpServer.Shutdown(ctx); err != nil {
+			log.Printf("httpServer shutdown failed: %s", err.Error())
+			return err
 		}
 
 		return nil
@@ -123,6 +126,7 @@ func init() {
 	serveCmd.Flags().StringP("jwt-secret", "", "", "JWT secret key")
 	serveCmd.Flags().StringP("master-key", "", "", "Application master key")
 	serveCmd.Flags().StringP("listen", "l", ":8000", "Listen address")
+	serveCmd.Flags().DurationP("timeout", "t", 30*time.Second, "Request timeout")
 	serveCmd.Flags().StringP("dsn", "n", "", "Database connection string. Setting the DSN ignores the db-* settings")
 	serveCmd.Flags().StringP("db-adapter", "a", "postgres", "Database adapter")
 	serveCmd.Flags().StringP("db-host", "H", "localhost", "Database host")
