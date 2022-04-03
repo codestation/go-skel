@@ -96,9 +96,7 @@ var serveCmd = &cobra.Command{
 		case s := <-quit:
 			log.Printf("Received signal: %s", s.String())
 		case err = <-httpServer.Notify():
-			if err != nil {
-				log.Printf("httpServer notify: %s", err.Error())
-			}
+			log.Printf("httpServer notify: %s", err.Error())
 		}
 
 		if err := httpServer.Shutdown(ctx); err != nil {

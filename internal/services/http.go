@@ -57,9 +57,7 @@ func (h *httpServer) Serve() error {
 
 func (h *httpServer) start() {
 	go func() {
-		if err := h.e.StartServer(h.HTTPServer); err != nil && err != http.ErrServerClosed {
-			h.notify <- err
-		}
+		h.notify <- h.e.StartServer(h.HTTPServer)
 		close(h.notify)
 	}()
 }
