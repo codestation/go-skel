@@ -23,7 +23,7 @@ import (
 
 	"github.com/gofrs/uuid"
 	"megpoid.xyz/go/go-skel/internal/config"
-	"megpoid.xyz/go/go-skel/internal/domain/repository"
+	"megpoid.xyz/go/go-skel/internal/repository"
 )
 
 type HealthCheck interface {

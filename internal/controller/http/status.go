@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package delivery
+package http
 
 import (
 	"net/http"

@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package delivery
+package http
 
 import (
 	"fmt"
@@ -24,7 +24,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"megpoid.xyz/go/go-skel/internal/config"
-	"megpoid.xyz/go/go-skel/internal/domain/usecase"
+	"megpoid.xyz/go/go-skel/internal/usecase"
 )
 
 const apiVersion = "v1"
