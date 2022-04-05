@@ -17,15 +17,12 @@ limitations under the License.
 package cmd
 
 import (
-	"context"
 	"log"
-	"megpoid.xyz/go/go-skel/config"
 
-	"github.com/jmoiron/sqlx"
-	migrate "github.com/rubenv/sql-migrate"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"megpoid.xyz/go/go-skel/db"
+	"megpoid.xyz/go/go-skel/model"
+	"megpoid.xyz/go/go-skel/store/sqlstore"
 )
 
 // migrateCmd represents the migrate command
@@ -34,85 +31,38 @@ var migrateCmd = &cobra.Command{
 	Short: "Run database migrations",
 	Long:  `Apply the database migrations to the database`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		ctx, cancel := context.WithCancel(context.Background())
-		defer cancel()
-
-		var cfg config.Config
-		err := viper.Unmarshal(&cfg, viper.DecodeHook(HexStringToByteArray()))
-		if err != nil {
+		var cfg model.Config
+		if err := viper.Unmarshal(&cfg.GeneralSettings, unmarshalDecoders...); err != nil {
 			return err
 		}
-
-		migrations := migrate.EmbedFileSystemMigrationSource{
-			FileSystem: db.Assets(),
-			Root:       "migrations",
-		}
-
-		db, err := sqlx.ConnectContext(ctx, cfg.DBAdapter, cfg.GetDSN())
-		if err != nil {
+		if err := viper.Unmarshal(&cfg.SqlSettings, unmarshalDecoders...); err != nil {
 			return err
 		}
-		defer func() {
-			if err := db.Close(); err != nil {
+		if err := viper.Unmarshal(&cfg.MigrationSettings, unmarshalDecoders...); err != nil {
+			return err
+		}
+		cfg.SetDefaults()
+
+		store := sqlstore.New(cfg.SqlSettings)
+		defer func(store *sqlstore.SqlStore) {
+			err := store.Close()
+			if err != nil {
 				log.Print(err)
 			}
-		}()
+		}(store)
 
-		migrate.SetTable("app_migrations")
-
-		if viper.GetBool("reset") {
-			_, err := db.ExecContext(ctx, "DROP SCHEMA IF EXISTS public CASCADE")
-			if err != nil {
-				return err
-			}
-
-			_, err = db.ExecContext(ctx, "CREATE SCHEMA public")
-			if err != nil {
-				return nil
-			}
-			log.Printf("Recreated 'public' schema")
-		}
-
-		step := 0
-
-		if !viper.GetBool("reset") && (viper.GetBool("rollback") || viper.GetBool("redo")) {
-			step = viper.GetInt("step")
-			n, err := migrate.ExecMax(db.DB, cfg.DBAdapter, migrations, migrate.Down, step)
-			if err != nil {
-				return err
-			}
-			log.Printf("Reverted %d migrations", n)
-		}
-
-		if viper.GetBool("reset") || !viper.GetBool("rollback") || viper.GetBool("redo") {
-			if viper.GetBool("redo") {
-				step = viper.GetInt("step")
-			}
-
-			n, err := migrate.ExecMax(db.DB, cfg.DBAdapter, migrations, migrate.Up, step)
-			if err != nil {
-				return err
-			}
-			log.Printf("Applied %d migrations", n)
-		}
-
-		return nil
+		return store.RunMigrations(cfg.MigrationSettings)
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(migrateCmd)
-	migrateCmd.Flags().BoolP("rollback", "r", false, "Rollback last migration")
-	migrateCmd.Flags().BoolP("redo", "e", false, "Rollback last migration then migrate again")
-	migrateCmd.Flags().BoolP("reset", "t", false, "Drop all tables and run migration")
-	migrateCmd.Flags().IntP("step", "s", 1, "Steps to rollback/redo")
-	migrateCmd.Flags().StringP("dsn", "n", "", "Database connection string. Setting the DSN ignores the db-* settings")
-	migrateCmd.Flags().StringP("db-adapter", "a", "postgres", "Database adapter")
-	migrateCmd.Flags().StringP("db-host", "h", "localhost", "Database host")
-	migrateCmd.Flags().StringP("db-port", "p", "5432", "Database port")
-	migrateCmd.Flags().StringP("db-name", "m", "", "Database name")
-	migrateCmd.Flags().StringP("db-user", "u", "postgres", "Database user")
-	migrateCmd.Flags().StringP("db-password", "w", "", "Database password")
+	migrateCmd.Flags().Bool("rollback", false, "Rollback last migration")
+	migrateCmd.Flags().Bool("redo", false, "Rollback last migration then migrate again")
+	migrateCmd.Flags().Bool("reset", false, "Drop all tables and run migration")
+	migrateCmd.Flags().Int("step", 1, "Steps to rollback/redo")
+	migrateCmd.Flags().String("dsn", "", "Database connection string. Setting the DSN ignores the db-* settings")
+	migrateCmd.Flags().String("driver", "postgres", "Database driver")
 	err := viper.BindPFlags(migrateCmd.Flags())
 	cobra.CheckErr(err)
 }

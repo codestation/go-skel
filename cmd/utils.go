@@ -22,9 +22,15 @@ import (
 	"strings"
 
 	"github.com/mitchellh/mapstructure"
+	"github.com/spf13/viper"
 )
 
 var typeOfBytes = reflect.TypeOf([]byte(nil))
+
+var unmarshalDecoders = []viper.DecoderConfigOption{
+	viper.DecodeHook(HexStringToByteArray()),
+	viper.DecodeHook(mapstructure.StringToTimeDurationHookFunc()),
+}
 
 func HexStringToByteArray() mapstructure.DecodeHookFuncType {
 	return func(

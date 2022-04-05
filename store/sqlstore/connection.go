@@ -10,7 +10,6 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 	"github.com/mattn/go-sqlite3"
-	"megpoid.xyz/go/go-skel/config"
 )
 
 const (
@@ -22,8 +21,8 @@ const (
 	postgresUniqueViolationCode = "23505"
 )
 
-func (ss *SqlStore) setupConnection(cfg *config.Config) SQLConn {
-	db, err := sqlx.Open(cfg.DBAdapter, cfg.GetDSN())
+func (ss *SqlStore) setupConnection() SQLConn {
+	db, err := sqlx.Open(ss.settings.DriverName, ss.settings.DataSourceName)
 	if err != nil {
 		log.Fatalf("Failed to open database, aborting: %s", err.Error())
 	}
@@ -50,8 +49,10 @@ func (ss *SqlStore) setupConnection(cfg *config.Config) SQLConn {
 	}
 
 	db.MapperFunc(ToSnakeCase)
-	db.SetMaxIdleConns(10)
-	db.SetMaxOpenConns(100)
+	db.SetMaxIdleConns(ss.settings.MaxIdleConns)
+	db.SetMaxOpenConns(ss.settings.MaxOpenConns)
+	db.SetConnMaxLifetime(ss.settings.ConnMaxLifetime)
+	db.SetConnMaxIdleTime(ss.settings.ConnMaxIdleTime)
 
 	return NewDb(db)
 }

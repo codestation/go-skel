@@ -50,6 +50,7 @@ type SQLConn interface {
 	Commit() error
 	Rollback() error
 	Tx() *sqlx.Tx
+	DB() *sqlx.DB
 }
 
 type postgresDatabase struct {
@@ -87,6 +88,10 @@ func (sd postgresDatabase) Close() error {
 
 func (sd postgresDatabase) Tx() *sqlx.Tx {
 	return sd.tx
+}
+
+func (sd postgresDatabase) DB() *sqlx.DB {
+	return sd.db
 }
 
 // BeginTxx starts a database transaction.

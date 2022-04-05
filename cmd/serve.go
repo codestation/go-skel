@@ -27,7 +27,7 @@ import (
 	"github.com/spf13/viper"
 	"megpoid.xyz/go/go-skel/api"
 	"megpoid.xyz/go/go-skel/app"
-	"megpoid.xyz/go/go-skel/config"
+	"megpoid.xyz/go/go-skel/model"
 	"megpoid.xyz/go/go-skel/web"
 )
 
@@ -40,21 +40,24 @@ var serveCmd = &cobra.Command{
 		quit := make(chan os.Signal, 1)
 
 		// load config
-		var cfg config.Config
-		if err := viper.Unmarshal(&cfg, viper.DecodeHook(HexStringToByteArray())); err != nil {
+		var cfg model.Config
+		if err := viper.Unmarshal(&cfg.GeneralSettings, unmarshalDecoders...); err != nil {
 			return err
 		}
-		if err := cfg.Validate(); err != nil {
+		if err := viper.Unmarshal(&cfg.ServerSettings, unmarshalDecoders...); err != nil {
 			return err
 		}
-
+		if err := viper.Unmarshal(&cfg.SqlSettings, unmarshalDecoders...); err != nil {
+			return err
+		}
+		cfg.SetDefaults()
 		printVersion()
 
-		return runServer(&cfg, quit)
+		return runServer(cfg, quit)
 	},
 }
 
-func runServer(cfg *config.Config, quit chan os.Signal) error {
+func runServer(cfg model.Config, quit chan os.Signal) error {
 	server, err := app.NewServer(cfg)
 	if err != nil {
 		return fmt.Errorf("cannot create server: %w", err)
@@ -94,17 +97,11 @@ func init() {
 	// is called directly, e.g.:
 	// serveCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
-	serveCmd.Flags().StringP("jwt-secret", "", "", "JWT secret key")
-	serveCmd.Flags().StringP("master-key", "", "", "Application master key")
+	serveCmd.Flags().String("jwt-secret", "", "JWT secret key")
+	serveCmd.Flags().String("encryption-key", "", "Application encryption key")
 	serveCmd.Flags().StringP("listen", "l", ":8000", "Listen address")
 	serveCmd.Flags().DurationP("timeout", "t", 30*time.Second, "Request timeout")
-	serveCmd.Flags().StringP("dsn", "n", "", "Database connection string. Setting the DSN ignores the db-* settings")
-	serveCmd.Flags().StringP("db-adapter", "a", "postgres", "Database adapter")
-	serveCmd.Flags().StringP("db-host", "H", "localhost", "Database host")
-	serveCmd.Flags().StringP("db-port", "p", "5432", "Database port")
-	serveCmd.Flags().StringP("db-name", "m", "", "Database name")
-	serveCmd.Flags().StringP("db-user", "u", "postgres", "Database user")
-	serveCmd.Flags().StringP("db-password", "w", "", "Database password")
+	serveCmd.Flags().String("dsn", "", "Database connection string. Setting the DSN ignores the db-* settings")
 	err := viper.BindPFlags(serveCmd.Flags())
 	cobra.CheckErr(err)
 }

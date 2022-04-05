@@ -8,30 +8,30 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"megpoid.xyz/go/go-skel/config"
+	"megpoid.xyz/go/go-skel/model"
 	"megpoid.xyz/go/go-skel/store"
 	"megpoid.xyz/go/go-skel/store/sqlstore"
 )
 
 type Server struct {
-	cfg        *config.Config
+	cfg        model.Config
 	sqlStore   *sqlstore.SqlStore
 	Store      store.Store
 	Server     *http.Server
 	EchoServer *echo.Echo
 }
 
-func NewServer(cfg *config.Config) (*Server, error) {
+func NewServer(cfg model.Config) (*Server, error) {
 	s := &Server{cfg: cfg}
 
 	// Store initialization, could use a different database or non-sql store
-	s.sqlStore = sqlstore.New(cfg)
+	s.sqlStore = sqlstore.New(cfg.SqlSettings)
 	s.Store = s.sqlStore
 
 	// HTTP server initialization
 	e := echo.New()
 	e.HideBanner = true
-	e.Debug = cfg.Debug
+	e.Debug = cfg.GeneralSettings.Debug
 	e.Use(middleware.Gzip())
 	e.Use(middleware.Recover())
 	e.Use(middleware.BodyLimit("1M"))
@@ -48,18 +48,15 @@ func NewServer(cfg *config.Config) (*Server, error) {
 }
 
 const (
-	readTimeout     = 30 * time.Second
-	writeTimeout    = readTimeout
-	idleTimeout     = readTimeout
 	shutdownTimeout = 30 * time.Second
 )
 
 func (s *Server) Start() error {
 	s.Server = &http.Server{
-		Addr:         s.cfg.Addr,
-		ReadTimeout:  readTimeout,
-		WriteTimeout: writeTimeout,
-		IdleTimeout:  idleTimeout,
+		Addr:         s.cfg.ServerSettings.ListenAddress,
+		ReadTimeout:  s.cfg.ServerSettings.ReadTimeout,
+		WriteTimeout: s.cfg.ServerSettings.WriteTimeout,
+		IdleTimeout:  s.cfg.ServerSettings.IdleTimeout,
 	}
 
 	log.Printf("Starting server")
