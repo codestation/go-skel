@@ -2,10 +2,14 @@ package sqlstore
 
 import (
 	"context"
+	"errors"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
+	"github.com/mattn/go-sqlite3"
 	"megpoid.xyz/go/go-skel/config"
 )
 
@@ -14,10 +18,14 @@ const (
 	pingTimeoutSecs = 10
 )
 
+const (
+	postgresUniqueViolationCode = "23505"
+)
+
 func (ss *SqlStore) setupConnection(cfg *config.Config) SQLConn {
 	db, err := sqlx.Open(cfg.DBAdapter, cfg.GetDSN())
 	if err != nil {
-		log.Fatal("Failed to open database, aborting")
+		log.Fatalf("Failed to open database, aborting: %s", err.Error())
 	}
 
 	// total waiting time: 1 minute
@@ -46,4 +54,54 @@ func (ss *SqlStore) setupConnection(cfg *config.Config) SQLConn {
 	db.SetMaxOpenConns(100)
 
 	return NewDb(db)
+}
+
+func IsUniqueError(err error, opts ...Option) bool {
+	var pqErr *pq.Error
+	var sqErr *sqlite3.Error
+
+	switch {
+	case errors.As(err, &pqErr):
+		if pqErr.Code == postgresUniqueViolationCode {
+			for _, opt := range opts {
+				if !opt(pqErr) {
+					return false
+				}
+			}
+			return true
+		}
+	case errors.As(err, &sqErr):
+		if sqErr.ExtendedCode == sqlite3.ErrConstraintUnique {
+			for _, opt := range opts {
+				if !opt(pqErr) {
+					return false
+				}
+			}
+			return true
+		}
+	}
+
+	return false
+}
+
+type Option func(err error) bool
+
+func WithConstraintName(name string) Option {
+	return func(err error) bool {
+		var pqErr *pq.Error
+		var sqErr *sqlite3.Error
+
+		switch {
+		case errors.As(err, &pqErr):
+			if pqErr.Constraint == name {
+				return true
+			}
+		case errors.As(err, &sqErr):
+			if strings.Contains(sqErr.Error(), name) {
+				return true
+			}
+		}
+
+		return false
+	}
 }
