@@ -42,6 +42,10 @@ func NewPostgresConn(db *sqlx.DB) SQLConnection {
 	return &postgresDatabase{db: db, Driver: db, uuidGen: uuid.NewGen()}
 }
 
+func (sd postgresDatabase) Close() error {
+	return sd.db.Close()
+}
+
 // TxBegin starts a database transaction.
 func (sd postgresDatabase) TxBegin(ctx context.Context) (SQLConnection, error) {
 	var err error

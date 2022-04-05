@@ -19,9 +19,9 @@ package sql
 import (
 	"context"
 	"fmt"
+	"megpoid.xyz/go/go-skel/store/sqlstore/sql/helper"
 
 	"github.com/jmoiron/sqlx"
-	"megpoid.xyz/go/go-skel/pkg/sql/helper"
 )
 
 type Option func(db *sqlx.DB) error

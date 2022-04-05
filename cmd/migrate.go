@@ -19,14 +19,13 @@ package cmd
 import (
 	"context"
 	"log"
-	"megpoid.xyz/go/go-skel/internal"
-	"megpoid.xyz/go/go-skel/internal/config"
-	"megpoid.xyz/go/go-skel/pkg/hooks"
+	"megpoid.xyz/go/go-skel/config"
 
 	"github.com/jmoiron/sqlx"
 	migrate "github.com/rubenv/sql-migrate"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"megpoid.xyz/go/go-skel/db"
 )
 
 // migrateCmd represents the migrate command
@@ -39,13 +38,13 @@ var migrateCmd = &cobra.Command{
 		defer cancel()
 
 		var cfg config.Config
-		err := viper.Unmarshal(&cfg, viper.DecodeHook(hooks.HexStringToByteArray()))
+		err := viper.Unmarshal(&cfg, viper.DecodeHook(HexStringToByteArray()))
 		if err != nil {
 			return err
 		}
 
 		migrations := migrate.EmbedFileSystemMigrationSource{
-			FileSystem: internal.Content,
+			FileSystem: db.Assets(),
 			Root:       "migrations",
 		}
 

@@ -14,10 +14,28 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package usecase
+package connection
 
-import "context"
+import (
+	"context"
 
-func (uc *usecase) HealthCheck(ctx context.Context) error {
-	return uc.repo.HealthCheck.HealthCheck(ctx)
+	"github.com/jmoiron/sqlx"
+)
+
+// Driver handles database connections from sqlx.tx or sqlx.tx
+type Driver interface {
+	sqlx.ExecerContext
+	sqlx.QueryerContext
+	sqlx.PreparerContext
+}
+
+// SQLConnection adds transaction support for sql databases
+type SQLConnection interface {
+	Driver
+	TxBegin(ctx context.Context) (SQLConnection, error)
+	TxEnd(txFunc func() error) error
+	Commit() error
+	Rollback() error
+	PingContext(ctx context.Context) error
+	Close() error
 }

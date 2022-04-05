@@ -14,27 +14,33 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package repository
+package store
 
 import (
-	"context"
-
-	"megpoid.xyz/go/go-skel/pkg/sql/connection"
+	"errors"
+	"fmt"
 )
 
-type healthRepo struct {
-	db connection.SQLConnection
+type RepoError struct {
+	Err      error
+	internal error
 }
 
-// NewHealthCheck creates a new repository with methods to check its health
-func NewHealthCheck(db connection.SQLConnection) HealthCheck {
-	return &healthRepo{db}
+var ErrBackend = errors.New("repo: backend error")
+var ErrNotFound = errors.New("repo: entity not found")
+var ErrDuplicated = errors.New("repo: duplicated entity")
+
+func NewRepoError(err, internal error) error {
+	return &RepoError{internal: internal, Err: err}
 }
 
-// HealthCheck returns an error if the database doesn't respond
-func (r *healthRepo) HealthCheck(ctx context.Context) error {
-	if err := r.db.PingContext(ctx); err != nil {
-		return NewRepoError(ErrBackend, err)
+func (r *RepoError) Error() string {
+	if r.internal != nil {
+		return fmt.Sprintf("%s: %s", r.Err, r.internal)
 	}
-	return nil
+	return r.Err.Error()
+}
+
+func (r *RepoError) Unwrap() error {
+	return r.Err
 }

@@ -14,12 +14,31 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package internal
+package cmd
 
-import "errors"
+import (
+	"encoding/hex"
+	"reflect"
+	"strings"
 
-//ErrNotFound not found
-var ErrNotFound = errors.New("not found")
+	"github.com/mitchellh/mapstructure"
+)
 
-// ErrUnexpected something failed in another layer
-var ErrUnexpected = errors.New("unexpected error")
+var typeOfBytes = reflect.TypeOf([]byte(nil))
+
+func HexStringToByteArray() mapstructure.DecodeHookFuncType {
+	return func(
+		f reflect.Type,
+		t reflect.Type,
+		data interface{}) (interface{}, error) {
+		if f.Kind() != reflect.String || t != typeOfBytes {
+			return data, nil
+		}
+
+		if strings.HasPrefix(data.(string), "s:") {
+			return []byte(strings.Split(data.(string), ":")[1]), nil
+		}
+
+		return hex.DecodeString(data.(string))
+	}
+}

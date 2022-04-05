@@ -2,9 +2,9 @@ package cmd
 
 import (
 	"fmt"
+	"megpoid.xyz/go/go-skel/version"
 
 	"github.com/spf13/cobra"
-	"megpoid.xyz/go/go-skel/internal/version"
 )
 
 const versionFormatter = "GoApp version: %s, commit: %s, date: %s, clean build: %t\n"

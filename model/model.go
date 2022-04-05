@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package entity
+package model
 
 import (
 	"database/sql"
@@ -24,8 +24,8 @@ import (
 // ID is used as an alias for the model primary key to avoid using some int by mistake.
 type ID int64
 
-// Entity is the base that will be used by other entity who need a primary key and timestamps.
-type Entity struct {
+// Model is the base that will be used by other entity who need a primary key and timestamps.
+type Model struct {
 	ID        ID           `json:"-"`
 	CreatedAt time.Time    `json:"created_at"`
 	UpdatedAt time.Time    `json:"updated_at"`
@@ -33,13 +33,13 @@ type Entity struct {
 }
 
 // SetTimestamps configures the time on created/updated fields. Only call this method on new entity.
-func (m *Entity) SetTimestamps(now time.Time) {
+func (m *Model) SetTimestamps(now time.Time) {
 	m.CreatedAt = now
 	m.UpdatedAt = now
 }
 
-func NewEntity(now time.Time) *Entity {
-	e := &Entity{}
+func NewModel(now time.Time) *Model {
+	e := &Model{}
 	e.SetTimestamps(now)
 	return e
 }

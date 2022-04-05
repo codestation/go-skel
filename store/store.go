@@ -1,5 +1,4 @@
 //go:generate mockgen -source=$GOFILE -destination=mocks/${GOFILE} -package=mocks
-//go:generate mockgen  -destination=mocks/uuid.go -package=mocks github.com/gofrs/uuid Generator
 /*
 Copyright © 2020 codestation <codestation404@gmail.com>
 
@@ -16,34 +15,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package usecase
+package store
 
 import (
 	"context"
-
-	"github.com/gofrs/uuid"
-	"megpoid.xyz/go/go-skel/internal/config"
-	"megpoid.xyz/go/go-skel/internal/repository"
 )
 
-type HealthCheck interface {
+// Store lists all the other stores
+type Store interface {
+	HealthCheck() HealthCheckStore
+	Close() error
+}
+
+// HealthCheckStore handles all healthCheck related operations on the store
+type HealthCheckStore interface {
 	HealthCheck(ctx context.Context) error
-}
-
-type UseCase interface {
-	HealthCheck
-}
-
-type usecase struct {
-	repo    *repository.Repository
-	cfg     *config.Config
-	uuidGen uuid.Generator
-}
-
-func NewUseCase(repo *repository.Repository, cfg *config.Config) UseCase {
-	return &usecase{
-		repo:    repo,
-		cfg:     cfg,
-		uuidGen: uuid.NewGen(),
-	}
 }

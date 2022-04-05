@@ -17,24 +17,19 @@ limitations under the License.
 package cmd
 
 import (
-	"context"
-	"log"
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"megpoid.xyz/go/go-skel/internal"
-	"megpoid.xyz/go/go-skel/internal/config"
-	"megpoid.xyz/go/go-skel/internal/services"
-	"megpoid.xyz/go/go-skel/pkg/hooks"
-	"megpoid.xyz/go/go-skel/pkg/sql"
-	"megpoid.xyz/go/go-skel/pkg/sql/connection"
+	"megpoid.xyz/go/go-skel/api"
+	"megpoid.xyz/go/go-skel/app"
+	"megpoid.xyz/go/go-skel/config"
+	"megpoid.xyz/go/go-skel/web"
 )
 
 // serveCmd represents the serve command
@@ -43,69 +38,48 @@ var serveCmd = &cobra.Command{
 	Short: "Start service",
 	Long:  `Starts the HTTP endpoint and other services`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		printVersion()
+		quit := make(chan os.Signal, 1)
 
 		// load config
 		var cfg config.Config
-		if err := viper.Unmarshal(&cfg, viper.DecodeHook(hooks.HexStringToByteArray())); err != nil {
+		if err := viper.Unmarshal(&cfg, viper.DecodeHook(HexStringToByteArray())); err != nil {
 			return err
 		}
 		if err := cfg.Validate(); err != nil {
 			return err
 		}
 
-		// Context initialization
-		ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("timeout"))
-		defer cancel()
+		printVersion()
 
-		// Database initialization
-		db, err := sql.NewDatabase(ctx, cfg.DBAdapter, cfg.GetDSN(), sql.MaxOpenConns(5))
-		if err != nil {
-			return err
-		}
-		defer func() {
-			err := db.Close()
-			if err != nil {
-				log.Print(err)
-			}
-		}()
-
-		// HTTP server initialization
-		e := echo.New()
-		e.HideBanner = true
-		e.Debug = cfg.Debug
-		e.Use(middleware.Gzip())
-		e.Use(middleware.Recover())
-		e.Use(middleware.BodyLimit("1M"))
-
-		if e.Debug {
-			e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
-				Format: "method=${method}, uri=${uri}, status=${status}\n",
-			}))
-		}
-
-		httpServer := services.NewHTTPServer(cfg.Addr, e)
-		module := internal.New(connection.NewPostgresConn(db), &cfg)
-		module.Handler.Register(e)
-
-		quit := make(chan os.Signal, 1)
-		signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
-
-		// wait until process is stopped or a service fails
-		select {
-		case s := <-quit:
-			log.Printf("Received signal: %s", s.String())
-		case err = <-httpServer.Notify():
-			log.Printf("httpServer notify: %s", err.Error())
-		}
-
-		if err := httpServer.Shutdown(ctx); err != nil {
-			log.Printf("httpServer shutdown failed: %s", err.Error())
-			return err
-		}
-
-		return nil
+		return runServer(&cfg, quit)
 	},
+}
+
+func runServer(cfg *config.Config, quit chan os.Signal) error {
+	server, err := app.NewServer(cfg)
+	if err != nil {
+		return fmt.Errorf("cannot create server: %w", err)
+	}
+
+	defer server.Shutdown()
+
+	// Create web, websocket, graphql, etc, servers
+	_, err = api.Init(server)
+	if err != nil {
+		return fmt.Errorf("cannot initialize API: %w", err)
+	}
+	web.New(server)
+
+	// Start server
+	if err := server.Start(); err != nil {
+		return fmt.Errorf("cannot start server: %w", err)
+	}
+
+	// Wait for kill signal before attempting to gracefully stop the running service
+	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
+	<-quit
+
+	return nil
 }
 
 func init() {

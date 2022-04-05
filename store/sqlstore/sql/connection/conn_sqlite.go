@@ -39,6 +39,10 @@ func NewSqlite(db *sqlx.DB) SQLConnection {
 	return &sqliteDatabase{db: db, Driver: db, uuidGen: uuid.NewGen()}
 }
 
+func (sd sqliteDatabase) Close() error {
+	return sd.db.Close()
+}
+
 // TxBegin starts a database transaction.
 func (sd sqliteDatabase) TxBegin(ctx context.Context) (SQLConnection, error) {
 	var err error
