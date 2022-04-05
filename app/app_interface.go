@@ -9,4 +9,5 @@ import (
 type IApp interface {
 	HealthCheck(ctx context.Context) *model.HealthCheckResult
 	Srv() *Server
+	Config() *model.Config
 }
