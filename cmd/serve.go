@@ -51,6 +51,9 @@ var serveCmd = &cobra.Command{
 			return err
 		}
 		cfg.SetDefaults()
+		if err := cfg.Validate(); err != nil {
+			return err
+		}
 		printVersion()
 
 		return runServer(cfg, quit)

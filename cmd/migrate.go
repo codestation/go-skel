@@ -42,6 +42,9 @@ var migrateCmd = &cobra.Command{
 			return err
 		}
 		cfg.SetDefaults()
+		if err := cfg.Validate(); err != nil {
+			return err
+		}
 
 		store := sqlstore.New(cfg.SqlSettings)
 		defer func(store *sqlstore.SqlStore) {

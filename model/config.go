@@ -1,6 +1,9 @@
 package model
 
-import "time"
+import (
+	"errors"
+	"time"
+)
 
 const (
 	DefaultListenAddress = ":8000"
@@ -30,6 +33,13 @@ func (cfg *Config) SetDefaults() {
 	cfg.MigrationSettings.SetDefaults()
 }
 
+func (cfg *Config) Validate() error {
+	if err := cfg.GeneralSettings.Validate(); err != nil {
+		return err
+	}
+	return nil
+}
+
 type GeneralSettings struct {
 	Debug         bool   `mapstructure:"debug"`
 	RunMigrations bool   `mapstructure:"run-migrations"`
@@ -38,6 +48,16 @@ type GeneralSettings struct {
 }
 
 func (cfg *GeneralSettings) SetDefaults() {}
+
+func (cfg *GeneralSettings) Validate() error {
+	if len(cfg.EncryptionKey) > 0 && len(cfg.EncryptionKey) < 32 {
+		return errors.New("GeneralSettings: encryption key must have at least 32 bytes")
+	}
+	if len(cfg.JwtSecret) > 0 && len(cfg.JwtSecret) < 32 {
+		return errors.New("GeneralSettings: jwt secret must have at least 32 bytes")
+	}
+	return nil
+}
 
 type ServerSettings struct {
 	ListenAddress string        `mapstructure:"listen"`
