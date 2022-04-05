@@ -7,7 +7,6 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"megpoid.xyz/go/go-skel/config"
-	"megpoid.xyz/go/go-skel/store/sqlstore/sql/helper"
 )
 
 const (
@@ -15,7 +14,7 @@ const (
 	pingTimeoutSecs = 10
 )
 
-func (ss *SqlStore) setupConnection(cfg *config.Config) *sqlx.DB {
+func (ss *SqlStore) setupConnection(cfg *config.Config) SQLConn {
 	db, err := sqlx.Open(cfg.DBAdapter, cfg.GetDSN())
 	if err != nil {
 		log.Fatal("Failed to open database, aborting")
@@ -42,9 +41,9 @@ func (ss *SqlStore) setupConnection(cfg *config.Config) *sqlx.DB {
 		}
 	}
 
-	db.MapperFunc(helper.ToSnakeCase)
+	db.MapperFunc(ToSnakeCase)
 	db.SetMaxIdleConns(10)
 	db.SetMaxOpenConns(100)
 
-	return db
+	return NewDb(db)
 }

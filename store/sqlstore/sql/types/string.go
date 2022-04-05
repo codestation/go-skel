@@ -17,9 +17,12 @@ limitations under the License.
 package types
 
 import (
+	"bytes"
 	"database/sql"
 	"encoding/json"
 )
+
+var nullBytes = []byte("null")
 
 type NullString struct {
 	sql.NullString
@@ -33,7 +36,14 @@ func (s NullString) MarshalJSON() ([]byte, error) {
 }
 
 func (s *NullString) UnmarshalJSON(data []byte) error {
-	s.Valid = string(data) != "null"
-	err := json.Unmarshal(data, &s.String)
-	return err
+	if bytes.Equal(data, nullBytes) {
+		s.Valid = false
+		return nil
+	}
+	if err := json.Unmarshal(data, &s.String); err != nil {
+		return err
+	}
+
+	s.Valid = true
+	return nil
 }

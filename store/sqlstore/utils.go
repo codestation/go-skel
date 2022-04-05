@@ -14,28 +14,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package connection
+package sqlstore
 
 import (
-	"context"
-
-	"github.com/jmoiron/sqlx"
+	"regexp"
+	"strings"
 )
 
-// Driver handles database connections from sqlx.tx or sqlx.tx
-type Driver interface {
-	sqlx.ExecerContext
-	sqlx.QueryerContext
-	sqlx.PreparerContext
-}
+var matchFirstCap = regexp.MustCompile("(.)([A-Z][a-z]+)")
+var matchAllCap = regexp.MustCompile("([a-z0-9])([A-Z])")
 
-// SQLConnection adds transaction support for sql databases
-type SQLConnection interface {
-	Driver
-	TxBegin(ctx context.Context) (SQLConnection, error)
-	TxEnd(txFunc func() error) error
-	Commit() error
-	Rollback() error
-	PingContext(ctx context.Context) error
-	Close() error
+func ToSnakeCase(str string) string {
+	snake := matchFirstCap.ReplaceAllString(str, "${1}_${2}")
+	snake = matchAllCap.ReplaceAllString(snake, "${1}_${2}")
+	return strings.ToLower(snake)
 }

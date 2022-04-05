@@ -1,7 +1,6 @@
 package sqlstore
 
 import (
-	"github.com/jmoiron/sqlx"
 	"megpoid.xyz/go/go-skel/config"
 	"megpoid.xyz/go/go-skel/store"
 )
@@ -12,7 +11,7 @@ type Stores struct {
 }
 
 type SqlStore struct {
-	db     *sqlx.DB
+	db     SQLConn
 	stores Stores
 }
 

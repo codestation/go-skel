@@ -17,6 +17,7 @@ limitations under the License.
 package types
 
 import (
+	"bytes"
 	"database/sql"
 	"encoding/json"
 )
@@ -33,7 +34,14 @@ func (s NullTime) MarshalJSON() ([]byte, error) {
 }
 
 func (s *NullTime) UnmarshalJSON(data []byte) error {
-	s.Valid = string(data) != "null"
-	err := json.Unmarshal(data, &s.Time)
-	return err
+	if bytes.Equal(data, nullBytes) {
+		s.Valid = false
+		return nil
+	}
+	if err := json.Unmarshal(data, &s.Time); err != nil {
+		return err
+	}
+
+	s.Valid = true
+	return nil
 }
