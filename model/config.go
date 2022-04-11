@@ -12,11 +12,12 @@ const (
 	DefaultIdleTimeout   = 1 * time.Minute
 
 	DefaultDriverName      = "postgres"
-	DefaultDataSourceName  = "postgres://goapp:secret@localhost/goapp?sslmode=disable&binary_parameters=yes"
+	DefaultDataSourceName  = "postgres://goapp:secret@localhost/goapp?sslmode=disable"
 	DefaultMaxIdleConns    = 10
 	DefaultMaxOpenConns    = 100
 	DefaultConnMaxLifetime = 1 * time.Hour
 	DefaultConnMaxIdleTime = 5 * time.Minute
+	DefaultQueryLimit      = 1000
 )
 
 type Config struct {
@@ -41,13 +42,18 @@ func (cfg *Config) Validate() error {
 }
 
 type GeneralSettings struct {
-	Debug         bool   `mapstructure:"debug"`
-	RunMigrations bool   `mapstructure:"run-migrations"`
-	EncryptionKey []byte `mapstructure:"encryption-key"`
-	JwtSecret     []byte `mapstructure:"jwt-secret"`
+	Debug            bool     `mapstructure:"debug"`
+	RunMigrations    bool     `mapstructure:"run-migrations"`
+	EncryptionKey    []byte   `mapstructure:"encryption-key"`
+	JwtSecret        []byte   `mapstructure:"jwt-secret"`
+	CorsAllowOrigins []string `mapstructure:"cors-allow-origin"`
 }
 
-func (cfg *GeneralSettings) SetDefaults() {}
+func (cfg *GeneralSettings) SetDefaults() {
+	if len(cfg.CorsAllowOrigins) == 0 {
+		cfg.CorsAllowOrigins = append(cfg.CorsAllowOrigins, "*")
+	}
+}
 
 func (cfg *GeneralSettings) Validate() error {
 	if len(cfg.EncryptionKey) > 0 && len(cfg.EncryptionKey) < 32 {
@@ -101,6 +107,7 @@ type SqlSettings struct {
 	MaxOpenConns    int           `mapstructure:"max-open-conns"`
 	ConnMaxLifetime time.Duration `mapstructure:"conn-max-lifetime"`
 	ConnMaxIdleTime time.Duration `mapstructure:"conn-max-idle-time"`
+	QueryLimit      int           `mapstructure:"query-limit"`
 }
 
 func (cfg *SqlSettings) SetDefaults() {
@@ -121,6 +128,9 @@ func (cfg *SqlSettings) SetDefaults() {
 	}
 	if cfg.ConnMaxIdleTime == 0 {
 		cfg.ConnMaxIdleTime = DefaultConnMaxIdleTime
+	}
+	if cfg.QueryLimit == 0 {
+		cfg.QueryLimit = DefaultQueryLimit
 	}
 }
 

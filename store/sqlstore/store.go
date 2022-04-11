@@ -2,6 +2,8 @@ package sqlstore
 
 import (
 	"context"
+	"database/sql"
+	"fmt"
 	"log"
 
 	migrate "github.com/rubenv/sql-migrate"
@@ -16,10 +18,15 @@ type Stores struct {
 }
 
 type SqlStore struct {
-	db            SQLConn
-	stores        Stores
-	settings      *model.SqlSettings
-	runMigrations bool
+	db       sqlExecutor
+	dbx      sqlFuncExecutor
+	stores   Stores
+	settings *model.SqlSettings
+}
+
+func (ss *SqlStore) initialize() {
+	// Create all the stores here
+	ss.stores.healthCheck = newSqlHealthCheckStore(ss)
 }
 
 func New(settings model.SqlSettings) *SqlStore {
@@ -28,10 +35,12 @@ func New(settings model.SqlSettings) *SqlStore {
 	}
 
 	// Database initialization
-	sqlStore.db = sqlStore.setupConnection()
+	conn := sqlStore.setupConnection()
+	sqlStore.db = conn
+	sqlStore.dbx = conn
 
 	// Create all the stores here
-	sqlStore.stores.healthCheck = newSqlHealthCheckStore(sqlStore)
+	sqlStore.initialize()
 
 	return sqlStore
 }
@@ -40,8 +49,8 @@ func (ss *SqlStore) HealthCheck() store.HealthCheckStore {
 	return ss.stores.healthCheck
 }
 
-func (ss *SqlStore) Close() error {
-	return ss.db.Close()
+func (ss *SqlStore) Close() {
+	ss.dbx.Close()
 }
 
 func (ss *SqlStore) RunMigrations(settings model.MigrationSettings) error {
@@ -54,12 +63,12 @@ func (ss *SqlStore) RunMigrations(settings model.MigrationSettings) error {
 	ctx := context.Background()
 
 	if settings.Reset {
-		_, err := ss.db.ExecContext(ctx, "DROP SCHEMA IF EXISTS public CASCADE")
+		_, err := ss.db.Exec(ctx, "DROP SCHEMA IF EXISTS public CASCADE")
 		if err != nil {
 			return err
 		}
 
-		_, err = ss.db.ExecContext(ctx, "CREATE SCHEMA public")
+		_, err = ss.db.Exec(ctx, "CREATE SCHEMA public")
 		if err != nil {
 			return nil
 		}
@@ -67,8 +76,18 @@ func (ss *SqlStore) RunMigrations(settings model.MigrationSettings) error {
 	}
 
 	step := 0
-	// SQLConn -> sqlx -> sql
-	sqlDb := ss.db.DB().DB
+	//TODO: find a way to either convert pgx.Pool to sql.DD
+	sqlDb, err := sql.Open("pgx", ss.settings.DataSourceName)
+	if err != nil {
+		return fmt.Errorf("failed to open migration connection: %w", err)
+	}
+
+	defer func(db *sql.DB) {
+		err := db.Close()
+		if err != nil {
+			log.Printf("Failed to clone migration connection: %s", err.Error())
+		}
+	}(sqlDb)
 
 	if !settings.Reset && (settings.Rollback || settings.Redo) {
 		step = settings.Step
@@ -89,6 +108,22 @@ func (ss *SqlStore) RunMigrations(settings model.MigrationSettings) error {
 			return err
 		}
 		log.Printf("Applied %d migrations", n)
+	}
+	return nil
+}
+
+func (ss *SqlStore) WithTransaction(ctx context.Context, f func(s store.Store) error) error {
+	err := ss.db.Begin(ctx, func(db sqlExecutor) error {
+		s := &SqlStore{
+			db:       db,
+			settings: ss.settings,
+		}
+		s.initialize()
+		return f(s)
+	})
+
+	if err != nil {
+		return fmt.Errorf("sqlstore: transaction failed: %w", err)
 	}
 	return nil
 }

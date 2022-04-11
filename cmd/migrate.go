@@ -17,8 +17,6 @@ limitations under the License.
 package cmd
 
 import (
-	"log"
-
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"megpoid.xyz/go/go-skel/model"
@@ -47,12 +45,7 @@ var migrateCmd = &cobra.Command{
 		}
 
 		store := sqlstore.New(cfg.SqlSettings)
-		defer func(store *sqlstore.SqlStore) {
-			err := store.Close()
-			if err != nil {
-				log.Print(err)
-			}
-		}(store)
+		defer store.Close()
 
 		return store.RunMigrations(cfg.MigrationSettings)
 	},

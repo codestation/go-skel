@@ -5,8 +5,5 @@ type HealthCheckResult struct {
 }
 
 func (h HealthCheckResult) AllOk() bool {
-	if h.Ping != nil {
-		return false
-	}
-	return true
+	return h.Ping == nil
 }

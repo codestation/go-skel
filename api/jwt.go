@@ -22,7 +22,7 @@ func (api *API) UseJWT(g *echo.Group) {
 	g.Use(middleware.JWTWithConfig(config))
 }
 
-func (api *API) getClaim(c echo.Context, key string) string {
+func (api *API) GetClaim(c echo.Context, key string) string {
 	user := c.Get("user").(*jwt.Token)
 	claims := user.Claims.(jwt.MapClaims)
 	return claims[key].(string)

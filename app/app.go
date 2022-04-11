@@ -1,13 +1,17 @@
 package app
 
-import "megpoid.xyz/go/go-skel/model"
+import (
+	"megpoid.xyz/go/go-skel/model"
+	"time"
+)
 
 type App struct {
-	svr *Server
+	svr     *Server
+	timeNow func() time.Time
 }
 
 func New(svr *Server) *App {
-	app := &App{svr: svr}
+	app := &App{svr: svr, timeNow: time.Now}
 	return app
 }
 

@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"github.com/go-playground/validator/v10"
 	"log"
 	"net/http"
 	"time"
@@ -32,9 +33,14 @@ func NewServer(cfg model.Config) (*Server, error) {
 	e := echo.New()
 	e.HideBanner = true
 	e.Debug = cfg.GeneralSettings.Debug
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: cfg.GeneralSettings.CorsAllowOrigins,
+		AllowMethods: []string{http.MethodGet, http.MethodHead, http.MethodPut, http.MethodPatch, http.MethodPost, http.MethodDelete},
+	}))
 	e.Use(middleware.Gzip())
 	e.Use(middleware.Recover())
 	e.Use(middleware.BodyLimit("1M"))
+	e.Validator = &CustomValidator{validator: validator.New()}
 
 	if e.Debug {
 		e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
@@ -90,7 +96,5 @@ func (s *Server) StopHTTPServer() {
 
 func (s *Server) Shutdown() {
 	s.StopHTTPServer()
-	if err := s.Store.Close(); err != nil {
-		log.Printf("Server: Store: Close failed: %s", err.Error())
-	}
+	s.sqlStore.Close()
 }

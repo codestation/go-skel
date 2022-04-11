@@ -24,7 +24,7 @@ import (
 // Store lists all the other stores
 type Store interface {
 	HealthCheck() HealthCheckStore
-	Close() error
+	WithTransaction(ctx context.Context, f func(s Store) error) error
 }
 
 // HealthCheckStore handles all healthCheck related operations on the store

@@ -14,6 +14,7 @@ COPY . /src/
 RUN set -ex; \
     CGO_ENABLED=0 go build -o release/goapp \
     -trimpath \
+    -tags viper_yaml3 \
     -ldflags "-w -s \
     -X megpoid.xyz/go/go-skel/internal/version.Tag=${CI_COMMIT_TAG}"
 

@@ -4,12 +4,10 @@ import (
 	"context"
 	"errors"
 	"log"
-	"strings"
 	"time"
 
-	"github.com/jmoiron/sqlx"
-	"github.com/lib/pq"
-	"github.com/mattn/go-sqlite3"
+	"github.com/jackc/pgconn"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 const (
@@ -21,8 +19,18 @@ const (
 	postgresUniqueViolationCode = "23505"
 )
 
-func (ss *SqlStore) setupConnection() SQLConn {
-	db, err := sqlx.Open(ss.settings.DriverName, ss.settings.DataSourceName)
+func (ss *SqlStore) setupConnection() sqlDb {
+	config, err := pgxpool.ParseConfig(ss.settings.DataSourceName)
+	if err != nil {
+		log.Fatalf("Failed to configure database, aborting: %s", err.Error())
+	}
+
+	config.MaxConnLifetime = ss.settings.ConnMaxLifetime
+	config.MaxConnIdleTime = ss.settings.ConnMaxIdleTime
+	config.MaxConns = int32(ss.settings.MaxOpenConns)
+	config.MinConns = int32(ss.settings.MaxIdleConns)
+
+	db, err := pgxpool.ConnectConfig(context.Background(), config)
 	if err != nil {
 		log.Fatalf("Failed to open database, aborting: %s", err.Error())
 	}
@@ -33,7 +41,7 @@ func (ss *SqlStore) setupConnection() SQLConn {
 			ctx, cancel := context.WithTimeout(context.Background(), pingTimeoutSecs*time.Second)
 			defer cancel()
 
-			return db.PingContext(ctx)
+			return db.Ping(ctx)
 		}()
 
 		if err == nil {
@@ -48,33 +56,17 @@ func (ss *SqlStore) setupConnection() SQLConn {
 		}
 	}
 
-	db.MapperFunc(ToSnakeCase)
-	db.SetMaxIdleConns(ss.settings.MaxIdleConns)
-	db.SetMaxOpenConns(ss.settings.MaxOpenConns)
-	db.SetConnMaxLifetime(ss.settings.ConnMaxLifetime)
-	db.SetConnMaxIdleTime(ss.settings.ConnMaxIdleTime)
-
-	return NewDb(db)
+	return newPgxWrapper(db)
 }
 
 func IsUniqueError(err error, opts ...Option) bool {
-	var pqErr *pq.Error
-	var sqErr *sqlite3.Error
+	var pgErr *pgconn.PgError
 
 	switch {
-	case errors.As(err, &pqErr):
-		if pqErr.Code == postgresUniqueViolationCode {
+	case errors.As(err, &pgErr):
+		if pgErr.Code == postgresUniqueViolationCode {
 			for _, opt := range opts {
-				if !opt(pqErr) {
-					return false
-				}
-			}
-			return true
-		}
-	case errors.As(err, &sqErr):
-		if sqErr.ExtendedCode == sqlite3.ErrConstraintUnique {
-			for _, opt := range opts {
-				if !opt(pqErr) {
+				if !opt(pgErr) {
 					return false
 				}
 			}
@@ -89,16 +81,11 @@ type Option func(err error) bool
 
 func WithConstraintName(name string) Option {
 	return func(err error) bool {
-		var pqErr *pq.Error
-		var sqErr *sqlite3.Error
+		var pgErr *pgconn.PgError
 
 		switch {
-		case errors.As(err, &pqErr):
-			if pqErr.Constraint == name {
-				return true
-			}
-		case errors.As(err, &sqErr):
-			if strings.Contains(sqErr.Error(), name) {
+		case errors.As(err, &pgErr):
+			if pgErr.ConstraintName == name {
 				return true
 			}
 		}

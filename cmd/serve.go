@@ -105,6 +105,8 @@ func init() {
 	serveCmd.Flags().StringP("listen", "l", ":8000", "Listen address")
 	serveCmd.Flags().DurationP("timeout", "t", 30*time.Second, "Request timeout")
 	serveCmd.Flags().String("dsn", "", "Database connection string. Setting the DSN ignores the db-* settings")
+	serveCmd.Flags().Int("query-limit", 1000, "Max results per query")
+	serveCmd.Flags().StringSlice("cors-allow-origin", []string{}, "CORS Allowed origins")
 	err := viper.BindPFlags(serveCmd.Flags())
 	cobra.CheckErr(err)
 }
