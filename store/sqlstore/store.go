@@ -25,6 +25,7 @@ import (
 	"fmt"
 	"log"
 
+	_ "github.com/jackc/pgx/v4/stdlib"
 	migrate "github.com/rubenv/sql-migrate"
 	"megpoid.xyz/go/go-skel/db"
 	"megpoid.xyz/go/go-skel/model"
