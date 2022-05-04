@@ -22,6 +22,7 @@ package i18n
 import (
 	"log"
 	"path"
+	"strings"
 
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"golang.org/x/text/language"
@@ -43,6 +44,15 @@ func Init() {
 		panic(err)
 	}
 	for _, file := range files {
+		// skip non translation files (just in case)
+		if !strings.HasPrefix(file.Name(), "active.") || !strings.HasSuffix(file.Name(), ".yaml") {
+			log.Printf("Skipping invalid file in translation directory: %s", file.Name())
+			continue
+		}
+		// do not load the default translation
+		if file.Name() == "active.en.yaml" {
+			continue
+		}
 		if _, err := bundle.LoadMessageFileFS(Assets(), path.Join("translations", file.Name())); err != nil {
 			panic(err)
 		}
