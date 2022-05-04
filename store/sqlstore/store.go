@@ -25,7 +25,8 @@ import (
 	"fmt"
 	"log"
 
-	_ "github.com/jackc/pgx/v4/stdlib"
+	"github.com/doug-martin/goqu/v9"
+	_ "github.com/doug-martin/goqu/v9/dialect/postgres"
 	migrate "github.com/rubenv/sql-migrate"
 	"megpoid.xyz/go/go-skel/db"
 	"megpoid.xyz/go/go-skel/model"
@@ -42,9 +43,11 @@ type SqlStore struct {
 	dbx      sqlFuncExecutor
 	stores   Stores
 	settings *model.SqlSettings
+	builder  goqu.DialectWrapper
 }
 
 func (ss *SqlStore) initialize() {
+	ss.builder = setupBuilder()
 	// Create all the stores here
 	ss.stores.healthCheck = newSqlHealthCheckStore(ss)
 }

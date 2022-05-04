@@ -23,11 +23,22 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"log"
+	"time"
 
+	"github.com/doug-martin/goqu/v9"
+	_ "github.com/doug-martin/goqu/v9/dialect/postgres"
 	"github.com/georgysavva/scany/pgxscan"
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
+	_ "github.com/jackc/pgx/v4/stdlib"
+)
+
+const (
+	pingMaxAttempts             = 6
+	pingTimeoutSecs             = 10
+	postgresUniqueViolationCode = "23505"
 )
 
 // compile time validator for the interfaces
@@ -37,13 +48,6 @@ var (
 
 	ErrNoRows = pgx.ErrNoRows
 )
-
-type sqlExecutor interface {
-	Begin(ctx context.Context, f func(db sqlExecutor) error) error
-	Exec(ctx context.Context, sql string, arguments ...interface{}) (sql.Result, error)
-	Get(ctx context.Context, dst interface{}, query string, args ...interface{}) error
-	Select(ctx context.Context, dest interface{}, query string, args ...interface{}) error
-}
 
 type pgxWrapper struct {
 	*pgxpool.Pool
@@ -117,12 +121,81 @@ func newPgxTxWrapper(tx pgx.Tx) *pgxTxWrapper {
 	return &pgxTxWrapper{tx}
 }
 
-type sqlFuncExecutor interface {
-	Close()
-	Ping(ctx context.Context) error
+func (ss *SqlStore) setupConnection() sqlDb {
+	config, err := pgxpool.ParseConfig(ss.settings.DataSourceName)
+	if err != nil {
+		log.Fatalf("Failed to configure database, aborting: %s", err.Error())
+	}
+
+	config.MaxConnLifetime = ss.settings.ConnMaxLifetime
+	config.MaxConnIdleTime = ss.settings.ConnMaxIdleTime
+	config.MaxConns = int32(ss.settings.MaxOpenConns)
+	config.MinConns = int32(ss.settings.MaxIdleConns)
+
+	db, err := pgxpool.ConnectConfig(context.Background(), config)
+	if err != nil {
+		log.Fatalf("Failed to open database, aborting: %s", err.Error())
+	}
+
+	// total waiting time: 1 minute
+	for i := 0; i < pingMaxAttempts; i++ {
+		err := func() error {
+			ctx, cancel := context.WithTimeout(context.Background(), pingTimeoutSecs*time.Second)
+			defer cancel()
+
+			return db.Ping(ctx)
+		}()
+
+		if err == nil {
+			break
+		}
+
+		if i < pingMaxAttempts {
+			log.Printf("Failed to ping database: %s, retrying in %d seconds", err.Error(), pingTimeoutSecs)
+			time.Sleep(pingTimeoutSecs * time.Second)
+		} else {
+			log.Fatal("Failed to ping database, aborting")
+		}
+	}
+
+	return newPgxWrapper(db)
 }
 
-type sqlDb interface {
-	sqlExecutor
-	sqlFuncExecutor
+func setupBuilder() goqu.DialectWrapper {
+	return goqu.Dialect("postgres")
+}
+
+func IsUniqueError(err error, opts ...Option) bool {
+	var pgErr *pgconn.PgError
+
+	switch {
+	case errors.As(err, &pgErr):
+		if pgErr.Code == postgresUniqueViolationCode {
+			for _, opt := range opts {
+				if !opt(pgErr) {
+					return false
+				}
+			}
+			return true
+		}
+	}
+
+	return false
+}
+
+type Option func(err error) bool
+
+func WithConstraintName(name string) Option {
+	return func(err error) bool {
+		var pgErr *pgconn.PgError
+
+		switch {
+		case errors.As(err, &pgErr):
+			if pgErr.ConstraintName == name {
+				return true
+			}
+		}
+
+		return false
+	}
 }

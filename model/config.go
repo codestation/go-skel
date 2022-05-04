@@ -126,7 +126,7 @@ type SqlSettings struct {
 	MaxOpenConns    int           `mapstructure:"max-open-conns"`
 	ConnMaxLifetime time.Duration `mapstructure:"conn-max-lifetime"`
 	ConnMaxIdleTime time.Duration `mapstructure:"conn-max-idle-time"`
-	QueryLimit      int           `mapstructure:"query-limit"`
+	QueryLimit      uint          `mapstructure:"query-limit"`
 }
 
 func (cfg *SqlSettings) SetDefaults() {
