@@ -17,14 +17,26 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-//go:generate gotext -srclang=en update -out=catalog.go -lang=en,es
+package model
 
-package main
+type AppError struct {
+	Message       string `json:"message"`
+	Location      string `json:"location,omitempty"`
+	DetailedError string `json:"detailed_error,omitempty"`
+	StatusCode    int    `json:"status_code"`
+}
 
-import (
-	"megpoid.xyz/go/go-skel/cmd"
-)
+func (e *AppError) Error() string {
+	return e.Location + ": " + e.Message + ", " + e.DetailedError
+}
 
-func main() {
-	cmd.Execute()
+func NewAppError(location, message string, details string, status int) *AppError {
+	appErr := &AppError{
+		Message:       message,
+		Location:      location,
+		DetailedError: details,
+		StatusCode:    status,
+	}
+
+	return appErr
 }

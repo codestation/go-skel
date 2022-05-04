@@ -28,6 +28,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"megpoid.xyz/go/go-skel/app/i18n"
 	"megpoid.xyz/go/go-skel/model"
 	"megpoid.xyz/go/go-skel/store"
 	"megpoid.xyz/go/go-skel/store/sqlstore"
@@ -63,6 +64,8 @@ func NewServer(cfg model.Config) (*Server, error) {
 	e.Use(middleware.Gzip())
 	e.Use(middleware.Recover())
 	e.Use(middleware.BodyLimit("1M"))
+	e.Use(i18n.LoadMessagePrinter("user_lang"))
+	e.HTTPErrorHandler = ErrorHandler(e)
 	e.Validator = &CustomValidator{validator: validator.New()}
 
 	if e.Debug {

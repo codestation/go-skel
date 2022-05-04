@@ -1,0 +1,12 @@
+{
+    "language": "en",
+    "messages": [
+        {
+            "id": "An error occurred",
+            "message": "An error occurred",
+            "translation": "An error occurred",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        }
+    ]
+}

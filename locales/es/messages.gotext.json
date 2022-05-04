@@ -1,0 +1,10 @@
+{
+  "language": "es",
+  "messages": [
+    {
+      "id": "An error occurred",
+      "message": "An error occurred",
+      "translation": "Ha ocurrido un error"
+    }
+  ]
+}
