@@ -40,35 +40,38 @@ var serveCmd = &cobra.Command{
 	Short: "Start service",
 	Long:  `Starts the HTTP endpoint and other services`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		quit := make(chan os.Signal, 1)
-
-		// load config
-		var cfg model.Config
-		if err := viper.Unmarshal(&cfg.GeneralSettings, unmarshalDecoders...); err != nil {
-			return err
-		}
-		if err := viper.Unmarshal(&cfg.ServerSettings, unmarshalDecoders...); err != nil {
-			return err
-		}
-		if err := viper.Unmarshal(&cfg.SqlSettings, unmarshalDecoders...); err != nil {
-			return err
-		}
-		cfg.SetDefaults()
-		if err := cfg.Validate(); err != nil {
-			return err
-		}
-		printVersion()
-
-		return runServer(cfg, quit)
+		return runServer()
 	},
 }
 
-func runServer(cfg model.Config, quit chan os.Signal) error {
+func runServer() error {
+	// show version on console
+	printVersion()
+
+	// load config
+	var cfg model.Config
+	if err := viper.Unmarshal(&cfg.GeneralSettings, unmarshalDecoders...); err != nil {
+		return err
+	}
+	if err := viper.Unmarshal(&cfg.ServerSettings, unmarshalDecoders...); err != nil {
+		return err
+	}
+	if err := viper.Unmarshal(&cfg.SqlSettings, unmarshalDecoders...); err != nil {
+		return err
+	}
+	cfg.SetDefaults()
+	if err := cfg.Validate(); err != nil {
+		return err
+	}
+
+	// setup channel to check when app is stopped
+	quit := make(chan os.Signal, 1)
+
+	// Create a new server
 	server, err := app.NewServer(cfg)
 	if err != nil {
 		return fmt.Errorf("cannot create server: %w", err)
 	}
-
 	defer server.Shutdown()
 
 	// Create web, websocket, graphql, etc, servers

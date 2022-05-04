@@ -47,10 +47,11 @@ var migrateCmd = &cobra.Command{
 			return err
 		}
 
-		store := sqlstore.New(cfg.SqlSettings)
-		defer store.Close()
+		// Database initialization
+		conn := sqlstore.NewConnection(cfg.SqlSettings)
+		defer conn.Close()
 
-		return store.RunMigrations(cfg.MigrationSettings)
+		return sqlstore.RunMigrations(conn, cfg)
 	},
 }
 

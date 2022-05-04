@@ -21,11 +21,11 @@ package app
 
 import (
 	"context"
-	"github.com/go-playground/validator/v10"
 	"log"
 	"net/http"
 	"time"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"megpoid.xyz/go/go-skel/model"
@@ -35,6 +35,7 @@ import (
 
 type Server struct {
 	cfg        model.Config
+	conn       sqlstore.SqlDb
 	sqlStore   *sqlstore.SqlStore
 	Store      store.Store
 	Server     *http.Server
@@ -44,8 +45,11 @@ type Server struct {
 func NewServer(cfg model.Config) (*Server, error) {
 	s := &Server{cfg: cfg}
 
+	// Database initialization
+	s.conn = sqlstore.NewConnection(cfg.SqlSettings)
+
 	// Store initialization, could use a different database or non-sql store
-	s.sqlStore = sqlstore.New(cfg.SqlSettings)
+	s.sqlStore = sqlstore.New(s.conn, cfg.SqlSettings)
 	s.Store = s.sqlStore
 
 	// HTTP server initialization
@@ -116,4 +120,5 @@ func (s *Server) StopHTTPServer() {
 func (s *Server) Shutdown() {
 	s.StopHTTPServer()
 	s.sqlStore.Close()
+	s.conn.Close()
 }

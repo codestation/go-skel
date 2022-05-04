@@ -39,26 +39,24 @@ type Stores struct {
 }
 
 type SqlStore struct {
-	db       sqlExecutor
-	dbx      sqlFuncExecutor
+	db       SqlExecutor
+	dbx      SqlFuncExecutor
 	stores   Stores
 	settings *model.SqlSettings
 	builder  goqu.DialectWrapper
 }
 
 func (ss *SqlStore) initialize() {
-	ss.builder = setupBuilder()
+	ss.builder = NewQueryBuilder()
 	// Create all the stores here
 	ss.stores.healthCheck = newSqlHealthCheckStore(ss)
 }
 
-func New(settings model.SqlSettings) *SqlStore {
+func New(conn SqlDb, settings model.SqlSettings) *SqlStore {
 	sqlStore := &SqlStore{
 		settings: &settings,
 	}
 
-	// Database initialization
-	conn := sqlStore.setupConnection()
 	sqlStore.db = conn
 	sqlStore.dbx = conn
 
@@ -72,11 +70,9 @@ func (ss *SqlStore) HealthCheck() store.HealthCheckStore {
 	return ss.stores.healthCheck
 }
 
-func (ss *SqlStore) Close() {
-	ss.dbx.Close()
-}
+func (ss *SqlStore) Close() {}
 
-func (ss *SqlStore) RunMigrations(settings model.MigrationSettings) error {
+func RunMigrations(conn SqlDb, config model.Config) error {
 	migrations := migrate.EmbedFileSystemMigrationSource{
 		FileSystem: db.Assets(),
 		Root:       "migrations",
@@ -85,13 +81,13 @@ func (ss *SqlStore) RunMigrations(settings model.MigrationSettings) error {
 	migrate.SetTable("app_migrations")
 	ctx := context.Background()
 
-	if settings.Reset {
-		_, err := ss.db.Exec(ctx, "DROP SCHEMA IF EXISTS public CASCADE")
+	if config.MigrationSettings.Reset {
+		_, err := conn.Exec(ctx, "DROP SCHEMA IF EXISTS public CASCADE")
 		if err != nil {
 			return err
 		}
 
-		_, err = ss.db.Exec(ctx, "CREATE SCHEMA public")
+		_, err = conn.Exec(ctx, "CREATE SCHEMA public")
 		if err != nil {
 			return nil
 		}
@@ -100,7 +96,7 @@ func (ss *SqlStore) RunMigrations(settings model.MigrationSettings) error {
 
 	step := 0
 	//TODO: find a way to either convert pgx.Pool to sql.DD
-	sqlDb, err := sql.Open("pgx", ss.settings.DataSourceName)
+	sqlDb, err := sql.Open("pgx", config.SqlSettings.DataSourceName)
 	if err != nil {
 		return fmt.Errorf("failed to open migration connection: %w", err)
 	}
@@ -112,21 +108,21 @@ func (ss *SqlStore) RunMigrations(settings model.MigrationSettings) error {
 		}
 	}(sqlDb)
 
-	if !settings.Reset && (settings.Rollback || settings.Redo) {
-		step = settings.Step
-		n, err := migrate.ExecMax(sqlDb, ss.settings.DriverName, migrations, migrate.Down, step)
+	if !config.MigrationSettings.Reset && (config.MigrationSettings.Rollback || config.MigrationSettings.Redo) {
+		step = config.MigrationSettings.Step
+		n, err := migrate.ExecMax(sqlDb, config.SqlSettings.DriverName, migrations, migrate.Down, step)
 		if err != nil {
 			return err
 		}
 		log.Printf("Reverted %d migrations", n)
 	}
 
-	if settings.Reset || !settings.Rollback || settings.Redo {
-		if settings.Redo {
-			step = settings.Step
+	if config.MigrationSettings.Reset || !config.MigrationSettings.Rollback || config.MigrationSettings.Redo {
+		if config.MigrationSettings.Redo {
+			step = config.MigrationSettings.Step
 		}
 
-		n, err := migrate.ExecMax(sqlDb, ss.settings.DriverName, migrations, migrate.Up, step)
+		n, err := migrate.ExecMax(sqlDb, config.SqlSettings.DriverName, migrations, migrate.Up, step)
 		if err != nil {
 			return err
 		}
@@ -136,7 +132,7 @@ func (ss *SqlStore) RunMigrations(settings model.MigrationSettings) error {
 }
 
 func (ss *SqlStore) WithTransaction(ctx context.Context, f func(s store.Store) error) error {
-	err := ss.db.Begin(ctx, func(db sqlExecutor) error {
+	err := ss.db.Begin(ctx, func(db SqlExecutor) error {
 		s := &SqlStore{
 			db:       db,
 			settings: ss.settings,

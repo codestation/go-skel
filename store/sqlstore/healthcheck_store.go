@@ -21,7 +21,6 @@ package sqlstore
 
 import (
 	"context"
-
 	"megpoid.xyz/go/go-skel/store"
 )
 

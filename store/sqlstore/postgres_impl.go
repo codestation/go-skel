@@ -33,6 +33,7 @@ import (
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 	_ "github.com/jackc/pgx/v4/stdlib"
+	"megpoid.xyz/go/go-skel/model"
 )
 
 const (
@@ -43,8 +44,8 @@ const (
 
 // compile time validator for the interfaces
 var (
-	_ sqlExecutor = pgxWrapper{}
-	_ sqlExecutor = pgxTxWrapper{}
+	_ SqlExecutor = pgxWrapper{}
+	_ SqlExecutor = pgxTxWrapper{}
 
 	ErrNoRows = pgx.ErrNoRows
 )
@@ -53,14 +54,14 @@ type pgxWrapper struct {
 	*pgxpool.Pool
 }
 
-func (p pgxWrapper) Begin(ctx context.Context, f func(db sqlExecutor) error) error {
+func (p pgxWrapper) Begin(ctx context.Context, f func(db SqlExecutor) error) error {
 	return p.Pool.BeginFunc(ctx, func(tx pgx.Tx) error {
 		return f(newPgxTxWrapper(tx))
 	})
 }
 
-func (p pgxWrapper) Exec(ctx context.Context, sql string, arguments ...interface{}) (sql.Result, error) {
-	tag, err := p.Pool.Exec(ctx, sql, arguments...)
+func (p pgxWrapper) Exec(ctx context.Context, query string, arguments ...interface{}) (sql.Result, error) {
+	tag, err := p.Pool.Exec(ctx, query, arguments...)
 	if err != nil {
 		return nil, err
 	}
@@ -79,14 +80,14 @@ type pgxTxWrapper struct {
 	pgx.Tx
 }
 
-func (p pgxTxWrapper) Begin(ctx context.Context, f func(db sqlExecutor) error) error {
+func (p pgxTxWrapper) Begin(ctx context.Context, f func(db SqlExecutor) error) error {
 	return p.Tx.BeginFunc(ctx, func(tx pgx.Tx) error {
 		return f(pgxTxWrapper{tx})
 	})
 }
 
-func (p pgxTxWrapper) Exec(ctx context.Context, sql string, arguments ...interface{}) (sql.Result, error) {
-	tag, err := p.Tx.Exec(ctx, sql, arguments...)
+func (p pgxTxWrapper) Exec(ctx context.Context, query string, arguments ...interface{}) (sql.Result, error) {
+	tag, err := p.Tx.Exec(ctx, query, arguments...)
 	if err != nil {
 		return nil, err
 	}
@@ -121,16 +122,16 @@ func newPgxTxWrapper(tx pgx.Tx) *pgxTxWrapper {
 	return &pgxTxWrapper{tx}
 }
 
-func (ss *SqlStore) setupConnection() sqlDb {
-	config, err := pgxpool.ParseConfig(ss.settings.DataSourceName)
+func NewConnection(settings model.SqlSettings) SqlDb {
+	config, err := pgxpool.ParseConfig(settings.DataSourceName)
 	if err != nil {
 		log.Fatalf("Failed to configure database, aborting: %s", err.Error())
 	}
 
-	config.MaxConnLifetime = ss.settings.ConnMaxLifetime
-	config.MaxConnIdleTime = ss.settings.ConnMaxIdleTime
-	config.MaxConns = int32(ss.settings.MaxOpenConns)
-	config.MinConns = int32(ss.settings.MaxIdleConns)
+	config.MaxConnLifetime = settings.ConnMaxLifetime
+	config.MaxConnIdleTime = settings.ConnMaxIdleTime
+	config.MaxConns = int32(settings.MaxOpenConns)
+	config.MinConns = int32(settings.MaxIdleConns)
 
 	db, err := pgxpool.ConnectConfig(context.Background(), config)
 	if err != nil {
@@ -161,7 +162,7 @@ func (ss *SqlStore) setupConnection() sqlDb {
 	return newPgxWrapper(db)
 }
 
-func setupBuilder() goqu.DialectWrapper {
+func NewQueryBuilder() goqu.DialectWrapper {
 	return goqu.Dialect("postgres")
 }
 

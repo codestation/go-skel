@@ -24,19 +24,19 @@ import (
 	"database/sql"
 )
 
-type sqlExecutor interface {
-	Begin(ctx context.Context, f func(db sqlExecutor) error) error
-	Exec(ctx context.Context, sql string, arguments ...interface{}) (sql.Result, error)
+type SqlExecutor interface {
+	Begin(ctx context.Context, f func(db SqlExecutor) error) error
+	Exec(ctx context.Context, query string, arguments ...interface{}) (sql.Result, error)
 	Get(ctx context.Context, dst interface{}, query string, args ...interface{}) error
 	Select(ctx context.Context, dest interface{}, query string, args ...interface{}) error
 }
 
-type sqlFuncExecutor interface {
+type SqlFuncExecutor interface {
 	Close()
 	Ping(ctx context.Context) error
 }
 
-type sqlDb interface {
-	sqlExecutor
-	sqlFuncExecutor
+type SqlDb interface {
+	SqlExecutor
+	SqlFuncExecutor
 }
