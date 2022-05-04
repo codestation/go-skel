@@ -21,13 +21,14 @@ package app
 
 import (
 	"context"
-	"github.com/go-playground/validator/v10"
 	"log"
 	"net/http"
 	"time"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"megpoid.xyz/go/go-skel/i18n"
 	"megpoid.xyz/go/go-skel/model"
 	"megpoid.xyz/go/go-skel/store"
 	"megpoid.xyz/go/go-skel/store/sqlstore"
@@ -47,6 +48,9 @@ func NewServer(cfg model.Config) (*Server, error) {
 	// Store initialization, could use a different database or non-sql store
 	s.sqlStore = sqlstore.New(cfg.SqlSettings)
 	s.Store = s.sqlStore
+
+	// i18n initialization
+	i18n.Init()
 
 	// HTTP server initialization
 	e := echo.New()
