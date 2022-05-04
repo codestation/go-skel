@@ -1,12 +1,11 @@
 module megpoid.xyz/go/go-skel
 
-go 1.17
+go 1.18
 
 require (
 	github.com/doug-martin/goqu/v9 v9.18.0
 	github.com/georgysavva/scany v0.3.0
 	github.com/go-playground/validator/v10 v10.11.0
-	github.com/gofrs/uuid v4.2.0+incompatible
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/jackc/pgconn v1.12.0
 	github.com/jackc/pgx/v4 v4.16.0
@@ -15,15 +14,14 @@ require (
 	github.com/rubenv/sql-migrate v1.1.1
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/viper v1.11.0
-	github.com/stretchr/testify v1.7.1
 )
 
 require (
-	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
 	github.com/go-gorp/gorp/v3 v3.0.2 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
+	github.com/gofrs/uuid v4.2.0+incompatible // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
@@ -43,7 +41,6 @@ require (
 	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/spf13/afero v1.8.2 // indirect
 	github.com/spf13/cast v1.4.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
