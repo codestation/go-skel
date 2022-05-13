@@ -17,20 +17,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-package sqlstore
+package model
 
-import (
-	"context"
-	"testing"
-
-	"github.com/stretchr/testify/assert"
-	"megpoid.xyz/go/go-skel/model"
-)
-
-func TestSqlHealthCheckStore(t *testing.T) {
-	db := &FakeDbConn{}
-	ss := New(db, model.SqlSettings{})
-
-	err := ss.HealthCheck().HealthCheck(context.Background())
-	assert.NoError(t, err)
+func NewString(s string) *string {
+	return &s
 }

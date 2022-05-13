@@ -26,8 +26,6 @@ import (
 )
 
 type jwtCustomClaims struct {
-	Schema string `json:"schema"`
-	Domain string `json:"domain"`
 	UserID string `json:"user_id"`
 	jwt.StandardClaims
 }
