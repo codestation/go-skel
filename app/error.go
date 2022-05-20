@@ -21,12 +21,80 @@ package app
 
 import (
 	"errors"
+	"net/http"
+	"runtime"
+	"strings"
+
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/text/message"
 	"megpoid.xyz/go/go-skel/app/i18n"
-	"megpoid.xyz/go/go-skel/model"
-	"net/http"
+	"megpoid.xyz/go/go-skel/store"
 )
+
+type ValidationError struct {
+	Field   string `json:"field"`
+	Message string `json:"message"`
+}
+
+type Error struct {
+	Message       string            `json:"message"`
+	Where         string            `json:"location,omitempty"`
+	DetailedError string            `json:"detailed_error,omitempty"`
+	StatusCode    int               `json:"status_code"`
+	Validation    []ValidationError `json:"validation,omitempty"`
+}
+
+func (e *Error) Error() string {
+	return e.Where + ": " + e.Message + ", " + e.DetailedError
+}
+
+func NewAppError(message string, err error) *Error {
+	appErr := &Error{
+		Message: message,
+	}
+
+	pc := make([]uintptr, 1)
+	n := runtime.Callers(2, pc)
+
+	if n > 0 {
+		frames := runtime.CallersFrames(pc[:n])
+		frame, _ := frames.Next()
+		funcParts := strings.Split(frame.Function, ".")
+		appErr.Where = funcParts[len(funcParts)-1]
+	}
+
+	if err != nil {
+		var httpErr *echo.HTTPError
+		var validateErr validator.ValidationErrors
+		var bindingErr *echo.BindingError
+
+		appErr.DetailedError = err.Error()
+		switch {
+		case errors.Is(err, store.ErrNotFound):
+			appErr.StatusCode = http.StatusNotFound
+		case errors.As(err, &httpErr):
+			appErr.StatusCode = httpErr.Code
+		case errors.As(err, &bindingErr):
+			appErr.StatusCode = bindingErr.Code
+			appErr.DetailedError = bindingErr.Internal.Error()
+		case errors.As(err, &validateErr):
+			for _, v := range validateErr {
+				appErr.Validation = append(appErr.Validation, ValidationError{
+					Field:   v.Field(),
+					Message: v.ActualTag(),
+				})
+			}
+			appErr.StatusCode = http.StatusBadRequest
+		default:
+			appErr.StatusCode = http.StatusInternalServerError
+		}
+	} else {
+		appErr.StatusCode = http.StatusInternalServerError
+	}
+
+	return appErr
+}
 
 func ErrorHandler(e *echo.Echo) echo.HTTPErrorHandler {
 	return func(err error, c echo.Context) {
@@ -34,30 +102,18 @@ func ErrorHandler(e *echo.Echo) echo.HTTPErrorHandler {
 			return
 		}
 
-		var appErr *model.AppError
-		var httpErr *echo.HTTPError
+		var appErr *Error
 		printer := message.NewPrinter(i18n.GetLanguageTags(c))
 
-		switch {
-		case errors.As(err, &appErr):
-			// remove internal state from non-debug error response
-			if !e.Debug {
-				appErr.DetailedError = ""
-				appErr.Location = ""
-			}
-		case errors.As(err, &httpErr):
-			appErr = model.NewAppError("app", printer.Sprintf("An error occurred"), "", httpErr.Code)
-			if e.Debug {
-				if httpErr.Internal != nil {
-					appErr.DetailedError = httpErr.Internal.Error()
-				} else {
-					appErr.DetailedError = http.StatusText(httpErr.Code)
-				}
-			} else {
-				appErr.Location = ""
-			}
-		default:
-			appErr = model.NewAppError("app", printer.Sprintf("An error occurred"), err.Error(), http.StatusInternalServerError)
+		if !errors.As(err, &appErr) {
+			appErr = NewAppError(printer.Sprintf("An error occurred"), err)
+			appErr.Where = "ErrorHandler"
+		}
+
+		if e.Debug {
+		} else {
+			appErr.DetailedError = ""
+			appErr.Where = ""
 		}
 
 		if c.Request().Method == http.MethodHead {
