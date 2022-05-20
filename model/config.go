@@ -29,6 +29,7 @@ const (
 	DefaultReadTimeout   = 1 * time.Minute
 	DefaultWriteTimeout  = 1 * time.Minute
 	DefaultIdleTimeout   = 1 * time.Minute
+	DefaultBodyLimit     = "10MB"
 
 	DefaultDriverName      = "postgres"
 	DefaultDataSourceName  = "postgres://goapp:secret@localhost/goapp?sslmode=disable"
@@ -90,6 +91,7 @@ type ServerSettings struct {
 	ReadTimeout   time.Duration `mapstructure:"read-timeout"`
 	WriteTimeout  time.Duration `mapstructure:"write-timeout"`
 	IdleTimeout   time.Duration `mapstructure:"idle-timeout"`
+	BodyLimit     string        `mapstore:"body-limit"`
 }
 
 func (cfg *ServerSettings) SetDefaults() {
@@ -116,6 +118,10 @@ func (cfg *ServerSettings) SetDefaults() {
 		} else {
 			cfg.IdleTimeout = DefaultIdleTimeout
 		}
+	}
+
+	if cfg.BodyLimit == "" {
+		cfg.BodyLimit = DefaultBodyLimit
 	}
 }
 

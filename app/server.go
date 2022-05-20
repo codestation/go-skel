@@ -63,17 +63,11 @@ func NewServer(cfg model.Config) (*Server, error) {
 	}))
 	e.Use(middleware.Gzip())
 	e.Use(middleware.Recover())
-	e.Use(middleware.BodyLimit("1M"))
 	e.Use(i18n.LoadMessagePrinter("user_lang"))
-	e.HTTPErrorHandler = ErrorHandler(e)
+	e.Use(middleware.Logger())
+	e.Use(middleware.BodyLimit(cfg.ServerSettings.BodyLimit))
 	e.Validator = &CustomValidator{validator: validator.New()}
-
-	if e.Debug {
-		e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
-			Format: "method=${method}, uri=${uri}, status=${status}\n",
-		}))
-	}
-
+	e.HTTPErrorHandler = ErrorHandler(e)
 	s.EchoServer = e
 
 	return s, nil

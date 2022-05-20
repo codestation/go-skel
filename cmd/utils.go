@@ -30,10 +30,11 @@ import (
 
 var typeOfBytes = reflect.TypeOf([]byte(nil))
 
-var unmarshalDecoders = []viper.DecoderConfigOption{
-	viper.DecodeHook(HexStringToByteArray()),
-	viper.DecodeHook(mapstructure.StringToTimeDurationHookFunc()),
-}
+var unmarshalDecoder = viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
+	HexStringToByteArray(),
+	mapstructure.StringToTimeDurationHookFunc(),
+	mapstructure.StringToSliceHookFunc(","),
+))
 
 func HexStringToByteArray() mapstructure.DecodeHookFuncType {
 	return func(

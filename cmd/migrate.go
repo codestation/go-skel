@@ -33,13 +33,13 @@ var migrateCmd = &cobra.Command{
 	Long:  `Apply the database migrations to the database`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		var cfg model.Config
-		if err := viper.Unmarshal(&cfg.GeneralSettings, unmarshalDecoders...); err != nil {
+		if err := viper.Unmarshal(&cfg.GeneralSettings, unmarshalDecoder); err != nil {
 			return err
 		}
-		if err := viper.Unmarshal(&cfg.SqlSettings, unmarshalDecoders...); err != nil {
+		if err := viper.Unmarshal(&cfg.SqlSettings, unmarshalDecoder); err != nil {
 			return err
 		}
-		if err := viper.Unmarshal(&cfg.MigrationSettings, unmarshalDecoders...); err != nil {
+		if err := viper.Unmarshal(&cfg.MigrationSettings, unmarshalDecoder); err != nil {
 			return err
 		}
 		cfg.SetDefaults()

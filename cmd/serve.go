@@ -21,17 +21,15 @@ package cmd
 
 import (
 	"fmt"
-	"os"
-	"os/signal"
-	"syscall"
-	"time"
-
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"megpoid.xyz/go/go-skel/api"
 	"megpoid.xyz/go/go-skel/app"
 	"megpoid.xyz/go/go-skel/model"
 	"megpoid.xyz/go/go-skel/web"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 // serveCmd represents the serve command
@@ -50,13 +48,13 @@ func runServer() error {
 
 	// load config
 	var cfg model.Config
-	if err := viper.Unmarshal(&cfg.GeneralSettings, unmarshalDecoders...); err != nil {
+	if err := viper.Unmarshal(&cfg.GeneralSettings, unmarshalDecoder); err != nil {
 		return err
 	}
-	if err := viper.Unmarshal(&cfg.ServerSettings, unmarshalDecoders...); err != nil {
+	if err := viper.Unmarshal(&cfg.ServerSettings, unmarshalDecoder); err != nil {
 		return err
 	}
-	if err := viper.Unmarshal(&cfg.SqlSettings, unmarshalDecoders...); err != nil {
+	if err := viper.Unmarshal(&cfg.SqlSettings, unmarshalDecoder); err != nil {
 		return err
 	}
 	cfg.SetDefaults()
@@ -108,10 +106,13 @@ func init() {
 
 	serveCmd.Flags().String("jwt-secret", "", "JWT secret key")
 	serveCmd.Flags().String("encryption-key", "", "Application encryption key")
-	serveCmd.Flags().StringP("listen", "l", ":8000", "Listen address")
-	serveCmd.Flags().DurationP("timeout", "t", 30*time.Second, "Request timeout")
+	serveCmd.Flags().StringP("listen", "l", model.DefaultListenAddress, "Listen address")
+	serveCmd.Flags().DurationP("timeout", "t", model.DefaultReadTimeout, "Request timeout")
 	serveCmd.Flags().String("dsn", "", "Database connection string. Setting the DSN ignores the db-* settings")
 	serveCmd.Flags().Int("query-limit", 1000, "Max results per query")
+	serveCmd.Flags().Int("max-open-conns", model.DefaultMaxOpenConns, "Max open connections")
+	serveCmd.Flags().Int("max-idle-conns", model.DefaultMaxIdleConns, "Max idle connections")
+	serveCmd.Flags().String("body-limit", "", "Max body size for http requests")
 	serveCmd.Flags().StringSlice("cors-allow-origin", []string{}, "CORS Allowed origins")
 	err := viper.BindPFlags(serveCmd.Flags())
 	cobra.CheckErr(err)
