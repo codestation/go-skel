@@ -31,9 +31,13 @@ import (
 
 type FakeDbConn struct{}
 
-func (d *FakeDbConn) Begin(_ context.Context, f func(db SqlExecutor) error) error {
+func (d *FakeDbConn) BeginFunc(_ context.Context, f func(db SqlExecutor) error) error {
 	db := &FakeDbConn{}
 	return f(db)
+}
+
+func (d *FakeDbConn) Begin(_ context.Context) (*PgxTxWrapper, error) {
+	panic("implement me")
 }
 
 func (d *FakeDbConn) Exec(_ context.Context, _ string, x ...interface{}) (sql.Result, error) {
