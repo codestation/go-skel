@@ -1,28 +1,10 @@
-// Copyright (c) 2022 codestation
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy of
-// this software and associated documentation files (the "Software"), to deal in
-// the Software without restriction, including without limitation the rights to
-// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-// the Software, and to permit persons to whom the Software is furnished to do so,
-// subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
 package sqlstore
 
 import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"log"
 	"time"
 
@@ -44,62 +26,96 @@ const (
 
 // compile time validator for the interfaces
 var (
-	_ SqlExecutor = pgxWrapper{}
-	_ SqlExecutor = pgxTxWrapper{}
+	_ SqlExecutor = PgxWrapper{}
+	_ SqlExecutor = PgxTxWrapper{}
 
 	ErrNoRows = pgx.ErrNoRows
 )
 
-type pgxWrapper struct {
-	*pgxpool.Pool
+type PgxWrapper struct {
+	pool *pgxpool.Pool
 }
 
-func (p pgxWrapper) Begin(ctx context.Context, f func(db SqlExecutor) error) error {
-	return p.Pool.BeginFunc(ctx, func(tx pgx.Tx) error {
+func (p PgxWrapper) BeginFunc(ctx context.Context, f func(db SqlExecutor) error) error {
+	return p.pool.BeginFunc(ctx, func(tx pgx.Tx) error {
 		return f(newPgxTxWrapper(tx))
 	})
 }
 
-func (p pgxWrapper) Exec(ctx context.Context, query string, arguments ...interface{}) (sql.Result, error) {
-	tag, err := p.Pool.Exec(ctx, query, arguments...)
+func (p PgxWrapper) Begin(ctx context.Context) (*PgxTxWrapper, error) {
+	tx, err := p.pool.Begin(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return newPgxTxWrapper(tx), nil
+}
+
+func (p PgxWrapper) Exec(ctx context.Context, query string, arguments ...interface{}) (sql.Result, error) {
+	tag, err := p.pool.Exec(ctx, query, arguments...)
 	if err != nil {
 		return nil, err
 	}
 	return pgxWrapperResult{tag}, nil
 }
 
-func (p pgxWrapper) Get(ctx context.Context, dst interface{}, query string, args ...interface{}) error {
-	return pgxscan.Get(ctx, p, dst, query, args...)
+func (p PgxWrapper) Get(ctx context.Context, dst interface{}, query string, args ...interface{}) error {
+	return pgxscan.Get(ctx, p.pool, dst, query, args...)
 }
 
-func (p pgxWrapper) Select(ctx context.Context, dest interface{}, query string, args ...interface{}) error {
-	return pgxscan.Select(ctx, p, dest, query, args...)
+func (p PgxWrapper) Select(ctx context.Context, dest interface{}, query string, args ...interface{}) error {
+	return pgxscan.Select(ctx, p.pool, dest, query, args...)
 }
 
-type pgxTxWrapper struct {
-	pgx.Tx
+func (p PgxWrapper) Close() {
+	p.pool.Close()
 }
 
-func (p pgxTxWrapper) Begin(ctx context.Context, f func(db SqlExecutor) error) error {
-	return p.Tx.BeginFunc(ctx, func(tx pgx.Tx) error {
-		return f(pgxTxWrapper{tx})
+func (p PgxWrapper) Ping(ctx context.Context) error {
+	return p.pool.Ping(ctx)
+}
+
+type PgxTxWrapper struct {
+	tx pgx.Tx
+}
+
+func (p PgxTxWrapper) BeginFunc(ctx context.Context, f func(db SqlExecutor) error) error {
+	return p.tx.BeginFunc(ctx, func(tx pgx.Tx) error {
+		return f(PgxTxWrapper{tx})
 	})
 }
 
-func (p pgxTxWrapper) Exec(ctx context.Context, query string, arguments ...interface{}) (sql.Result, error) {
-	tag, err := p.Tx.Exec(ctx, query, arguments...)
+func (p PgxTxWrapper) Begin(ctx context.Context) (*PgxTxWrapper, error) {
+	tx, err := p.tx.Begin(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return newPgxTxWrapper(tx), nil
+}
+
+func (p PgxTxWrapper) Commit(ctx context.Context) error {
+	return p.tx.Commit(ctx)
+}
+
+func (p PgxTxWrapper) Rollback(ctx context.Context) error {
+	return p.tx.Rollback(ctx)
+}
+
+func (p PgxTxWrapper) Exec(ctx context.Context, query string, arguments ...interface{}) (sql.Result, error) {
+	tag, err := p.tx.Exec(ctx, query, arguments...)
 	if err != nil {
 		return nil, err
 	}
 	return pgxWrapperResult{tag}, nil
 }
 
-func (p pgxTxWrapper) Get(ctx context.Context, dst interface{}, query string, args ...interface{}) error {
-	return pgxscan.Get(ctx, p, dst, query, args...)
+func (p PgxTxWrapper) Get(ctx context.Context, dst interface{}, query string, args ...interface{}) error {
+	return pgxscan.Get(ctx, p.tx, dst, query, args...)
 }
 
-func (p pgxTxWrapper) Select(ctx context.Context, dest interface{}, query string, args ...interface{}) error {
-	return pgxscan.Select(ctx, p, dest, query, args...)
+func (p PgxTxWrapper) Select(ctx context.Context, dest interface{}, query string, args ...interface{}) error {
+	return pgxscan.Select(ctx, p.tx, dest, query, args...)
 }
 
 type pgxWrapperResult struct {
@@ -114,18 +130,18 @@ func (r pgxWrapperResult) RowsAffected() (int64, error) {
 	return r.CommandTag.RowsAffected(), nil
 }
 
-func newPgxWrapper(pool *pgxpool.Pool) *pgxWrapper {
-	return &pgxWrapper{pool}
+func newPgxWrapper(pool *pgxpool.Pool) *PgxWrapper {
+	return &PgxWrapper{pool}
 }
 
-func newPgxTxWrapper(tx pgx.Tx) *pgxTxWrapper {
-	return &pgxTxWrapper{tx}
+func newPgxTxWrapper(tx pgx.Tx) *PgxTxWrapper {
+	return &PgxTxWrapper{tx}
 }
 
-func NewConnection(settings model.SqlSettings) SqlDb {
+func NewConnection(settings model.SqlSettings) (*PgxWrapper, error) {
 	config, err := pgxpool.ParseConfig(settings.DataSourceName)
 	if err != nil {
-		log.Fatalf("Failed to configure database, aborting: %s", err.Error())
+		return nil, fmt.Errorf("failed to configure database, aborting: %w", err)
 	}
 
 	config.MaxConnLifetime = settings.ConnMaxLifetime
@@ -135,7 +151,7 @@ func NewConnection(settings model.SqlSettings) SqlDb {
 
 	db, err := pgxpool.ConnectConfig(context.Background(), config)
 	if err != nil {
-		log.Fatalf("Failed to open database, aborting: %s", err.Error())
+		return nil, fmt.Errorf("failed to open database, aborting: %w", err)
 	}
 
 	// total waiting time: 1 minute
@@ -155,11 +171,11 @@ func NewConnection(settings model.SqlSettings) SqlDb {
 			log.Printf("Failed to ping database: %s, retrying in %d seconds", err.Error(), pingTimeoutSecs)
 			time.Sleep(pingTimeoutSecs * time.Second)
 		} else {
-			log.Fatal("Failed to ping database, aborting")
+			return nil, errors.New("failed to ping database, aborting")
 		}
 	}
 
-	return newPgxWrapper(db)
+	return newPgxWrapper(db), nil
 }
 
 func NewQueryBuilder() goqu.DialectWrapper {

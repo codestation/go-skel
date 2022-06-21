@@ -47,7 +47,12 @@ func NewServer(cfg model.Config) (*Server, error) {
 	s := &Server{cfg: cfg}
 
 	// Database initialization
-	s.conn = sqlstore.NewConnection(cfg.SqlSettings)
+	db, err := sqlstore.NewConnection(cfg.SqlSettings)
+	if err != nil {
+		return nil, err
+	}
+
+	s.conn = db
 
 	// Store initialization, could use a different database or non-sql store
 	s.sqlStore = sqlstore.New(s.conn, cfg.SqlSettings)
@@ -66,6 +71,7 @@ func NewServer(cfg model.Config) (*Server, error) {
 	e.Use(i18n.LoadMessagePrinter("user_lang"))
 	e.Use(middleware.Logger())
 	e.Use(middleware.BodyLimit(cfg.ServerSettings.BodyLimit))
+	e.Use(middleware.RequestID())
 	e.Validator = &CustomValidator{validator: validator.New()}
 	e.HTTPErrorHandler = ErrorHandler(e)
 	s.EchoServer = e

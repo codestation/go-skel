@@ -21,14 +21,9 @@ package sqlstore
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
-	"log"
-
 	"github.com/doug-martin/goqu/v9"
 	_ "github.com/doug-martin/goqu/v9/dialect/postgres"
-	migrate "github.com/rubenv/sql-migrate"
-	"megpoid.xyz/go/go-skel/db"
 	"megpoid.xyz/go/go-skel/model"
 	"megpoid.xyz/go/go-skel/store"
 )
@@ -72,67 +67,8 @@ func (ss *SqlStore) HealthCheck() store.HealthCheckStore {
 
 func (ss *SqlStore) Close() {}
 
-func RunMigrations(conn SqlDb, config model.Config) error {
-	migrations := migrate.EmbedFileSystemMigrationSource{
-		FileSystem: db.Assets(),
-		Root:       "migrations",
-	}
-
-	migrate.SetTable("app_migrations")
-	ctx := context.Background()
-
-	if config.MigrationSettings.Reset {
-		_, err := conn.Exec(ctx, "DROP SCHEMA IF EXISTS public CASCADE")
-		if err != nil {
-			return err
-		}
-
-		_, err = conn.Exec(ctx, "CREATE SCHEMA public")
-		if err != nil {
-			return nil
-		}
-		log.Printf("Recreated 'public' schema")
-	}
-
-	step := 0
-	//TODO: find a way to either convert pgx.Pool to sql.DD
-	sqlDb, err := sql.Open("pgx", config.SqlSettings.DataSourceName)
-	if err != nil {
-		return fmt.Errorf("failed to open migration connection: %w", err)
-	}
-
-	defer func(db *sql.DB) {
-		err := db.Close()
-		if err != nil {
-			log.Printf("Failed to clone migration connection: %s", err.Error())
-		}
-	}(sqlDb)
-
-	if !config.MigrationSettings.Reset && (config.MigrationSettings.Rollback || config.MigrationSettings.Redo) {
-		step = config.MigrationSettings.Step
-		n, err := migrate.ExecMax(sqlDb, config.SqlSettings.DriverName, migrations, migrate.Down, step)
-		if err != nil {
-			return err
-		}
-		log.Printf("Reverted %d migrations", n)
-	}
-
-	if config.MigrationSettings.Reset || !config.MigrationSettings.Rollback || config.MigrationSettings.Redo {
-		if config.MigrationSettings.Redo {
-			step = config.MigrationSettings.Step
-		}
-
-		n, err := migrate.ExecMax(sqlDb, config.SqlSettings.DriverName, migrations, migrate.Up, step)
-		if err != nil {
-			return err
-		}
-		log.Printf("Applied %d migrations", n)
-	}
-	return nil
-}
-
 func (ss *SqlStore) WithTransaction(ctx context.Context, f func(s store.Store) error) error {
-	err := ss.db.Begin(ctx, func(db SqlExecutor) error {
+	err := ss.db.BeginFunc(ctx, func(db SqlExecutor) error {
 		s := &SqlStore{
 			db:       db,
 			settings: ss.settings,

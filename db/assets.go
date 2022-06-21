@@ -24,6 +24,13 @@ import "embed"
 //go:embed migrations
 var assets embed.FS
 
+//go:embed seed
+var seeds embed.FS
+
 func Assets() embed.FS {
 	return assets
+}
+
+func Seeds() embed.FS {
+	return seeds
 }

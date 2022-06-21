@@ -25,7 +25,8 @@ import (
 )
 
 type SqlExecutor interface {
-	Begin(ctx context.Context, f func(db SqlExecutor) error) error
+	BeginFunc(ctx context.Context, f func(db SqlExecutor) error) error
+	Begin(ctx context.Context) (*PgxTxWrapper, error)
 	Exec(ctx context.Context, query string, arguments ...interface{}) (sql.Result, error)
 	Get(ctx context.Context, dst interface{}, query string, args ...interface{}) error
 	Select(ctx context.Context, dest interface{}, query string, args ...interface{}) error

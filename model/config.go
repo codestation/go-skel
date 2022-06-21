@@ -21,6 +21,7 @@ package model
 
 import (
 	"errors"
+	"fmt"
 	"time"
 )
 
@@ -45,6 +46,46 @@ type Config struct {
 	ServerSettings    ServerSettings
 	SqlSettings       SqlSettings
 	MigrationSettings MigrationSettings
+}
+
+type ConfigOption func(c *Config) error
+
+func WithUnmarshal(fn func(val any) error) ConfigOption {
+	return func(c *Config) error {
+		return c.Unmarshal(fn)
+	}
+}
+
+func NewConfig(opts ...ConfigOption) (*Config, error) {
+	cfg := &Config{}
+	for _, opt := range opts {
+		if err := opt(cfg); err != nil {
+			return nil, err
+		}
+	}
+	cfg.SetDefaults()
+	if err := cfg.Validate(); err != nil {
+		return nil, err
+	}
+
+	return cfg, nil
+}
+
+func (cfg *Config) Unmarshal(fn func(val any) error) error {
+	var err error
+	if err = fn(&cfg.GeneralSettings); err != nil {
+		return fmt.Errorf("failed to read general settings: %w", err)
+	}
+	if err = fn(&cfg.ServerSettings); err != nil {
+		return fmt.Errorf("failed to read general settings: %w", err)
+	}
+	if err = fn(&cfg.SqlSettings); err != nil {
+		return fmt.Errorf("failed to read general settings: %w", err)
+	}
+	if err = fn(&cfg.MigrationSettings); err != nil {
+		return fmt.Errorf("failed to read general settings: %w", err)
+	}
+	return nil
 }
 
 func (cfg *Config) SetDefaults() {
@@ -163,6 +204,7 @@ type MigrationSettings struct {
 	Redo     bool
 	Rollback bool
 	Reset    bool
+	Seed     bool
 	Step     int
 }
 

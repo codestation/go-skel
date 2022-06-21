@@ -20,11 +20,20 @@
 package cmd
 
 import (
+	"context"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"log"
 	"megpoid.xyz/go/go-skel/model"
 	"megpoid.xyz/go/go-skel/store/sqlstore"
+	"os"
+	"os/signal"
+	"syscall"
 )
+
+func unmarshalFunc(val any) error {
+	return viper.Unmarshal(val, unmarshalDecoder)
+}
 
 // migrateCmd represents the migrate command
 var migrateCmd = &cobra.Command{
@@ -32,26 +41,37 @@ var migrateCmd = &cobra.Command{
 	Short: "Run database migrations",
 	Long:  `Apply the database migrations to the database`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		var cfg model.Config
-		if err := viper.Unmarshal(&cfg.GeneralSettings, unmarshalDecoder); err != nil {
+		cfg, err := model.NewConfig(model.WithUnmarshal(unmarshalFunc))
+		if err != nil {
 			return err
 		}
-		if err := viper.Unmarshal(&cfg.SqlSettings, unmarshalDecoder); err != nil {
-			return err
-		}
-		if err := viper.Unmarshal(&cfg.MigrationSettings, unmarshalDecoder); err != nil {
-			return err
-		}
-		cfg.SetDefaults()
-		if err := cfg.Validate(); err != nil {
-			return err
-		}
+
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+
+		quit := make(chan os.Signal, 1)
 
 		// Database initialization
-		conn := sqlstore.NewConnection(cfg.SqlSettings)
+		conn, err := sqlstore.NewConnection(cfg.SqlSettings)
+		if err != nil {
+			return err
+		}
 		defer conn.Close()
 
-		return sqlstore.RunMigrations(conn, cfg)
+		go func() {
+			err := sqlstore.RunMigrations(ctx, conn, cfg)
+			if err != nil {
+				log.Println(err.Error())
+			}
+			quit <- os.Interrupt
+		}()
+
+		signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
+		<-quit
+
+		cancel()
+
+		return nil
 	},
 }
 
