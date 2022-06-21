@@ -1,0 +1,5 @@
+production:
+    dialect: postgres
+    datasource: ${APP_DSN}
+    dir: db/migrations
+    table: app_migrations
