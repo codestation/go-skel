@@ -11,9 +11,19 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+type Foo struct {
+	Model
+	Bar int
+}
+
+func NewFoo(opts ...Option) *Foo {
+	return &Foo{Model: NewModel(opts...)}
+}
+
 func TestNewModel(t *testing.T) {
 	now := time.Now()
-	model := NewModel(now)
+	model := NewFoo(WithTime(now))
 	assert.Equal(t, model.CreatedAt, now)
 	assert.Equal(t, model.UpdatedAt, now)
+	assert.Equal(t, 0, model.Bar)
 }

@@ -5,19 +5,18 @@
 package model
 
 import (
-	"database/sql"
 	"time"
 )
 
 // ID is used as an alias for the model primary key to avoid using some int by mistake.
-type ID int64
+type ID uint
 
 // Model is the base that will be used by other entity who need a primary key and timestamps.
 type Model struct {
-	ID        ID           `json:"-"`
-	CreatedAt time.Time    `json:"created_at"`
-	UpdatedAt time.Time    `json:"updated_at"`
-	DeletedAt sql.NullTime `json:"-"`
+	ID        ID         `json:"-"`
+	CreatedAt time.Time  `json:"created_at"`
+	UpdatedAt time.Time  `json:"updated_at"`
+	DeletedAt *time.Time `json:"-"`
 }
 
 // SetTimestamps configures the time on created/updated fields. Only call this method on new entity.
@@ -26,8 +25,21 @@ func (m *Model) SetTimestamps(now time.Time) {
 	m.UpdatedAt = now
 }
 
-func NewModel(now time.Time) *Model {
-	e := &Model{}
-	e.SetTimestamps(now)
+type Option func(m *Model)
+
+func WithTime(now time.Time) Option {
+	return func(m *Model) {
+		m.SetTimestamps(now)
+	}
+}
+
+func NewModel(opts ...Option) Model {
+	e := Model{}
+	for _, opt := range opts {
+		opt(&e)
+	}
+	if e.CreatedAt.IsZero() {
+		e.SetTimestamps(time.Now())
+	}
 	return e
 }
