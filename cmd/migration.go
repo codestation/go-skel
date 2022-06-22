@@ -42,7 +42,15 @@ var migrationCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		timestamp := time.Now().Format("20060102150405")
 		name := toSnakeCase(args[0])
-		filename := path.Join("db/migrations", timestamp+"_"+name+".sql")
+
+		var baseDir string
+		if viper.GetBool("seed") {
+			baseDir = "db/seed"
+		} else {
+			baseDir = "db/migrations"
+		}
+
+		filename := path.Join(baseDir, timestamp+"_"+name+".sql")
 		err := ioutil.WriteFile(filename, []byte(templateContent), 0644)
 		if err != nil {
 			return fmt.Errorf("failed to create migration file: %w", err)
@@ -53,6 +61,7 @@ var migrationCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(migrationCmd)
+	migrationCmd.Flags().Bool("seed", false, "Create a seed file")
 	err := viper.BindPFlags(migrationCmd.Flags())
 	cobra.CheckErr(err)
 }
