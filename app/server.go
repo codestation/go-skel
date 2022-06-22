@@ -20,7 +20,7 @@ import (
 )
 
 type Server struct {
-	cfg        config.Config
+	cfg        *config.Config
 	conn       sqlstore.SqlDb
 	sqlStore   *sqlstore.SqlStore
 	Store      store.Store
@@ -28,7 +28,7 @@ type Server struct {
 	EchoServer *echo.Echo
 }
 
-func NewServer(cfg config.Config) (*Server, error) {
+func NewServer(cfg *config.Config) (*Server, error) {
 	s := &Server{cfg: cfg}
 
 	// Database initialization

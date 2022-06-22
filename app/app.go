@@ -24,5 +24,5 @@ func (a *App) Srv() *Server {
 }
 
 func (a *App) Config() *config.Config {
-	return &a.svr.cfg
+	return a.svr.cfg
 }

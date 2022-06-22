@@ -32,18 +32,8 @@ func runServer() error {
 	printVersion()
 
 	// load config
-	var cfg config.Config
-	if err := viper.Unmarshal(&cfg.GeneralSettings, unmarshalDecoder); err != nil {
-		return err
-	}
-	if err := viper.Unmarshal(&cfg.ServerSettings, unmarshalDecoder); err != nil {
-		return err
-	}
-	if err := viper.Unmarshal(&cfg.SqlSettings, unmarshalDecoder); err != nil {
-		return err
-	}
-	cfg.SetDefaults()
-	if err := cfg.Validate(); err != nil {
+	cfg, err := config.NewConfig(config.WithUnmarshal(unmarshalFunc))
+	if err != nil {
 		return err
 	}
 
