@@ -5,7 +5,7 @@
 package app
 
 import (
-	"megpoid.xyz/go/go-skel/model"
+	"megpoid.xyz/go/go-skel/config"
 	"time"
 )
 
@@ -23,6 +23,6 @@ func (a *App) Srv() *Server {
 	return a.svr
 }
 
-func (a *App) Config() *model.Config {
+func (a *App) Config() *config.Config {
 	return &a.svr.cfg
 }

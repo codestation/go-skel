@@ -7,6 +7,7 @@ package app
 import (
 	"context"
 	"log"
+	"megpoid.xyz/go/go-skel/config"
 	"net/http"
 	"time"
 
@@ -14,13 +15,12 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"megpoid.xyz/go/go-skel/app/i18n"
-	"megpoid.xyz/go/go-skel/model"
 	"megpoid.xyz/go/go-skel/store"
 	"megpoid.xyz/go/go-skel/store/sqlstore"
 )
 
 type Server struct {
-	cfg        model.Config
+	cfg        config.Config
 	conn       sqlstore.SqlDb
 	sqlStore   *sqlstore.SqlStore
 	Store      store.Store
@@ -28,7 +28,7 @@ type Server struct {
 	EchoServer *echo.Echo
 }
 
-func NewServer(cfg model.Config) (*Server, error) {
+func NewServer(cfg config.Config) (*Server, error) {
 	s := &Server{cfg: cfg}
 
 	// Database initialization

@@ -7,10 +7,10 @@ package sqlstore
 import (
 	"context"
 	"database/sql"
+	"megpoid.xyz/go/go-skel/config"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"megpoid.xyz/go/go-skel/model"
 	"megpoid.xyz/go/go-skel/store"
 )
 
@@ -45,7 +45,7 @@ func (d *FakeDbConn) Ping(_ context.Context) error {
 
 func TestNew(t *testing.T) {
 	db := &FakeDbConn{}
-	ss := New(db, model.SqlSettings{})
+	ss := New(db, config.SqlSettings{})
 	assert.NotNil(t, ss.stores.healthCheck)
 	assert.NotNil(t, ss.db)
 	assert.NotNil(t, ss.dbx)

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT-license
 // that can be found in the LICENSE file.
 
-package model
+package config
 
 import (
 	"errors"
@@ -33,15 +33,15 @@ type Config struct {
 	MigrationSettings MigrationSettings
 }
 
-type ConfigOption func(c *Config) error
+type Option func(c *Config) error
 
-func WithUnmarshal(fn func(val any) error) ConfigOption {
+func WithUnmarshal(fn func(val any) error) Option {
 	return func(c *Config) error {
 		return c.Unmarshal(fn)
 	}
 }
 
-func NewConfig(opts ...ConfigOption) (*Config, error) {
+func NewConfig(opts ...Option) (*Config, error) {
 	cfg := &Config{}
 	for _, opt := range opts {
 		if err := opt(cfg); err != nil {

@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/viper"
 	"megpoid.xyz/go/go-skel/api"
 	"megpoid.xyz/go/go-skel/app"
-	"megpoid.xyz/go/go-skel/model"
+	"megpoid.xyz/go/go-skel/config"
 	"megpoid.xyz/go/go-skel/web"
 	"os"
 	"os/signal"
@@ -32,7 +32,7 @@ func runServer() error {
 	printVersion()
 
 	// load config
-	var cfg model.Config
+	var cfg config.Config
 	if err := viper.Unmarshal(&cfg.GeneralSettings, unmarshalDecoder); err != nil {
 		return err
 	}
@@ -91,12 +91,12 @@ func init() {
 
 	serveCmd.Flags().String("jwt-secret", "", "JWT secret key")
 	serveCmd.Flags().String("encryption-key", "", "Application encryption key")
-	serveCmd.Flags().StringP("listen", "l", model.DefaultListenAddress, "Listen address")
-	serveCmd.Flags().DurationP("timeout", "t", model.DefaultReadTimeout, "Request timeout")
+	serveCmd.Flags().StringP("listen", "l", config.DefaultListenAddress, "Listen address")
+	serveCmd.Flags().DurationP("timeout", "t", config.DefaultReadTimeout, "Request timeout")
 	serveCmd.Flags().String("dsn", "", "Database connection string. Setting the DSN ignores the db-* settings")
 	serveCmd.Flags().Int("query-limit", 1000, "Max results per query")
-	serveCmd.Flags().Int("max-open-conns", model.DefaultMaxOpenConns, "Max open connections")
-	serveCmd.Flags().Int("max-idle-conns", model.DefaultMaxIdleConns, "Max idle connections")
+	serveCmd.Flags().Int("max-open-conns", config.DefaultMaxOpenConns, "Max open connections")
+	serveCmd.Flags().Int("max-idle-conns", config.DefaultMaxIdleConns, "Max idle connections")
 	serveCmd.Flags().String("body-limit", "", "Max body size for http requests")
 	serveCmd.Flags().StringSlice("cors-allow-origin", []string{}, "CORS Allowed origins")
 	err := viper.BindPFlags(serveCmd.Flags())

@@ -6,6 +6,7 @@ package app
 
 import (
 	"context"
+	"megpoid.xyz/go/go-skel/config"
 
 	"megpoid.xyz/go/go-skel/model"
 )
@@ -13,5 +14,5 @@ import (
 type IApp interface {
 	HealthCheck(ctx context.Context) *model.HealthCheckResult
 	Srv() *Server
-	Config() *model.Config
+	Config() *config.Config
 }

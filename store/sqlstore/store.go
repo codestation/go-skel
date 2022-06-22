@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"github.com/doug-martin/goqu/v9"
 	_ "github.com/doug-martin/goqu/v9/dialect/postgres"
-	"megpoid.xyz/go/go-skel/model"
+	"megpoid.xyz/go/go-skel/config"
 	"megpoid.xyz/go/go-skel/store"
 )
 
@@ -22,7 +22,7 @@ type SqlStore struct {
 	db       SqlExecutor
 	dbx      SqlFuncExecutor
 	stores   Stores
-	settings *model.SqlSettings
+	settings *config.SqlSettings
 	builder  goqu.DialectWrapper
 }
 
@@ -32,7 +32,7 @@ func (ss *SqlStore) initialize() {
 	ss.stores.healthCheck = newSqlHealthCheckStore(ss)
 }
 
-func New(conn SqlDb, settings model.SqlSettings) *SqlStore {
+func New(conn SqlDb, settings config.SqlSettings) *SqlStore {
 	sqlStore := &SqlStore{
 		settings: &settings,
 	}

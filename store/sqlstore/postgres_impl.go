@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"megpoid.xyz/go/go-skel/config"
 	"time"
 
 	"github.com/doug-martin/goqu/v9"
@@ -19,7 +20,6 @@ import (
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 	_ "github.com/jackc/pgx/v4/stdlib"
-	"megpoid.xyz/go/go-skel/model"
 )
 
 const (
@@ -142,7 +142,7 @@ func newPgxTxWrapper(tx pgx.Tx) *PgxTxWrapper {
 	return &PgxTxWrapper{tx}
 }
 
-func NewConnection(settings model.SqlSettings) (*PgxWrapper, error) {
+func NewConnection(settings config.SqlSettings) (*PgxWrapper, error) {
 	config, err := pgxpool.ParseConfig(settings.DataSourceName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to configure database, aborting: %w", err)

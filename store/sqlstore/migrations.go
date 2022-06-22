@@ -10,13 +10,13 @@ import (
 	"fmt"
 	migrate "github.com/rubenv/sql-migrate"
 	"log"
+	"megpoid.xyz/go/go-skel/config"
 	"megpoid.xyz/go/go-skel/db"
-	"megpoid.xyz/go/go-skel/model"
 	"path"
 	"strings"
 )
 
-func RunMigrations(ctx context.Context, pool SqlExecutor, config *model.Config) error {
+func RunMigrations(ctx context.Context, pool SqlExecutor, config *config.Config) error {
 	migrations := migrate.EmbedFileSystemMigrationSource{
 		FileSystem: db.Assets(),
 		Root:       "migrations",

@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"log"
-	"megpoid.xyz/go/go-skel/model"
+	"megpoid.xyz/go/go-skel/config"
 	"megpoid.xyz/go/go-skel/store/sqlstore"
 	"os"
 	"os/signal"
@@ -26,7 +26,7 @@ var migrateCmd = &cobra.Command{
 	Short: "Run database migrations",
 	Long:  `Apply the database migrations to the database`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		cfg, err := model.NewConfig(model.WithUnmarshal(unmarshalFunc))
+		cfg, err := config.NewConfig(config.WithUnmarshal(unmarshalFunc))
 		if err != nil {
 			return err
 		}
