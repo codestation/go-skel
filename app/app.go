@@ -9,6 +9,11 @@ import (
 	"time"
 )
 
+// compile time validator for the interfaces
+var (
+	_ IApp = &App{}
+)
+
 type App struct {
 	svr     *Server
 	timeNow func() time.Time

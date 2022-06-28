@@ -6,6 +6,7 @@ package store
 
 import (
 	"context"
+	"github.com/gofrs/uuid"
 	"megpoid.xyz/go/go-skel/model"
 	"megpoid.xyz/go/go-skel/model/response"
 )
@@ -19,10 +20,12 @@ type Store interface {
 
 type CrudStore[T any, PT model.Modelable[T]] interface {
 	Get(ctx context.Context, id model.ID) (PT, error)
+	GetByExtID(ctx context.Context, externalID uuid.UUID) (PT, error)
 	List(ctx context.Context, opts ...FilterOption) (*response.ListResponse[T], error)
 	Save(ctx context.Context, req PT) error
 	Update(ctx context.Context, req PT) error
 	Delete(ctx context.Context, id model.ID) error
+	DeleteByExtId(ctx context.Context, externalId uuid.UUID) error
 }
 
 // HealthCheckStore handles all healthCheck related operations on the store

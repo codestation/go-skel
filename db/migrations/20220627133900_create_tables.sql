@@ -1,13 +1,14 @@
 -- +migrate Up
 create table if not exists profiles
 (
-    id         integer generated always as identity,
-    created_at timestamptz not null,
-    updated_at timestamptz not null,
-    deleted_at timestamptz,
-    first_name text        not null,
-    last_name  text        not null,
-    user_token text        not null,
+    id          integer generated always as identity,
+    created_at  timestamptz not null,
+    updated_at  timestamptz not null,
+    deleted_at  timestamptz,
+    external_id uuid        not null,
+    first_name  text        not null,
+    last_name   text        not null,
+    user_token  text        not null,
     primary key (id),
     unique (user_token),
     check (char_length(first_name) <= 255),

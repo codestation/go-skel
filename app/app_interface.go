@@ -15,7 +15,9 @@ import (
 type IApp interface {
 	GetProfile(ctx context.Context, id model.ID) (*model.Profile, error)
 	ListProfiles(ctx context.Context, query *request.QueryParams) (*response.ListResponse[model.Profile], error)
-
+	SaveProfile(ctx context.Context, req *model.ProfileRequest) (*model.Profile, error)
+	UpdateProfile(ctx context.Context, req *model.ProfileRequest) (*model.Profile, error)
+	RemoveProfile(ctx context.Context, id model.ID) error
 	HealthCheck(ctx context.Context) *model.HealthCheckResult
 	Srv() *Server
 	Config() *config.Config

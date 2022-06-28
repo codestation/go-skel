@@ -5,6 +5,8 @@
 package model
 
 import (
+	"github.com/gofrs/uuid"
+	"github.com/jackc/pgtype"
 	"time"
 )
 
@@ -13,10 +15,11 @@ type ID uint
 
 // Model is the base that will be used by other entity who need a primary key and timestamps.
 type Model struct {
-	ID        ID         `json:"-"`
-	CreatedAt time.Time  `json:"created_at"`
-	UpdatedAt time.Time  `json:"updated_at"`
-	DeletedAt *time.Time `json:"-"`
+	ID         ID          `json:"-"`
+	ExternalID pgtype.UUID `json:"external_id"`
+	CreatedAt  time.Time   `json:"created_at"`
+	UpdatedAt  time.Time   `json:"updated_at"`
+	DeletedAt  *time.Time  `json:"-"`
 }
 
 type Modelable[T any] interface {
@@ -47,6 +50,12 @@ func WithTime(now time.Time) Option {
 	}
 }
 
+func WithUUID(id uuid.UUID) Option {
+	return func(m *Model) {
+		_ = m.ExternalID.Set(id)
+	}
+}
+
 func NewModel(opts ...Option) Model {
 	e := Model{}
 	for _, opt := range opts {
@@ -54,6 +63,10 @@ func NewModel(opts ...Option) Model {
 	}
 	if e.CreatedAt.IsZero() {
 		e.SetTimestamps(time.Now())
+	}
+	if e.ExternalID.Status == pgtype.Undefined {
+		externalId := uuid.Must(uuid.NewV6())
+		_ = e.ExternalID.Set(externalId)
 	}
 	return e
 }

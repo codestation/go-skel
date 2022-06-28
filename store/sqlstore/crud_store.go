@@ -9,11 +9,17 @@ import (
 	"errors"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/doug-martin/goqu/v9/exp"
+	"github.com/gofrs/uuid"
 	"megpoid.xyz/go/go-skel/model"
 	"megpoid.xyz/go/go-skel/model/response"
 	"megpoid.xyz/go/go-skel/store"
 	"megpoid.xyz/go/go-skel/store/filter"
 	"megpoid.xyz/go/go-skel/store/paginator"
+)
+
+// compile time validator for the interfaces
+var (
+	_ store.CrudStore[model.Model, *model.Model] = &crudStore[model.Model, *model.Model]{}
 )
 
 type crudStore[T any, PT model.Modelable[T]] struct {
@@ -63,6 +69,30 @@ func NewCrudStore[T any, PT model.Modelable[T]](sqlStore *SqlStore, opts ...Crud
 
 func (s *crudStore[T, PT]) Get(ctx context.Context, id model.ID) (PT, error) {
 	query := s.builder.From(s.table).Select(s.selectFields...).Where(goqu.Ex{"id": id})
+	if !s.defaultFilters.IsEmpty() {
+		query = query.Where(s.defaultFilters)
+	}
+
+	sql, args, err := query.Prepared(true).ToSQL()
+	if err != nil {
+		return nil, store.NewRepoError(store.ErrBackend, err)
+	}
+
+	var result T
+	err = s.db.Get(ctx, result, sql, args...)
+
+	switch {
+	case errors.Is(err, ErrNoRows):
+		return nil, store.NewRepoError(store.ErrNotFound, err)
+	case err != nil:
+		return nil, store.NewRepoError(store.ErrBackend, err)
+	default:
+		return &result, nil
+	}
+}
+
+func (s *crudStore[T, PT]) GetByExtID(ctx context.Context, externalID uuid.UUID) (PT, error) {
+	query := s.builder.From(s.table).Select(s.selectFields...).Where(goqu.Ex{"external_id": externalID})
 	if !s.defaultFilters.IsEmpty() {
 		query = query.Where(s.defaultFilters)
 	}
@@ -167,6 +197,31 @@ func (s *crudStore[T, PT]) Update(ctx context.Context, req PT) error {
 
 func (s *crudStore[T, PT]) Delete(ctx context.Context, id model.ID) error {
 	query := s.builder.Delete(s.table).Where(goqu.Ex{"id": id})
+
+	sql, args, err := query.Prepared(true).ToSQL()
+	if err != nil {
+		return store.NewRepoError(store.ErrDuplicated, err)
+	}
+
+	result, err := s.db.Exec(ctx, sql, args...)
+	if err != nil {
+		return store.NewRepoError(store.ErrBackend, err)
+	}
+
+	n, err := result.RowsAffected()
+	if err != nil {
+		return store.NewRepoError(store.ErrBackend, err)
+	}
+
+	if n != 1 {
+		return store.NewRepoError(store.ErrNotFound, nil)
+	}
+
+	return nil
+}
+
+func (s *crudStore[T, PT]) DeleteByExtId(ctx context.Context, externalId uuid.UUID) error {
+	query := s.builder.Delete(s.table).Where(goqu.Ex{"external_id": externalId})
 
 	sql, args, err := query.Prepared(true).ToSQL()
 	if err != nil {

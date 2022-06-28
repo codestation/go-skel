@@ -40,3 +40,38 @@ func (a *App) ListProfiles(ctx context.Context, query *request.QueryParams) (*re
 
 	return result, nil
 }
+
+func (a *App) SaveProfile(ctx context.Context, req *model.ProfileRequest) (*model.Profile, error) {
+	t := message.NewPrinter(i18n.GetLanguageTagsContext(ctx))
+
+	profile := req.Profile()
+	err := a.Srv().Store.Profile().Save(ctx, profile)
+	if err != nil {
+		return nil, NewAppError(t.Sprintf("Failed to save profile"), err)
+	}
+
+	return profile, nil
+}
+
+func (a *App) UpdateProfile(ctx context.Context, req *model.ProfileRequest) (*model.Profile, error) {
+	t := message.NewPrinter(i18n.GetLanguageTagsContext(ctx))
+
+	profile := req.Profile()
+	err := a.Srv().Store.Profile().Update(ctx, profile)
+	if err != nil {
+		return nil, NewAppError(t.Sprintf("Failed to update profile"), err)
+	}
+
+	return profile, nil
+}
+
+func (a *App) RemoveProfile(ctx context.Context, id model.ID) error {
+	t := message.NewPrinter(i18n.GetLanguageTagsContext(ctx))
+
+	err := a.Srv().Store.Profile().Delete(ctx, id)
+	if err != nil {
+		return NewAppError(t.Sprintf("Failed to remove profile"), err)
+	}
+
+	return nil
+}
