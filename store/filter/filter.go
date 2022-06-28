@@ -11,7 +11,6 @@ import (
 	"github.com/shopspring/decimal"
 	"go.uber.org/multierr"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -160,7 +159,7 @@ func (f *Filter) buildWhereExpression() (exp.ExpressionList, error) {
 		case OperationHas:
 			queryFilter = goqu.I(rule.Key).ILike(fmt.Sprintf("%%%s%%", value))
 		case OperationIn:
-			values := strings.Split(value.(string), ",")
+			values := filter.Values()
 			queryFilter = goqu.I(rule.Key).In(values)
 		case OperationIsNull:
 			queryFilter = goqu.I(rule.Key).IsNull()

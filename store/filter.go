@@ -26,7 +26,11 @@ func WithFilter(query *request.QueryParams) FilterOption {
 		if query.Filters != nil {
 			var conditions []filter.Condition
 			for _, fi := range query.Filters {
-				conditions = append(conditions, filter.NewCondition(fi.Field, fi.Operation, fi.Value))
+				conditions = append(conditions, filter.Condition{
+					Field:     fi.Field,
+					Operation: filter.OperationType(fi.Operation),
+					Value:     fi.Value,
+				})
 			}
 			f.SetConditions(conditions...)
 		}

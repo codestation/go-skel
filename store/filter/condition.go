@@ -12,14 +12,6 @@ type Condition struct {
 	Value     string
 }
 
-func NewCondition(field, operation, value string) Condition {
-	return Condition{
-		Field:     field,
-		Operation: OperationType(operation),
-		Value:     value,
-	}
-}
-
 func (f Condition) Values() []string {
 	return strings.Split(f.Value, ",")
 }
