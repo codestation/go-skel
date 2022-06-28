@@ -2,9 +2,37 @@
     "language": "en",
     "messages": [
         {
+            "id": "Invalid profile ID",
+            "message": "Invalid profile ID",
+            "translation": "Invalid profile ID",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
             "id": "An error occurred",
             "message": "An error occurred",
             "translation": "An error occurred",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Profile not found",
+            "message": "Profile not found",
+            "translation": "Profile not found",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Failed to get profile",
+            "message": "Failed to get profile",
+            "translation": "Failed to get profile",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Failed to list profiles",
+            "message": "Failed to list profiles",
+            "translation": "Failed to list profiles",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         }

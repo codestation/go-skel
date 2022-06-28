@@ -39,19 +39,29 @@ func init() {
 }
 
 var messageKeyToIndex = map[string]int{
-	"An error occurred": 0,
+	"An error occurred":       1,
+	"Failed to get profile":   3,
+	"Failed to list profiles": 4,
+	"Invalid profile ID":      0,
+	"Profile not found":       2,
 }
 
-var enIndex = []uint32{ // 2 elements
-	0x00000000, 0x00000012,
-} // Size: 32 bytes
+var enIndex = []uint32{ // 6 elements
+	0x00000000, 0x00000013, 0x00000025, 0x00000037,
+	0x0000004d, 0x00000065,
+} // Size: 48 bytes
 
-const enData string = "\x02An error occurred"
+const enData string = "" + // Size: 101 bytes
+	"\x02Invalid profile ID\x02An error occurred\x02Profile not found\x02Fail" +
+	"ed to get profile\x02Failed to list profiles"
 
-var esIndex = []uint32{ // 2 elements
-	0x00000000, 0x00000015,
-} // Size: 32 bytes
+var esIndex = []uint32{ // 6 elements
+	0x00000000, 0x00000017, 0x0000002c, 0x00000041,
+	0x00000059, 0x00000072,
+} // Size: 48 bytes
 
-const esData string = "\x02Ha ocurrido un error"
+const esData string = "" + // Size: 114 bytes
+	"\x02ID de perfil inválido\x02Ha ocurrido un error\x02Perfil no encontrad" +
+	"o\x02Error al obtener perfil\x02Error al listar perfiles"
 
-// Total table size 103 bytes (0KiB); checksum: 73327995
+	// Total table size 311 bytes (0KiB); checksum: 4778579D

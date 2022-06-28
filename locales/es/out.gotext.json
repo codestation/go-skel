@@ -2,9 +2,29 @@
     "language": "es",
     "messages": [
         {
+            "id": "Invalid profile ID",
+            "message": "Invalid profile ID",
+            "translation": "ID de perfil inválido"
+        },
+        {
             "id": "An error occurred",
             "message": "An error occurred",
             "translation": "Ha ocurrido un error"
+        },
+        {
+            "id": "Profile not found",
+            "message": "Profile not found",
+            "translation": "Perfil no encontrado"
+        },
+        {
+            "id": "Failed to get profile",
+            "message": "Failed to get profile",
+            "translation": "Error al obtener perfil"
+        },
+        {
+            "id": "Failed to list profiles",
+            "message": "Failed to list profiles",
+            "translation": "Error al listar perfiles"
         }
     ]
 }
