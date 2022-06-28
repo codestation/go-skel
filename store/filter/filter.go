@@ -10,22 +10,9 @@ import (
 	"github.com/doug-martin/goqu/v9/exp"
 	"github.com/shopspring/decimal"
 	"go.uber.org/multierr"
-	"megpoid.xyz/go/go-skel/model/request"
 	"strconv"
 	"strings"
 	"time"
-)
-
-type VariableType string
-
-const (
-	VariableString          VariableType = "string"
-	VariableInteger         VariableType = "number"
-	VariableBool            VariableType = "boolean"
-	VariableDecimal         VariableType = "decimal"
-	VariableDate            VariableType = "date"
-	VariableTimestamp       VariableType = "timestamp"
-	VariableTimestampMillis VariableType = "timestamp_millis"
 )
 
 // New creates a query filter
@@ -38,8 +25,8 @@ func New(opts ...Option) *Filter {
 }
 
 type Filter struct {
-	rules   map[string]Rule
-	filters []request.Filter
+	rules      map[string]Rule
+	conditions []Condition
 }
 
 // SetRules sets paging rules
@@ -50,74 +37,67 @@ func (f *Filter) SetRules(rules ...Rule) {
 	}
 }
 
-// SetFilters sets filter rules
-func (f *Filter) SetFilters(filters ...request.Filter) {
-	f.filters = make([]request.Filter, len(filters))
-	copy(f.filters, filters)
+// SetConditions sets filter rules
+func (f *Filter) SetConditions(conditions ...Condition) {
+	f.conditions = make([]Condition, len(conditions))
+	copy(f.conditions, conditions)
 }
 
-type Rule struct {
-	Key        string
-	Operation  []request.OperationType
-	Type       VariableType
-	AcceptNull bool
-}
-
-func (f *Filter) getValueFromFilter(rule Rule, filter request.Filter) (any, error) {
+func (f *Filter) getValueFromFilter(rule Rule, condition Condition) (any, error) {
 	var value any
 
-	if rule.AcceptNull && (filter.Operation == request.OperationIsNull || filter.Operation == request.OperationIsNotNull) {
+	if rule.AcceptNull && (condition.Operation == OperationIsNull || condition.Operation == OperationIsNotNull) {
 		return nil, nil
 	}
 
 	switch rule.Type {
 	case VariableString:
-		value = filter.Value
+		value = condition.Value
 	case VariableInteger:
-		intVal, err := strconv.ParseInt(filter.Value, 10, 64)
+		intVal, err := strconv.ParseInt(condition.Value, 10, 64)
 		if err != nil {
-			return nil, fmt.Errorf("invalid filter value for %s, must be integer: %w", filter.Field, err)
+			return nil, fmt.Errorf("invalid filter value for %s, must be integer: %w", condition.Field, err)
 		}
 		value = intVal
 	case VariableDecimal:
-		decVal, err := decimal.NewFromString(filter.Value)
+		decVal, err := decimal.NewFromString(condition.Value)
 		if err != nil {
-			return nil, fmt.Errorf("invalid filter value for %s, must be decimal: %w", filter.Field, err)
+			return nil, fmt.Errorf("invalid filter value for %s, must be decimal: %w", condition.Field, err)
 		}
 		value = decVal
 	case VariableDate:
-		_, err := time.Parse("2006-01-02", filter.Value)
+		_, err := time.Parse("2006-01-02", condition.Value)
 		if err != nil {
-			return nil, fmt.Errorf("invalid filter value for %s, must match format yyyy-MM-dd: %w", filter.Field, err)
+			return nil, fmt.Errorf("invalid filter value for %s, must match format yyyy-MM-dd: %w", condition.Field, err)
 		}
-		value = filter.Value
+		value = condition.Value
 	case VariableTimestamp:
-		i, err := strconv.ParseInt(filter.Value, 10, 64)
+		i, err := strconv.ParseInt(condition.Value, 10, 64)
 		if err != nil {
-			return nil, fmt.Errorf("invalid filter value for %s, must be a timestamp: %w", filter.Field, err)
+			return nil, fmt.Errorf("invalid filter value for %s, must be a timestamp: %w", condition.Field, err)
 		}
 		value = time.Unix(i, 0)
 	case VariableTimestampMillis:
-		i, err := strconv.ParseInt(filter.Value, 10, 64)
+		i, err := strconv.ParseInt(condition.Value, 10, 64)
 		if err != nil {
-			return nil, fmt.Errorf("invalid filter value for %s, must be a timestamp with milliseconds: %w", filter.Field, err)
+			return nil, fmt.Errorf("invalid filter value for %s, must be a timestamp with milliseconds: %w", condition.Field, err)
 		}
 		value = time.UnixMilli(i)
 	case VariableBool:
-		switch filter.Operation {
-		case request.OperationIsTrue:
+		switch condition.Operation {
+		case OperationIsTrue:
 			value = true
-		case request.OperationIsFalse:
+		case OperationIsFalse:
 			value = false
 		default:
-			boolVal, err := strconv.ParseBool(filter.Value)
+			boolVal, err := strconv.ParseBool(condition.Value)
 			if err != nil {
-				return nil, fmt.Errorf("invalid filter value for %s, must be boolean: %w", filter.Field, err)
+				return nil, fmt.Errorf("invalid filter value for %s, must be boolean: %w", condition.Field, err)
 			}
 			value = boolVal
 		}
 	default:
-		return nil, fmt.Errorf("unknown rule type for field %s: %s", filter.Field, rule.Type)
+		return nil, fmt.Errorf("unknown rule type for field %s: %s", condition.Field, rule.Type)
 	}
 
 	return value, nil
@@ -135,7 +115,7 @@ func (f *Filter) buildWhereExpression() (exp.ExpressionList, error) {
 	queries := make([]exp.Expression, 0)
 	var err error
 
-	for _, filter := range f.filters {
+	for _, filter := range f.conditions {
 		rule, ok := f.rules[filter.Field]
 		if !ok {
 			continue
@@ -165,30 +145,30 @@ func (f *Filter) buildWhereExpression() (exp.ExpressionList, error) {
 
 		var queryFilter exp.Expression
 		switch filter.Operation {
-		case request.OperationEqual:
+		case OperationEqual:
 			queryFilter = goqu.I(rule.Key).Eq(value)
-		case request.OperationNotEqual:
+		case OperationNotEqual:
 			queryFilter = goqu.I(rule.Key).Neq(value)
-		case request.OperationGreaterThan:
+		case OperationGreaterThan:
 			queryFilter = goqu.I(rule.Key).Gt(value)
-		case request.OperationGreaterOrEqual:
+		case OperationGreaterOrEqual:
 			queryFilter = goqu.I(rule.Key).Gte(value)
-		case request.OperationLessThan:
+		case OperationLessThan:
 			queryFilter = goqu.I(rule.Key).Lt(value)
-		case request.OperationLessOrEqual:
+		case OperationLessOrEqual:
 			queryFilter = goqu.I(rule.Key).Lte(value)
-		case request.OperationHas:
+		case OperationHas:
 			queryFilter = goqu.I(rule.Key).ILike(fmt.Sprintf("%%%s%%", value))
-		case request.OperationIn:
+		case OperationIn:
 			values := strings.Split(value.(string), ",")
 			queryFilter = goqu.I(rule.Key).In(values)
-		case request.OperationIsNull:
+		case OperationIsNull:
 			queryFilter = goqu.I(rule.Key).IsNull()
-		case request.OperationIsNotNull:
+		case OperationIsNotNull:
 			queryFilter = goqu.I(rule.Key).IsNotNull()
-		case request.OperationIsTrue:
+		case OperationIsTrue:
 			queryFilter = goqu.I(rule.Key).IsTrue()
-		case request.OperationIsFalse:
+		case OperationIsFalse:
 			queryFilter = goqu.I(rule.Key).IsFalse()
 		}
 		queries = append(queries, queryFilter)

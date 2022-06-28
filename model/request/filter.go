@@ -4,39 +4,16 @@
 
 package request
 
-import "strings"
-
-type OperationType string
-
-const (
-	OperationEqual          OperationType = "eq"
-	OperationNotEqual       OperationType = "neq"
-	OperationLessThan       OperationType = "lt"
-	OperationLessOrEqual    OperationType = "lte"
-	OperationGreaterThan    OperationType = "gt"
-	OperationGreaterOrEqual OperationType = "gte"
-	OperationHas            OperationType = "has"
-	OperationIn             OperationType = "in"
-	OperationIsNull         OperationType = "null"
-	OperationIsNotNull      OperationType = "notnull"
-	OperationIsTrue         OperationType = "true"
-	OperationIsFalse        OperationType = "false"
-)
-
-type Filter struct {
-	Field     string
-	Operation OperationType
-	Value     string
-}
-
-func (f Filter) Values() []string {
-	return strings.Split(f.Value, ",")
-}
-
 type Pagination struct {
 	Limit  *int    `query:"limit"`
 	After  *string `query:"after"`
 	Before *string `query:"before"`
+}
+
+type Filter struct {
+	Field     string
+	Operation string
+	Value     string
 }
 
 type QueryParams struct {

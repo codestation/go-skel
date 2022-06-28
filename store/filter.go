@@ -13,18 +13,22 @@ import (
 type FilterOption func(paginator *paginator.Paginator, filter *filter.Filter)
 
 func WithFilter(query *request.QueryParams) FilterOption {
-	return func(paginator *paginator.Paginator, filter *filter.Filter) {
+	return func(p *paginator.Paginator, f *filter.Filter) {
 		if query.Pagination.Limit != nil {
-			paginator.SetLimit(*query.Pagination.Limit)
+			p.SetLimit(*query.Pagination.Limit)
 		}
 		if query.Pagination.After != nil {
-			paginator.SetAfterCursor(*query.Pagination.After)
+			p.SetAfterCursor(*query.Pagination.After)
 		}
 		if query.Pagination.Before != nil {
-			paginator.SetBeforeCursor(*query.Pagination.Before)
+			p.SetBeforeCursor(*query.Pagination.Before)
 		}
 		if query.Filters != nil {
-			filter.SetFilters(query.Filters...)
+			var conditions []filter.Condition
+			for _, fi := range query.Filters {
+				conditions = append(conditions, filter.NewCondition(fi.Field, fi.Operation, fi.Value))
+			}
+			f.SetConditions(conditions...)
 		}
 	}
 }

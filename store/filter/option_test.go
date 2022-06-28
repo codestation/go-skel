@@ -1,20 +1,23 @@
+// Copyright 2022 codestation. All rights reserved.
+// Use of this source code is governed by a MIT-license
+// that can be found in the LICENSE file.
+
 package filter
 
 import (
 	"github.com/stretchr/testify/assert"
-	"megpoid.xyz/go/go-skel/model/request"
 	"testing"
 )
 
 func TestEmptyOptions(t *testing.T) {
 	f := New()
 	assert.Empty(t, f.rules)
-	assert.Empty(t, f.filters)
+	assert.Empty(t, f.conditions)
 }
 
 func TestOptionsWith(t *testing.T) {
 	opts := []Option{
-		WithFilters([]request.Filter{
+		WithConditions([]Condition{
 			{Field: "foo"},
 		}...),
 		WithRules([]Rule{
@@ -23,7 +26,7 @@ func TestOptionsWith(t *testing.T) {
 	}
 
 	f := New(opts...)
-	assert.Len(t, f.filters, 1)
+	assert.Len(t, f.conditions, 1)
 	assert.Len(t, f.rules, 1)
 	assert.Contains(t, f.rules, "bar")
 }

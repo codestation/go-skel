@@ -34,7 +34,7 @@ func NewFilter(c echo.Context) (*request.QueryParams, error) {
 			if len(filterParts) == 2 {
 				query.Filters = append(query.Filters, request.Filter{
 					Field:     filterParts[0],
-					Operation: request.OperationType(filterParts[1]),
+					Operation: filterParts[1],
 					Value:     value[0], //ignore other repeated filters
 				})
 			} else {

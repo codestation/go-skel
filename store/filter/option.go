@@ -4,8 +4,6 @@
 
 package filter
 
-import "megpoid.xyz/go/go-skel/model/request"
-
 // Option for filter
 type Option interface {
 	Apply(f *Filter)
@@ -13,8 +11,8 @@ type Option interface {
 
 // Config for filter
 type Config struct {
-	Rules   []Rule
-	Filters []request.Filter
+	Rules      []Rule
+	Conditions []Condition
 }
 
 // Apply applies config to paginator
@@ -23,8 +21,8 @@ func (c *Config) Apply(f *Filter) {
 		f.SetRules(c.Rules...)
 	}
 	// only set keys when no rules presented
-	if c.Filters != nil {
-		f.SetFilters(c.Filters...)
+	if c.Conditions != nil {
+		f.SetConditions(c.Conditions...)
 	}
 }
 
@@ -35,9 +33,9 @@ func WithRules(rules ...Rule) Option {
 	}
 }
 
-// WithFilters configures filter for query
-func WithFilters(filters ...request.Filter) Option {
+// WithConditions configures filter for query
+func WithConditions(filters ...Condition) Option {
 	return &Config{
-		Filters: filters,
+		Conditions: filters,
 	}
 }

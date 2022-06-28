@@ -1,35 +1,38 @@
+// Copyright 2022 codestation. All rights reserved.
+// Use of this source code is governed by a MIT-license
+// that can be found in the LICENSE file.
+
 package filter
 
 import (
 	"github.com/doug-martin/goqu/v9"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/multierr"
-	"megpoid.xyz/go/go-skel/model/request"
 	"strings"
 	"testing"
 )
 
 func TestFilter_Apply(t *testing.T) {
 	opts := []Option{
-		WithFilters([]request.Filter{
-			{Field: "value1", Operation: request.OperationEqual, Value: "1"},
-			{Field: "value2", Operation: request.OperationNotEqual, Value: "2"},
-			{Field: "value3", Operation: request.OperationGreaterThan, Value: "3"},
-			{Field: "value4", Operation: request.OperationGreaterOrEqual, Value: "4"},
-			{Field: "value5", Operation: request.OperationLessThan, Value: "5"},
-			{Field: "value6", Operation: request.OperationLessOrEqual, Value: "6"},
-			{Field: "value7", Operation: request.OperationHas, Value: "seven"},
-			{Field: "value8", Operation: request.OperationIn, Value: "1,2,3"},
-			{Field: "value9", Operation: request.OperationGreaterThan, Value: "5.2"},
-			{Field: "value10", Operation: request.OperationEqual, Value: "2022-06-28"},
-			{Field: "value11", Operation: request.OperationEqual, Value: "1656431650"},
-			{Field: "value12", Operation: request.OperationEqual, Value: "1656431650001"},
-			{Field: "value13", Operation: request.OperationEqual, Value: "true"},
-			{Field: "value14", Operation: request.OperationIsNull},
-			{Field: "value15", Operation: request.OperationIsNotNull},
-			{Field: "value16", Operation: request.OperationIsTrue},
-			{Field: "value17", Operation: request.OperationIsFalse},
-			{Field: "value18", Operation: request.OperationIsTrue},
+		WithConditions([]Condition{
+			{Field: "value1", Operation: OperationEqual, Value: "1"},
+			{Field: "value2", Operation: OperationNotEqual, Value: "2"},
+			{Field: "value3", Operation: OperationGreaterThan, Value: "3"},
+			{Field: "value4", Operation: OperationGreaterOrEqual, Value: "4"},
+			{Field: "value5", Operation: OperationLessThan, Value: "5"},
+			{Field: "value6", Operation: OperationLessOrEqual, Value: "6"},
+			{Field: "value7", Operation: OperationHas, Value: "seven"},
+			{Field: "value8", Operation: OperationIn, Value: "1,2,3"},
+			{Field: "value9", Operation: OperationGreaterThan, Value: "5.2"},
+			{Field: "value10", Operation: OperationEqual, Value: "2022-06-28"},
+			{Field: "value11", Operation: OperationEqual, Value: "1656431650"},
+			{Field: "value12", Operation: OperationEqual, Value: "1656431650001"},
+			{Field: "value13", Operation: OperationEqual, Value: "true"},
+			{Field: "value14", Operation: OperationIsNull},
+			{Field: "value15", Operation: OperationIsNotNull},
+			{Field: "value16", Operation: OperationIsTrue},
+			{Field: "value17", Operation: OperationIsFalse},
+			{Field: "value18", Operation: OperationIsTrue},
 		}...),
 		WithRules([]Rule{
 			{Key: "value1", Type: VariableString},
@@ -49,9 +52,9 @@ func TestFilter_Apply(t *testing.T) {
 			{Key: "value15", Type: VariableString, AcceptNull: true},
 			{Key: "value16", Type: VariableBool},
 			{Key: "value17", Type: VariableBool},
-			{Key: "value18", Type: VariableBool, Operation: []request.OperationType{
-				request.OperationIsTrue,
-				request.OperationIsFalse,
+			{Key: "value18", Type: VariableBool, Operation: []OperationType{
+				OperationIsTrue,
+				OperationIsFalse,
 			}},
 		}...),
 	}
@@ -91,16 +94,16 @@ SELECT * FROM "profiles" WHERE (
 
 func TestFilterErrors(t *testing.T) {
 	opts := []Option{
-		WithFilters([]request.Filter{
-			{Field: "value1", Operation: request.OperationEqual, Value: "not_number"},
-			{Field: "value2", Operation: request.OperationEqual, Value: "not_decimal"},
-			{Field: "value3", Operation: request.OperationEqual, Value: "not_date"},
-			{Field: "value4", Operation: request.OperationEqual, Value: "not_timestamp"},
-			{Field: "value5", Operation: request.OperationEqual, Value: "not_timestamp_millis"},
-			{Field: "value6", Operation: request.OperationEqual, Value: "not_bool"},
-			{Field: "value7", Operation: request.OperationEqual, Value: "value"},
-			{Field: "value8", Operation: request.OperationNotEqual, Value: "invalid_operation"},
-			{Field: "value99", Operation: request.OperationEqual, Value: "not_in_rules"},
+		WithConditions([]Condition{
+			{Field: "value1", Operation: OperationEqual, Value: "not_number"},
+			{Field: "value2", Operation: OperationEqual, Value: "not_decimal"},
+			{Field: "value3", Operation: OperationEqual, Value: "not_date"},
+			{Field: "value4", Operation: OperationEqual, Value: "not_timestamp"},
+			{Field: "value5", Operation: OperationEqual, Value: "not_timestamp_millis"},
+			{Field: "value6", Operation: OperationEqual, Value: "not_bool"},
+			{Field: "value7", Operation: OperationEqual, Value: "value"},
+			{Field: "value8", Operation: OperationNotEqual, Value: "invalid_operation"},
+			{Field: "value99", Operation: OperationEqual, Value: "not_in_rules"},
 		}...),
 		WithRules([]Rule{
 			{Key: "value1", Type: VariableInteger},
@@ -110,8 +113,8 @@ func TestFilterErrors(t *testing.T) {
 			{Key: "value5", Type: VariableTimestampMillis},
 			{Key: "value6", Type: VariableBool},
 			{Key: "value7", Type: "unknown"},
-			{Key: "value8", Type: VariableString, Operation: []request.OperationType{
-				request.OperationEqual,
+			{Key: "value8", Type: VariableString, Operation: []OperationType{
+				OperationEqual,
 			}},
 		}...),
 	}
@@ -131,6 +134,5 @@ func TestFilterErrors(t *testing.T) {
 			assert.Contains(t, errors[6].Error(), "unknown rule type for field value7")
 			assert.Contains(t, errors[7].Error(), "operator not permitted for field value8")
 		}
-
 	}
 }
