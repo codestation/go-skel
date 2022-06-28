@@ -9,6 +9,7 @@ import (
 	"github.com/doug-martin/goqu/v9"
 	"github.com/doug-martin/goqu/v9/exp"
 	"github.com/shopspring/decimal"
+	"go.uber.org/multierr"
 	"megpoid.xyz/go/go-skel/model/request"
 	"strconv"
 	"strings"
@@ -65,7 +66,7 @@ type Rule struct {
 func (f *Filter) getValueFromFilter(rule Rule, filter request.Filter) (any, error) {
 	var value any
 
-	if rule.AcceptNull && strings.ToLower(filter.Value) == "null" {
+	if rule.AcceptNull && (filter.Operation == request.OperationIsNull || filter.Operation == request.OperationIsNotNull) {
 		return nil, nil
 	}
 
@@ -103,13 +104,20 @@ func (f *Filter) getValueFromFilter(rule Rule, filter request.Filter) (any, erro
 		}
 		value = time.UnixMilli(i)
 	case VariableBool:
-		boolVal, err := strconv.ParseBool(filter.Value)
-		if err != nil {
-			return nil, fmt.Errorf("invalid filter value for %s, must be boolean: %w", filter.Field, err)
+		switch filter.Operation {
+		case request.OperationIsTrue:
+			value = true
+		case request.OperationIsFalse:
+			value = false
+		default:
+			boolVal, err := strconv.ParseBool(filter.Value)
+			if err != nil {
+				return nil, fmt.Errorf("invalid filter value for %s, must be boolean: %w", filter.Field, err)
+			}
+			value = boolVal
 		}
-		value = boolVal
 	default:
-		return nil, fmt.Errorf("unknown rule type: %s", rule.Type)
+		return nil, fmt.Errorf("unknown rule type for field %s: %s", filter.Field, rule.Type)
 	}
 
 	return value, nil
@@ -118,22 +126,25 @@ func (f *Filter) getValueFromFilter(rule Rule, filter request.Filter) (any, erro
 func (f *Filter) Apply(query *goqu.SelectDataset) (*goqu.SelectDataset, error) {
 	expr, err := f.buildWhereExpression()
 	if err != nil {
-		return nil, fmt.Errorf("failed to build query expression: %w", err)
+		return nil, err
 	}
 	return query.Where(expr), nil
 }
 
 func (f *Filter) buildWhereExpression() (exp.ExpressionList, error) {
 	queries := make([]exp.Expression, 0)
+	var err error
+
 	for _, filter := range f.filters {
 		rule, ok := f.rules[filter.Field]
 		if !ok {
 			continue
 		}
 
-		value, err := f.getValueFromFilter(rule, filter)
-		if err != nil {
-			return nil, err
+		value, valueErr := f.getValueFromFilter(rule, filter)
+		if valueErr != nil {
+			err = multierr.Append(err, valueErr)
+			continue
 		}
 
 		if len(rule.Operation) > 0 {
@@ -146,7 +157,9 @@ func (f *Filter) buildWhereExpression() (exp.ExpressionList, error) {
 			}
 
 			if !found {
-				return nil, fmt.Errorf("operator not permitted for field %s: %s", filter.Field, filter.Operation)
+				notFoundErr := fmt.Errorf("operator not permitted for field %s: %s", filter.Field, filter.Operation)
+				err = multierr.Append(err, notFoundErr)
+				continue
 			}
 		}
 
@@ -169,8 +182,20 @@ func (f *Filter) buildWhereExpression() (exp.ExpressionList, error) {
 		case request.OperationIn:
 			values := strings.Split(value.(string), ",")
 			queryFilter = goqu.I(rule.Key).In(values)
+		case request.OperationIsNull:
+			queryFilter = goqu.I(rule.Key).IsNull()
+		case request.OperationIsNotNull:
+			queryFilter = goqu.I(rule.Key).IsNotNull()
+		case request.OperationIsTrue:
+			queryFilter = goqu.I(rule.Key).IsTrue()
+		case request.OperationIsFalse:
+			queryFilter = goqu.I(rule.Key).IsFalse()
 		}
 		queries = append(queries, queryFilter)
+	}
+
+	if err != nil {
+		return nil, err
 	}
 
 	return goqu.And(queries...), nil
