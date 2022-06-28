@@ -1,2 +1,2 @@
 ###
-GET {{host}}/apis/goapp/v1/profiles?created_at__gt=1556385792652
+GET {{host}}/apis/goapp/v1/profiles

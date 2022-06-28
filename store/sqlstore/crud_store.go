@@ -10,10 +10,10 @@ import (
 	"github.com/doug-martin/goqu/v9"
 	"github.com/doug-martin/goqu/v9/exp"
 	"megpoid.xyz/go/go-skel/model"
+	"megpoid.xyz/go/go-skel/model/response"
 	"megpoid.xyz/go/go-skel/store"
 	"megpoid.xyz/go/go-skel/store/filter"
 	"megpoid.xyz/go/go-skel/store/paginator"
-	"megpoid.xyz/go/go-skel/store/paginator/cursor"
 )
 
 type crudStore[T any, PT model.Modelable[T]] struct {
@@ -85,7 +85,7 @@ func (s *crudStore[T, PT]) Get(ctx context.Context, id model.ID) (PT, error) {
 	}
 }
 
-func (s *crudStore[T, PT]) List(ctx context.Context, opts ...store.FilterOption) ([]PT, *cursor.Cursor, error) {
+func (s *crudStore[T, PT]) List(ctx context.Context, opts ...store.FilterOption) (*response.ListResponse[T], error) {
 	query := s.builder.From(s.table).Select(s.selectFields...)
 	if s.defaultFilters != nil {
 		query = query.Where(s.defaultFilters)
@@ -99,19 +99,20 @@ func (s *crudStore[T, PT]) List(ctx context.Context, opts ...store.FilterOption)
 
 	query, err := f.Apply(query)
 	if err != nil {
-		return nil, nil, store.NewRepoError(store.ErrBackend, err)
+		return nil, store.NewRepoError(store.ErrBackend, err)
 	}
 
-	results := make([]PT, 0)
+	results := make([]*T, 0)
 	cur, err := p.Paginate(ctx, s.db, query, &results)
 
 	switch {
 	case errors.Is(err, ErrNoRows):
-		return results, cur, nil
+
+		return response.NewListResponse(results, cur), nil
 	case err != nil:
-		return nil, nil, store.NewRepoError(store.ErrBackend, err)
+		return nil, store.NewRepoError(store.ErrBackend, err)
 	default:
-		return results, cur, nil
+		return response.NewListResponse(results, cur), nil
 	}
 }
 

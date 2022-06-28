@@ -10,7 +10,6 @@ import (
 	"megpoid.xyz/go/go-skel/app"
 	"megpoid.xyz/go/go-skel/app/i18n"
 	"megpoid.xyz/go/go-skel/model"
-	"megpoid.xyz/go/go-skel/model/response"
 	"net/http"
 )
 
@@ -43,10 +42,10 @@ func (api *API) ListProfiles(c echo.Context) error {
 		return err
 	}
 
-	results, cur, err := api.app.ListProfiles(c.Request().Context(), query)
+	result, err := api.app.ListProfiles(c.Request().Context(), query)
 	if err != nil {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, response.NewListResponse(results, cur))
+	return c.JSON(http.StatusOK, result)
 }

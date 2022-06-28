@@ -11,8 +11,8 @@ import (
 	"megpoid.xyz/go/go-skel/app/i18n"
 	"megpoid.xyz/go/go-skel/model"
 	"megpoid.xyz/go/go-skel/model/request"
+	"megpoid.xyz/go/go-skel/model/response"
 	"megpoid.xyz/go/go-skel/store"
-	"megpoid.xyz/go/go-skel/store/paginator/cursor"
 )
 
 func (a *App) GetProfile(ctx context.Context, id model.ID) (*model.Profile, error) {
@@ -30,13 +30,13 @@ func (a *App) GetProfile(ctx context.Context, id model.ID) (*model.Profile, erro
 	return profile, nil
 }
 
-func (a *App) ListProfiles(ctx context.Context, query *request.QueryParams) ([]*model.Profile, *cursor.Cursor, error) {
+func (a *App) ListProfiles(ctx context.Context, query *request.QueryParams) (*response.ListResponse[model.Profile], error) {
 	t := message.NewPrinter(i18n.GetLanguageTagsContext(ctx))
 
-	profile, cur, err := a.Srv().Store.Profile().List(ctx, store.WithFilter(query))
+	result, err := a.Srv().Store.Profile().List(ctx, store.WithFilter(query))
 	if err != nil {
-		return nil, nil, NewAppError(t.Sprintf("Failed to list profiles"), err)
+		return nil, NewAppError(t.Sprintf("Failed to list profiles"), err)
 	}
 
-	return profile, cur, nil
+	return result, nil
 }

@@ -7,7 +7,7 @@ package store
 import (
 	"context"
 	"megpoid.xyz/go/go-skel/model"
-	"megpoid.xyz/go/go-skel/store/paginator/cursor"
+	"megpoid.xyz/go/go-skel/model/response"
 )
 
 // Store lists all the other stores
@@ -19,7 +19,7 @@ type Store interface {
 
 type CrudStore[T any, PT model.Modelable[T]] interface {
 	Get(ctx context.Context, id model.ID) (PT, error)
-	List(ctx context.Context, opts ...FilterOption) ([]PT, *cursor.Cursor, error)
+	List(ctx context.Context, opts ...FilterOption) (*response.ListResponse[T], error)
 	Save(ctx context.Context, req PT) error
 	Update(ctx context.Context, req PT) error
 	Delete(ctx context.Context, id model.ID) error

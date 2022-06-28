@@ -7,15 +7,14 @@ package app
 import (
 	"context"
 	"megpoid.xyz/go/go-skel/config"
-	"megpoid.xyz/go/go-skel/model/request"
-	"megpoid.xyz/go/go-skel/store/paginator/cursor"
-
 	"megpoid.xyz/go/go-skel/model"
+	"megpoid.xyz/go/go-skel/model/request"
+	"megpoid.xyz/go/go-skel/model/response"
 )
 
 type IApp interface {
 	GetProfile(ctx context.Context, id model.ID) (*model.Profile, error)
-	ListProfiles(ctx context.Context, query *request.QueryParams) ([]*model.Profile, *cursor.Cursor, error)
+	ListProfiles(ctx context.Context, query *request.QueryParams) (*response.ListResponse[model.Profile], error)
 
 	HealthCheck(ctx context.Context) *model.HealthCheckResult
 	Srv() *Server
