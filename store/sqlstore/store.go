@@ -16,6 +16,7 @@ import (
 type Stores struct {
 	healthCheck store.HealthCheckStore
 	// define more stores here
+	profile store.ProfileStore
 }
 
 type SqlStore struct {
@@ -30,6 +31,7 @@ func (ss *SqlStore) initialize() {
 	ss.builder = NewQueryBuilder()
 	// Create all the stores here
 	ss.stores.healthCheck = newSqlHealthCheckStore(ss)
+	ss.stores.profile = newSqlProfileStore(ss)
 }
 
 func New(conn SqlDb, settings config.SqlSettings) *SqlStore {
@@ -48,6 +50,10 @@ func New(conn SqlDb, settings config.SqlSettings) *SqlStore {
 
 func (ss *SqlStore) HealthCheck() store.HealthCheckStore {
 	return ss.stores.healthCheck
+}
+
+func (ss *SqlStore) Profile() store.ProfileStore {
+	return ss.stores.profile
 }
 
 func (ss *SqlStore) Close() {}

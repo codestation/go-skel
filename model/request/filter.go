@@ -6,22 +6,22 @@ package request
 
 import "strings"
 
-type FilterType string
+type OperationType string
 
 const (
-	FilterEqual          FilterType = "eq"
-	FilterNotEqual       FilterType = "neq"
-	FilterLessThan       FilterType = "lt"
-	FilterLessOrEqual    FilterType = "lte"
-	FilterGreaterThan    FilterType = "gt"
-	FilterGreaterOrEqual FilterType = "gte"
-	FilterHas            FilterType = "has"
-	FilterIn             FilterType = "in"
+	OperationEqual          OperationType = "eq"
+	OperationNotEqual       OperationType = "neq"
+	OperationLessThan       OperationType = "lt"
+	OperationLessOrEqual    OperationType = "lte"
+	OperationGreaterThan    OperationType = "gt"
+	OperationGreaterOrEqual OperationType = "gte"
+	OperationHas            OperationType = "has"
+	OperationIn             OperationType = "in"
 )
 
 type Filter struct {
 	Field     string
-	Operation FilterType
+	Operation OperationType
 	Value     string
 }
 

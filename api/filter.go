@@ -13,15 +13,11 @@ import (
 
 func NewFilter(c echo.Context) (*request.QueryParams, error) {
 	query := &request.QueryParams{}
-	if err := c.Bind(query); err != nil {
+	if err := c.Bind(&query.Pagination); err != nil {
 		return nil, fmt.Errorf("failed to bind pagination filter: %w", err)
 	}
 
 	for key, value := range c.QueryParams() {
-		if len(value) == 0 {
-			// skip empty filter
-			continue
-		}
 		switch key {
 		case "after":
 			fallthrough
@@ -30,37 +26,19 @@ func NewFilter(c echo.Context) (*request.QueryParams, error) {
 		case "limit":
 		// managed by bind
 		case "q":
-			query.Search = value[0]
+			if len(value) > 0 {
+				query.Search = value[0]
+			}
 		default:
 			filterParts := strings.Split(key, "__")
 			if len(filterParts) == 2 {
-				switch request.FilterType(filterParts[1]) {
-				case request.FilterEqual:
-					fallthrough
-				case request.FilterNotEqual:
-					fallthrough
-				case request.FilterGreaterThan:
-					fallthrough
-				case request.FilterGreaterOrEqual:
-					fallthrough
-				case request.FilterLessThan:
-					fallthrough
-				case request.FilterLessOrEqual:
-					fallthrough
-				case request.FilterHas:
-					fallthrough
-				case request.FilterIn:
-					query.Filters = append(query.Filters, request.Filter{
-						Field:     filterParts[0],
-						Operation: request.FilterType(filterParts[1]),
-						Value:     value[0], //ignore other repeated filters
-					})
-				default:
-					// ignore filters outside the available ones
-					continue
-				}
+				query.Filters = append(query.Filters, request.Filter{
+					Field:     filterParts[0],
+					Operation: request.OperationType(filterParts[1]),
+					Value:     value[0], //ignore other repeated filters
+				})
 			} else {
-				// ignore other fields not separated by __
+				// skip values that aren't filters
 				continue
 			}
 		}

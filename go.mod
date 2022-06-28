@@ -12,6 +12,7 @@ require (
 	github.com/labstack/echo/v4 v4.7.2
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/rubenv/sql-migrate v1.1.1
+	github.com/shopspring/decimal v1.2.0
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/viper v1.11.0
 	github.com/stretchr/testify v1.7.1

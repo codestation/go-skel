@@ -6,13 +6,14 @@ package store
 
 import (
 	"megpoid.xyz/go/go-skel/model/request"
+	"megpoid.xyz/go/go-skel/store/filter"
 	"megpoid.xyz/go/go-skel/store/paginator"
 )
 
-type FilterOption func(paginator *paginator.Paginator)
+type FilterOption func(paginator *paginator.Paginator, filter *filter.Filter)
 
 func WithFilter(query *request.QueryParams) FilterOption {
-	return func(paginator *paginator.Paginator) {
+	return func(paginator *paginator.Paginator, filter *filter.Filter) {
 		if query.Pagination.Limit != nil {
 			paginator.SetLimit(*query.Pagination.Limit)
 		}
@@ -21,6 +22,9 @@ func WithFilter(query *request.QueryParams) FilterOption {
 		}
 		if query.Pagination.Before != nil {
 			paginator.SetBeforeCursor(*query.Pagination.Before)
+		}
+		if query.Filters != nil {
+			filter.SetFilters(query.Filters...)
 		}
 	}
 }

@@ -26,6 +26,7 @@ func Init(srv *app.Server) (*API, error) {
 
 	// initialize all handlers
 	api.InitStatus()
+	api.InitProfile()
 
 	return api, nil
 }

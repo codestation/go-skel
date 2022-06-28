@@ -23,6 +23,10 @@ func (s fakeStore) HealthCheck() store.HealthCheckStore {
 	}
 }
 
+func (s fakeStore) Profile() store.ProfileStore {
+	panic("not implemented")
+}
+
 func (s fakeStore) WithTransaction(_ context.Context, _ func(s store.Store) error) error {
 	panic("implement me")
 }

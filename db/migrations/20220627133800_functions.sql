@@ -12,4 +12,4 @@ $$ language plpgsql;
 -- +migrate StatementEnd
 
 -- +migrate Down
-drop function if exists  notify_event();
+drop function if exists notify_event();

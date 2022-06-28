@@ -19,10 +19,24 @@ type Model struct {
 	DeletedAt *time.Time `json:"-"`
 }
 
+type Modelable[T any] interface {
+	*T
+	GetID() ID
+	SetID(id ID)
+}
+
 // SetTimestamps configures the time on created/updated fields. Only call this method on new entity.
 func (m *Model) SetTimestamps(now time.Time) {
 	m.CreatedAt = now
 	m.UpdatedAt = now
+}
+
+func (m *Model) GetID() ID {
+	return m.ID
+}
+
+func (m *Model) SetID(id ID) {
+	m.ID = id
 }
 
 type Option func(m *Model)
