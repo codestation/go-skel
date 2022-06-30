@@ -19,5 +19,6 @@ type Filter struct {
 type QueryParams struct {
 	Pagination Pagination
 	Filters    []Filter
+	Includes   []string
 	Search     string
 }

@@ -7,6 +7,7 @@ package api
 import (
 	"fmt"
 	"github.com/labstack/echo/v4"
+	"go.uber.org/multierr"
 	"megpoid.xyz/go/go-skel/model/request"
 	"strings"
 )
@@ -17,14 +18,21 @@ func NewFilter(c echo.Context) (*request.QueryParams, error) {
 		return nil, fmt.Errorf("failed to bind pagination filter: %w", err)
 	}
 
+	var err error
 	for key, value := range c.QueryParams() {
 		switch key {
 		case "after":
+			// managed by bind
 			fallthrough
 		case "before":
+			// managed by bind
 			fallthrough
 		case "limit":
-		// managed by bind
+			// managed by bind
+		case "includes":
+			if len(value) > 0 {
+				query.Includes = strings.Split(value[0], ",")
+			}
 		case "q":
 			if len(value) > 0 {
 				query.Search = value[0]
@@ -38,10 +46,14 @@ func NewFilter(c echo.Context) (*request.QueryParams, error) {
 					Value:     value[0], //ignore other repeated filters
 				})
 			} else {
-				// skip values that aren't filters
+				err = multierr.Append(err, fmt.Errorf("invalid query param: %s", key))
 				continue
 			}
 		}
+	}
+
+	if err != nil {
+		return nil, err
 	}
 
 	return query, nil
