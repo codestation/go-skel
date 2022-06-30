@@ -45,8 +45,13 @@ func (f *Filter) SetConditions(conditions ...Condition) {
 func (f *Filter) getValueFromFilter(rule Rule, condition Condition) (any, error) {
 	var value any
 
-	if rule.AcceptNull && (condition.Operation == OperationIsNull || condition.Operation == OperationIsNotNull) {
-		return nil, nil
+	// handle null filter here
+	if rule.AcceptNull && (condition.Operation == OperationIsNull) {
+		boolVal, err := strconv.ParseBool(condition.Value)
+		if err != nil {
+			return nil, fmt.Errorf("invalid filter value for %s, must be boolean: %w", condition.Field, err)
+		}
+		return boolVal, nil
 	}
 
 	switch rule.Type {
@@ -83,18 +88,11 @@ func (f *Filter) getValueFromFilter(rule Rule, condition Condition) (any, error)
 		}
 		value = time.UnixMilli(i)
 	case VariableBool:
-		switch condition.Operation {
-		case OperationIsTrue:
-			value = true
-		case OperationIsFalse:
-			value = false
-		default:
-			boolVal, err := strconv.ParseBool(condition.Value)
-			if err != nil {
-				return nil, fmt.Errorf("invalid filter value for %s, must be boolean: %w", condition.Field, err)
-			}
-			value = boolVal
+		boolVal, err := strconv.ParseBool(condition.Value)
+		if err != nil {
+			return nil, fmt.Errorf("invalid filter value for %s, must be boolean: %w", condition.Field, err)
 		}
+		value = boolVal
 	default:
 		return nil, fmt.Errorf("unknown rule type for field %s: %s", condition.Field, rule.Type)
 	}
@@ -162,13 +160,16 @@ func (f *Filter) buildWhereExpression() (exp.ExpressionList, error) {
 			values := filter.Values()
 			queryFilter = goqu.I(rule.Key).In(values)
 		case OperationIsNull:
-			queryFilter = goqu.I(rule.Key).IsNull()
-		case OperationIsNotNull:
-			queryFilter = goqu.I(rule.Key).IsNotNull()
-		case OperationIsTrue:
-			queryFilter = goqu.I(rule.Key).IsTrue()
-		case OperationIsFalse:
-			queryFilter = goqu.I(rule.Key).IsFalse()
+			if isNull, ok := value.(bool); ok {
+				if isNull {
+					queryFilter = goqu.I(rule.Key).IsNull()
+				} else {
+					queryFilter = goqu.I(rule.Key).IsNotNull()
+				}
+			} else {
+				nullErr := fmt.Errorf("value for operator 'isnull' must be a boolean for field %s", filter.Field)
+				err = multierr.Append(err, nullErr)
+			}
 		}
 		queries = append(queries, queryFilter)
 	}

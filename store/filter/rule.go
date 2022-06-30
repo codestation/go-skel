@@ -27,10 +27,7 @@ const (
 	OperationGreaterOrEqual OperationType = "gte"
 	OperationHas            OperationType = "has"
 	OperationIn             OperationType = "in"
-	OperationIsNull         OperationType = "null"
-	OperationIsNotNull      OperationType = "notnull"
-	OperationIsTrue         OperationType = "true"
-	OperationIsFalse        OperationType = "false"
+	OperationIsNull         OperationType = "isnull"
 )
 
 type Rule struct {

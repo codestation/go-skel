@@ -28,11 +28,7 @@ func TestFilter_Apply(t *testing.T) {
 			{Field: "value11", Operation: OperationEqual, Value: "1656431650"},
 			{Field: "value12", Operation: OperationEqual, Value: "1656431650001"},
 			{Field: "value13", Operation: OperationEqual, Value: "true"},
-			{Field: "value14", Operation: OperationIsNull},
-			{Field: "value15", Operation: OperationIsNotNull},
-			{Field: "value16", Operation: OperationIsTrue},
-			{Field: "value17", Operation: OperationIsFalse},
-			{Field: "value18", Operation: OperationIsTrue},
+			{Field: "value14", Operation: OperationIsNull, Value: "true"},
 		}...),
 		WithRules([]Rule{
 			{Key: "value1", Type: VariableString},
@@ -49,13 +45,6 @@ func TestFilter_Apply(t *testing.T) {
 			{Key: "value12", Type: VariableTimestampMillis},
 			{Key: "value13", Type: VariableBool},
 			{Key: "value14", Type: VariableString, AcceptNull: true},
-			{Key: "value15", Type: VariableString, AcceptNull: true},
-			{Key: "value16", Type: VariableBool},
-			{Key: "value17", Type: VariableBool},
-			{Key: "value18", Type: VariableBool, Operation: []OperationType{
-				OperationIsTrue,
-				OperationIsFalse,
-			}},
 		}...),
 	}
 
@@ -74,11 +63,7 @@ SELECT * FROM "profiles" WHERE (
 ("value11" = '2022-06-28T15:54:10Z') AND 
 ("value12" = '2022-06-28T15:54:10.001Z') AND 
 ("value13" IS TRUE) AND 
-("value14" IS NULL) AND 
-("value15" IS NOT NULL) AND 
-("value16" IS TRUE) AND 
-("value17" IS FALSE) AND 
-("value18" IS TRUE))
+("value14" IS NULL))
 `, "\n", "", -1)
 
 	f := New(opts...)
