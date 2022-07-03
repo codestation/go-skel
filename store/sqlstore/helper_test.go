@@ -6,10 +6,10 @@ package sqlstore
 
 import (
 	"context"
+	"database/sql"
 	"github.com/stretchr/testify/assert"
 	"megpoid.xyz/go/go-skel/config"
 	"megpoid.xyz/go/go-skel/testdata"
-	"os"
 	"testing"
 )
 
@@ -40,17 +40,10 @@ func (c *connection) Close(t *testing.T) {
 func (c *connection) setupDatabase(t *testing.T) {
 	t.Helper()
 
-	dsn := os.Getenv("APP_DSN")
-	if dsn == "" {
-		t.Skip("Test skipped because APP_DSN environment variable wasn't found")
-	}
-
 	cfg, err := config.NewConfig()
 	if err != nil {
 		assert.FailNowf(t, "Cannot load settings", err.Error())
 	}
-
-	cfg.SqlSettings.DataSourceName = dsn
 
 	conn, err := NewConnection(cfg.SqlSettings)
 	if err != nil {
@@ -87,3 +80,47 @@ func (c *connection) seedDatabase(t *testing.T, conn SqlExecutor) {
 		assert.FailNowf(t, "Failed to run seed file", err.Error())
 	}
 }
+
+type fakeDatabase struct {
+	Error  error
+	Result *fakeSqlResult
+}
+
+func (d fakeDatabase) BeginFunc(ctx context.Context, f func(db SqlExecutor) error) error {
+	return d.Error
+}
+
+func (d fakeDatabase) Begin(ctx context.Context) (*PgxTxWrapper, error) {
+	return nil, d.Error
+}
+
+func (d fakeDatabase) Exec(ctx context.Context, query string, arguments ...interface{}) (sql.Result, error) {
+	if d.Result != nil {
+		return d.Result, nil
+	}
+	return nil, d.Error
+}
+
+func (d fakeDatabase) Get(ctx context.Context, dst interface{}, query string, args ...interface{}) error {
+	return d.Error
+}
+
+func (d fakeDatabase) Select(ctx context.Context, dest interface{}, query string, args ...interface{}) error {
+	return d.Error
+}
+
+var _ SqlExecutor = &fakeDatabase{}
+
+type fakeSqlResult struct {
+	Error error
+}
+
+func (f fakeSqlResult) LastInsertId() (int64, error) {
+	return 0, f.Error
+}
+
+func (f fakeSqlResult) RowsAffected() (int64, error) {
+	return 0, f.Error
+}
+
+var _ sql.Result = &fakeSqlResult{}

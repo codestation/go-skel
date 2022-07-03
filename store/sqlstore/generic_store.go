@@ -19,10 +19,10 @@ import (
 
 // compile time validator for the interfaces
 var (
-	_ store.CrudStore[model.Model, *model.Model] = &crudStore[model.Model, *model.Model]{}
+	_ store.GenericStore[model.Model, *model.Model] = &genericStore[model.Model, *model.Model]{}
 )
 
-type crudStore[T any, PT model.Modelable[T]] struct {
+type genericStore[T any, PT model.Modelable[T]] struct {
 	*SqlStore
 	table           string
 	paginatorConfig paginator.Config
@@ -31,35 +31,35 @@ type crudStore[T any, PT model.Modelable[T]] struct {
 	defaultFilters  exp.ExpressionList
 }
 
-type CrudOption[T any, PT model.Modelable[T]] func(c *crudStore[T, PT])
+type StoreOption[T any, PT model.Modelable[T]] func(c *genericStore[T, PT])
 
-func WithPaginatorConfig[T any, PT model.Modelable[T]](cfg paginator.Config) CrudOption[T, PT] {
-	return func(c *crudStore[T, PT]) {
+func WithPaginatorConfig[T any, PT model.Modelable[T]](cfg paginator.Config) StoreOption[T, PT] {
+	return func(c *genericStore[T, PT]) {
 		c.paginatorConfig = cfg
 	}
 }
 
-func WithFilterConfig[T any, PT model.Modelable[T]](cfg filter.Config) CrudOption[T, PT] {
-	return func(c *crudStore[T, PT]) {
+func WithFilterConfig[T any, PT model.Modelable[T]](cfg filter.Config) StoreOption[T, PT] {
+	return func(c *genericStore[T, PT]) {
 		c.filterConfig = cfg
 	}
 }
 
-func WithSelectFields[T any, PT model.Modelable[T]](fields ...any) CrudOption[T, PT] {
-	return func(c *crudStore[T, PT]) {
+func WithSelectFields[T any, PT model.Modelable[T]](fields ...any) StoreOption[T, PT] {
+	return func(c *genericStore[T, PT]) {
 		c.selectFields = fields
 	}
 }
 
-func WithFilters[T any, PT model.Modelable[T]](filters exp.ExpressionList) CrudOption[T, PT] {
-	return func(c *crudStore[T, PT]) {
+func WithFilters[T any, PT model.Modelable[T]](filters exp.ExpressionList) StoreOption[T, PT] {
+	return func(c *genericStore[T, PT]) {
 		c.defaultFilters = filters
 	}
 }
 
-func NewCrudStore[T any, PT model.Modelable[T]](sqlStore *SqlStore, opts ...CrudOption[T, PT]) *crudStore[T, PT] {
-	st := &crudStore[T, PT]{SqlStore: sqlStore}
-	var defaults []CrudOption[T, PT]
+func NewStore[T any, PT model.Modelable[T]](sqlStore *SqlStore, opts ...StoreOption[T, PT]) *genericStore[T, PT] {
+	st := &genericStore[T, PT]{SqlStore: sqlStore}
+	var defaults []StoreOption[T, PT]
 	defaults = append(defaults, WithSelectFields[T, PT]("*"))
 	for _, opt := range append(defaults, opts...) {
 		opt(st)
@@ -69,7 +69,7 @@ func NewCrudStore[T any, PT model.Modelable[T]](sqlStore *SqlStore, opts ...Crud
 	return st
 }
 
-func (s *crudStore[T, PT]) Get(ctx context.Context, id model.ID) (PT, error) {
+func (s *genericStore[T, PT]) Get(ctx context.Context, id model.ID) (PT, error) {
 	query := s.builder.From(s.table).Select(s.selectFields...).Where(goqu.Ex{"id": id})
 	if s.defaultFilters != nil && !s.defaultFilters.IsEmpty() {
 		query = query.Where(s.defaultFilters)
@@ -93,9 +93,9 @@ func (s *crudStore[T, PT]) Get(ctx context.Context, id model.ID) (PT, error) {
 	}
 }
 
-func (s *crudStore[T, PT]) GetByExtID(ctx context.Context, externalID uuid.UUID) (PT, error) {
+func (s *genericStore[T, PT]) GetByExternalID(ctx context.Context, externalID uuid.UUID) (PT, error) {
 	query := s.builder.From(s.table).Select(s.selectFields...).Where(goqu.Ex{"external_id": externalID})
-	if !s.defaultFilters.IsEmpty() {
+	if s.defaultFilters != nil && !s.defaultFilters.IsEmpty() {
 		query = query.Where(s.defaultFilters)
 	}
 
@@ -105,7 +105,7 @@ func (s *crudStore[T, PT]) GetByExtID(ctx context.Context, externalID uuid.UUID)
 	}
 
 	var result T
-	err = s.db.Get(ctx, result, sql, args...)
+	err = s.db.Get(ctx, &result, sql, args...)
 
 	switch {
 	case errors.Is(err, ErrNoRows):
@@ -117,7 +117,7 @@ func (s *crudStore[T, PT]) GetByExtID(ctx context.Context, externalID uuid.UUID)
 	}
 }
 
-func (s *crudStore[T, PT]) List(ctx context.Context, opts ...store.FilterOption) (*response.ListResponse[T], error) {
+func (s *genericStore[T, PT]) List(ctx context.Context, opts ...store.FilterOption) (*response.ListResponse[T], error) {
 	query := s.builder.From(s.table).Select(s.selectFields...)
 	if s.defaultFilters != nil {
 		query = query.Where(s.defaultFilters)
@@ -139,7 +139,6 @@ func (s *crudStore[T, PT]) List(ctx context.Context, opts ...store.FilterOption)
 
 	switch {
 	case errors.Is(err, ErrNoRows):
-
 		return response.NewListResponse(results, cur), nil
 	case err != nil:
 		return nil, store.NewRepoError(store.ErrBackend, err)
@@ -148,12 +147,12 @@ func (s *crudStore[T, PT]) List(ctx context.Context, opts ...store.FilterOption)
 	}
 }
 
-func (s *crudStore[T, PT]) Save(ctx context.Context, req PT) error {
+func (s *genericStore[T, PT]) Save(ctx context.Context, req PT) error {
 	query := s.builder.Insert(s.table).Rows(req).Returning("id")
 
 	sql, args, err := query.Prepared(true).ToSQL()
 	if err != nil {
-		return store.NewRepoError(store.ErrDuplicated, err)
+		return store.NewRepoError(store.ErrBackend, err)
 	}
 
 	var id model.ID
@@ -171,12 +170,12 @@ func (s *crudStore[T, PT]) Save(ctx context.Context, req PT) error {
 	return nil
 }
 
-func (s *crudStore[T, PT]) Update(ctx context.Context, req PT) error {
+func (s *genericStore[T, PT]) Update(ctx context.Context, req PT) error {
 	query := s.builder.Update(s.table).Set(req).Where(goqu.Ex{"id": req.GetID()})
 
 	sql, args, err := query.Prepared(true).ToSQL()
 	if err != nil {
-		return store.NewRepoError(store.ErrDuplicated, err)
+		return store.NewRepoError(store.ErrBackend, err)
 	}
 
 	result, err := s.db.Exec(ctx, sql, args...)
@@ -197,12 +196,12 @@ func (s *crudStore[T, PT]) Update(ctx context.Context, req PT) error {
 	return nil
 }
 
-func (s *crudStore[T, PT]) Delete(ctx context.Context, id model.ID) error {
+func (s *genericStore[T, PT]) Delete(ctx context.Context, id model.ID) error {
 	query := s.builder.Delete(s.table).Where(goqu.Ex{"id": id})
 
 	sql, args, err := query.Prepared(true).ToSQL()
 	if err != nil {
-		return store.NewRepoError(store.ErrDuplicated, err)
+		return store.NewRepoError(store.ErrBackend, err)
 	}
 
 	result, err := s.db.Exec(ctx, sql, args...)
@@ -222,12 +221,12 @@ func (s *crudStore[T, PT]) Delete(ctx context.Context, id model.ID) error {
 	return nil
 }
 
-func (s *crudStore[T, PT]) DeleteByExtId(ctx context.Context, externalId uuid.UUID) error {
+func (s *genericStore[T, PT]) DeleteByExternalId(ctx context.Context, externalId uuid.UUID) error {
 	query := s.builder.Delete(s.table).Where(goqu.Ex{"external_id": externalId})
 
 	sql, args, err := query.Prepared(true).ToSQL()
 	if err != nil {
-		return store.NewRepoError(store.ErrDuplicated, err)
+		return store.NewRepoError(store.ErrBackend, err)
 	}
 
 	result, err := s.db.Exec(ctx, sql, args...)

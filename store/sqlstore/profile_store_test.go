@@ -32,7 +32,7 @@ func (s *profileSuite) TearDownTest() {
 }
 
 func (s *profileSuite) TestNewStore() {
-	store := NewCrudStore[model.Profile](s.conn.store)
+	store := NewStore[model.Profile](s.conn.store)
 	s.Equal("profiles", store.table)
 	s.Equal([]any{"*"}, store.selectFields)
 }
