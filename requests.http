@@ -1,2 +1,5 @@
 ###
 GET {{host}}/apis/goapp/v1/profiles
+
+###
+GET {{host}}/apis/goapp/v1/profiles/8

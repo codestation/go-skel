@@ -45,7 +45,7 @@ func (s *SqlProfileStore) GetByUserToken(ctx context.Context, userToken string) 
 	}
 
 	var result model.Profile
-	err = s.db.Get(ctx, result, sql, args...)
+	err = s.db.Get(ctx, &result, sql, args...)
 
 	switch {
 	case errors.Is(err, ErrNoRows):

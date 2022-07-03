@@ -18,9 +18,9 @@ type ID uint
 
 // Model is the base that will be used by other entity who need a primary key and timestamps.
 type Model struct {
-	ID         ID          `json:"-"`
+	ID         ID          `json:"-" goqu:"skipinsert,skipupdate"`
 	ExternalID pgtype.UUID `json:"external_id"`
-	CreatedAt  time.Time   `json:"created_at"`
+	CreatedAt  time.Time   `json:"created_at" goqu:"skipupdate"`
 	UpdatedAt  time.Time   `json:"updated_at"`
 	DeletedAt  *time.Time  `json:"-"`
 }

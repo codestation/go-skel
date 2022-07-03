@@ -71,7 +71,7 @@ func NewCrudStore[T any, PT model.Modelable[T]](sqlStore *SqlStore, opts ...Crud
 
 func (s *crudStore[T, PT]) Get(ctx context.Context, id model.ID) (PT, error) {
 	query := s.builder.From(s.table).Select(s.selectFields...).Where(goqu.Ex{"id": id})
-	if !s.defaultFilters.IsEmpty() {
+	if s.defaultFilters != nil && !s.defaultFilters.IsEmpty() {
 		query = query.Where(s.defaultFilters)
 	}
 
@@ -81,7 +81,7 @@ func (s *crudStore[T, PT]) Get(ctx context.Context, id model.ID) (PT, error) {
 	}
 
 	var result T
-	err = s.db.Get(ctx, result, sql, args...)
+	err = s.db.Get(ctx, &result, sql, args...)
 
 	switch {
 	case errors.Is(err, ErrNoRows):

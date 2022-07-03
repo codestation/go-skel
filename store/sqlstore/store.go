@@ -6,9 +6,11 @@ package sqlstore
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/doug-martin/goqu/v9"
 	_ "github.com/doug-martin/goqu/v9/dialect/postgres"
+	"github.com/georgysavva/scany/dbscan"
 	"megpoid.xyz/go/go-skel/config"
 	"megpoid.xyz/go/go-skel/store"
 )
@@ -29,6 +31,8 @@ type SqlStore struct {
 
 func (ss *SqlStore) initialize() {
 	ss.builder = NewQueryBuilder()
+	// convert the fields names to snake case without needing goqu tags
+	goqu.SetColumnRenameFunction(dbscan.SnakeCaseMapper)
 	// Create all the stores here
 	ss.stores.healthCheck = newSqlHealthCheckStore(ss)
 	ss.stores.profile = newSqlProfileStore(ss)
@@ -72,4 +76,37 @@ func (ss *SqlStore) WithTransaction(ctx context.Context, f func(s store.Store) e
 		return fmt.Errorf("sqlstore: transaction failed: %w", err)
 	}
 	return nil
+}
+
+func (ss *SqlStore) Begin(ctx context.Context) (*SqlStore, error) {
+	tx, err := ss.db.Begin(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	s := &SqlStore{
+		db:       tx,
+		settings: ss.settings,
+	}
+	s.initialize()
+
+	return s, nil
+}
+
+func (ss *SqlStore) Commit(ctx context.Context) error {
+	tx, ok := ss.db.(*PgxTxWrapper)
+	if ok {
+		return tx.Commit(ctx)
+	}
+
+	return errors.New("no transaction in progress")
+}
+
+func (ss *SqlStore) Rollback(ctx context.Context) error {
+	tx, ok := ss.db.(*PgxTxWrapper)
+	if ok {
+		return tx.Rollback(ctx)
+	}
+
+	return errors.New("no transaction in progress")
 }
