@@ -18,24 +18,27 @@ func TestProfileStore(t *testing.T) {
 type profileSuite struct {
 	suite.Suite
 	sqlStore *SqlStore
+	conn     *connection
 }
 
 func (s *profileSuite) SetupTest() {
-	s.sqlStore = setupDatabase(s.T())
+	s.conn = NewTestConnection(s.T(), true)
 }
 
 func (s *profileSuite) TearDownTest() {
-	teardownDatabase(s.T(), s.sqlStore)
+	if s.conn != nil {
+		s.conn.Close(s.T())
+	}
 }
 
 func (s *profileSuite) TestNewStore() {
-	store := NewCrudStore[model.Profile](s.sqlStore)
+	store := NewCrudStore[model.Profile](s.conn.store)
 	s.Equal("profiles", store.table)
 	s.Equal([]any{"*"}, store.selectFields)
 }
 
 func (s *profileSuite) TestProfileByUserToken() {
-	store := newSqlProfileStore(s.sqlStore)
+	store := newSqlProfileStore(s.conn.store)
 	profile, err := store.GetByUserToken(context.Background(), "1234")
 	if s.NoError(err) {
 		s.Equal("1234", profile.UserToken)

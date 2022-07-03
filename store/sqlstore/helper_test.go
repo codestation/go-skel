@@ -13,7 +13,31 @@ import (
 	"testing"
 )
 
-func setupDatabase(t *testing.T) *SqlStore {
+type connection struct {
+	store           *SqlStore
+	db              *PgxWrapper
+	withTransaction bool
+}
+
+func NewTestConnection(t *testing.T, withTransaction bool) *connection {
+	c := &connection{withTransaction: withTransaction}
+	c.setupDatabase(t)
+	return c
+}
+
+func (c *connection) Close(t *testing.T) {
+	t.Helper()
+	if c.withTransaction {
+		// do not save the changes to the database
+		err := c.store.Rollback(context.Background())
+		if err != nil {
+			assert.FailNowf(t, "Failed to rollback transaction", err.Error())
+		}
+	}
+	c.db.Close()
+}
+
+func (c *connection) setupDatabase(t *testing.T) {
 	t.Helper()
 
 	dsn := os.Getenv("APP_DSN")
@@ -32,19 +56,26 @@ func setupDatabase(t *testing.T) *SqlStore {
 	if err != nil {
 		assert.FailNowf(t, "Failed to create database connection", err.Error())
 	}
+
+	c.db = conn
+
 	store := New(conn, cfg.SqlSettings)
-	// create a new transaction so a test doesn't interfere with another
-	tx, err := store.Begin(context.Background())
-	if err != nil {
-		assert.FailNowf(t, "Failed to create transaction", err.Error())
+
+	if c.withTransaction {
+		// create a new transaction so a test doesn't interfere with another
+		tx, err := store.Begin(context.Background())
+		if err != nil {
+			assert.FailNowf(t, "Failed to create transaction", err.Error())
+		}
+
+		c.seedDatabase(t, tx.db)
+		c.store = tx
+	} else {
+		c.store = store
 	}
-
-	seedDatabase(t, tx.db)
-
-	return tx
 }
 
-func seedDatabase(t *testing.T, conn SqlExecutor) {
+func (c *connection) seedDatabase(t *testing.T, conn SqlExecutor) {
 	assets := testdata.Assets()
 	data, err := assets.ReadFile("seed/base.sql")
 	if err != nil {
@@ -54,17 +85,5 @@ func seedDatabase(t *testing.T, conn SqlExecutor) {
 	_, err = conn.Exec(context.Background(), string(data))
 	if err != nil {
 		assert.FailNowf(t, "Failed to run seed file", err.Error())
-	}
-}
-
-func teardownDatabase(t *testing.T, store *SqlStore) {
-	t.Helper()
-	if store != nil {
-		// do not save the changes to the database
-		err := store.Rollback(context.Background())
-		if err != nil {
-			assert.FailNowf(t, "Failed to rollback transaction", err.Error())
-		}
-		store.Close()
 	}
 }

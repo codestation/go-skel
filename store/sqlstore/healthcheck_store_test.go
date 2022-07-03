@@ -6,16 +6,31 @@ package sqlstore
 
 import (
 	"context"
-	"megpoid.xyz/go/go-skel/config"
+	"github.com/stretchr/testify/suite"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
-func TestSqlHealthCheckStore(t *testing.T) {
-	db := &FakeDbConn{}
-	ss := New(db, config.SqlSettings{})
+func TestHealthCheckStore(t *testing.T) {
+	suite.Run(t, &healthCheckSuite{})
+}
 
-	err := ss.HealthCheck().HealthCheck(context.Background())
-	assert.NoError(t, err)
+type healthCheckSuite struct {
+	suite.Suite
+	conn *connection
+}
+
+func (s *healthCheckSuite) SetupTest() {
+	s.conn = NewTestConnection(s.T(), false)
+}
+
+func (s *healthCheckSuite) TearDownTest() {
+	if s.conn != nil {
+		s.conn.Close(s.T())
+	}
+}
+
+func (s *healthCheckSuite) TestPing() {
+	store := newSqlHealthCheckStore(s.conn.store)
+	err := store.HealthCheck(context.Background())
+	s.NoError(err)
 }

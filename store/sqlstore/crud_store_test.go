@@ -23,25 +23,27 @@ func TestStore(t *testing.T) {
 
 type crudSuite struct {
 	suite.Suite
-	sqlStore *SqlStore
+	conn *connection
 }
 
 func (s *crudSuite) SetupTest() {
-	s.sqlStore = setupDatabase(s.T())
+	s.conn = NewTestConnection(s.T(), true)
 }
 
 func (s *crudSuite) TearDownTest() {
-	teardownDatabase(s.T(), s.sqlStore)
+	if s.conn != nil {
+		s.conn.Close(s.T())
+	}
 }
 
 func (s *crudSuite) TestNewStore() {
-	store := NewCrudStore[model.Profile](s.sqlStore)
+	store := NewCrudStore[model.Profile](s.conn.store)
 	s.Equal("profiles", store.table)
 	s.Equal([]any{"*"}, store.selectFields)
 }
 
 func (s *crudSuite) TestStoreGet() {
-	store := NewCrudStore[testUser](s.sqlStore)
+	store := NewCrudStore[testUser](s.conn.store)
 	user, err := store.Get(context.Background(), 1)
 	if s.NoError(err) {
 		s.Equal(model.ID(1), user.ID)
@@ -49,7 +51,7 @@ func (s *crudSuite) TestStoreGet() {
 }
 
 func (s *crudSuite) TestStoreList() {
-	store := NewCrudStore[testUser](s.sqlStore)
+	store := NewCrudStore[testUser](s.conn.store)
 	users, err := store.List(context.Background())
 	if s.NoError(err) {
 		s.Len(users.Data, 1)
@@ -57,7 +59,7 @@ func (s *crudSuite) TestStoreList() {
 }
 
 func (s *crudSuite) TestStoreUpdate() {
-	store := NewCrudStore[testUser](s.sqlStore)
+	store := NewCrudStore[testUser](s.conn.store)
 	user, err := store.Get(context.Background(), 1)
 	if s.NoError(err) {
 		user.Name = "Jane Doe"
@@ -68,7 +70,7 @@ func (s *crudSuite) TestStoreUpdate() {
 }
 
 func (s *crudSuite) TestStoreRemove() {
-	store := NewCrudStore[testUser](s.sqlStore)
+	store := NewCrudStore[testUser](s.conn.store)
 	err := store.Delete(context.Background(), 1)
 	s.NoError(err)
 }
