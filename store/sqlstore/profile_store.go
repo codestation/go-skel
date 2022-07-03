@@ -31,7 +31,6 @@ func newSqlProfileStore(sqlStore *SqlStore) store.ProfileStore {
 		},
 		}})),
 	}
-	s.table = "profiles"
 	return s
 }
 

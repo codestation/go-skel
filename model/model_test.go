@@ -11,19 +11,34 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type Foo struct {
+type LocalCompany struct {
 	Model
-	Bar int
+	Name int
 }
 
-func NewFoo(opts ...Option) *Foo {
-	return &Foo{Model: NewModel(opts...)}
+type GlobalCompany struct {
+	LocalCompany
+}
+
+func (g GlobalCompany) TableName() string {
+	return "company"
+}
+
+func NewLocalCompany(opts ...Option) *LocalCompany {
+	return &LocalCompany{Model: NewModel(opts...)}
 }
 
 func TestNewModel(t *testing.T) {
 	now := time.Now()
-	model := NewFoo(WithTime(now))
+	model := NewLocalCompany(WithTime(now))
 	assert.Equal(t, model.CreatedAt, now)
 	assert.Equal(t, model.UpdatedAt, now)
-	assert.Equal(t, 0, model.Bar)
+}
+
+func TestTableName(t *testing.T) {
+	name := GetTableName(&LocalCompany{})
+	assert.Equal(t, "local_companies", name)
+
+	name = GetTableName(&GlobalCompany{})
+	assert.Equal(t, "company", name)
 }

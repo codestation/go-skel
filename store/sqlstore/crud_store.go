@@ -64,6 +64,8 @@ func NewCrudStore[T any, PT model.Modelable[T]](sqlStore *SqlStore, opts ...Crud
 	for _, opt := range append(defaults, opts...) {
 		opt(st)
 	}
+
+	st.table = model.GetTableName[T, PT](new(T))
 	return st
 }
 

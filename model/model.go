@@ -5,8 +5,11 @@
 package model
 
 import (
+	"github.com/georgysavva/scany/dbscan"
 	"github.com/gofrs/uuid"
 	"github.com/jackc/pgtype"
+	"github.com/jinzhu/inflection"
+	"reflect"
 	"time"
 )
 
@@ -28,6 +31,10 @@ type Modelable[T any] interface {
 	SetID(id ID)
 }
 
+type Tabler interface {
+	TableName() string
+}
+
 // SetTimestamps configures the time on created/updated fields. Only call this method on new entity.
 func (m *Model) SetTimestamps(now time.Time) {
 	m.CreatedAt = now
@@ -40,6 +47,30 @@ func (m *Model) GetID() ID {
 
 func (m *Model) SetID(id ID) {
 	m.ID = id
+}
+
+func (m *Model) Apply(opts ...Option) {
+	for _, opt := range opts {
+		opt(m)
+	}
+}
+
+func GetModelName[T any, PT Modelable[T]](m PT) string {
+	if t := reflect.TypeOf(m); t.Kind() == reflect.Ptr {
+		return t.Elem().Name()
+	} else {
+		return t.Name()
+	}
+}
+
+func GetTableName[T any, PT Modelable[T]](m PT) string {
+	if m, ok := any(m).(Tabler); ok {
+		return m.TableName()
+	}
+
+	name := GetModelName[T](m)
+
+	return inflection.Plural(dbscan.SnakeCaseMapper(name))
 }
 
 type Option func(m *Model)
@@ -58,9 +89,7 @@ func WithUUID(id uuid.UUID) Option {
 
 func NewModel(opts ...Option) Model {
 	e := Model{}
-	for _, opt := range opts {
-		opt(&e)
-	}
+	e.Apply(opts...)
 	if e.CreatedAt.IsZero() {
 		e.SetTimestamps(time.Now())
 	}
