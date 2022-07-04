@@ -208,27 +208,28 @@ func (s *storeSuite) TestBackendError() {
 	}
 	conn := &SqlStore{db: db}
 	st := NewStore[testUser](conn)
+	ctx := context.Background()
 
-	_, err := st.Get(context.Background(), 1)
+	_, err := st.Get(ctx, 1)
 	s.ErrorIs(err, store.ErrBackend)
-	_, err = st.List(context.Background())
+	_, err = st.List(ctx)
 	s.ErrorIs(err, store.ErrBackend)
-	err = st.Save(context.Background(), newUser("John Doe"))
+	err = st.Save(ctx, newUser("John Doe"))
 	s.ErrorIs(err, store.ErrBackend)
-	err = st.Update(context.Background(), newUser("John Doe"))
+	err = st.Update(ctx, newUser("John Doe"))
 	s.ErrorIs(err, store.ErrBackend)
-	err = st.Delete(context.Background(), 1)
+	err = st.Delete(ctx, 1)
 	s.ErrorIs(err, store.ErrBackend)
-	_, err = st.GetByExternalID(context.Background(), uuid.Must(uuid.FromString("00000000-0000-0000-0000-000000000000")))
+	_, err = st.GetByExternalID(ctx, uuid.Must(uuid.FromString("00000000-0000-0000-0000-000000000000")))
 	s.ErrorIs(err, store.ErrBackend)
-	err = st.DeleteByExternalId(context.Background(), uuid.Must(uuid.FromString("00000000-0000-0000-0000-000000000000")))
+	err = st.DeleteByExternalId(ctx, uuid.Must(uuid.FromString("00000000-0000-0000-0000-000000000000")))
 	s.ErrorIs(err, store.ErrBackend)
 
 	db.Result = &fakeSqlResult{Error: errors.New("not implemented")}
-	err = st.Update(context.Background(), newUser("John Doe"))
+	err = st.Update(ctx, newUser("John Doe"))
 	s.ErrorIs(err, store.ErrBackend)
-	err = st.Delete(context.Background(), 1)
+	err = st.Delete(ctx, 1)
 	s.ErrorIs(err, store.ErrBackend)
-	err = st.DeleteByExternalId(context.Background(), uuid.Must(uuid.FromString("00000000-0000-0000-0000-000000000000")))
+	err = st.DeleteByExternalId(ctx, uuid.Must(uuid.FromString("00000000-0000-0000-0000-000000000000")))
 	s.ErrorIs(err, store.ErrBackend)
 }

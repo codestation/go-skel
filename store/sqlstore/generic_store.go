@@ -13,6 +13,7 @@ import (
 	"megpoid.xyz/go/go-skel/model"
 	"megpoid.xyz/go/go-skel/model/response"
 	"megpoid.xyz/go/go-skel/store"
+	"megpoid.xyz/go/go-skel/store/clause"
 	"megpoid.xyz/go/go-skel/store/filter"
 	"megpoid.xyz/go/go-skel/store/paginator"
 )
@@ -117,25 +118,16 @@ func (s *genericStore[T, PT]) GetByExternalID(ctx context.Context, externalID uu
 	}
 }
 
-func (s *genericStore[T, PT]) List(ctx context.Context, opts ...store.FilterOption) (*response.ListResponse[T], error) {
+func (s *genericStore[T, PT]) List(ctx context.Context, opts ...clause.FilterOption) (*response.ListResponse[T], error) {
 	query := s.builder.From(s.table).Select(s.selectFields...)
 	if s.defaultFilters != nil {
 		query = query.Where(s.defaultFilters)
 	}
 
-	p := paginator.New(&s.paginatorConfig)
-	f := filter.New(&s.filterConfig)
-	for _, opt := range opts {
-		opt(p, f)
-	}
-
-	query, err := f.Apply(query)
-	if err != nil {
-		return nil, store.NewRepoError(store.ErrBackend, err)
-	}
+	cl := clause.NewClause(opts...)
 
 	results := make([]*T, 0)
-	cur, err := p.Paginate(ctx, s.db, query, &results)
+	cur, err := cl.ApplyFilters(ctx, s.db, query, &results)
 
 	switch {
 	case errors.Is(err, ErrNoRows):

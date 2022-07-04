@@ -9,6 +9,7 @@ import (
 	"github.com/gofrs/uuid"
 	"megpoid.xyz/go/go-skel/model"
 	"megpoid.xyz/go/go-skel/model/response"
+	"megpoid.xyz/go/go-skel/store/clause"
 )
 
 // Store lists all the other stores
@@ -21,7 +22,7 @@ type Store interface {
 type GenericStore[T any, PT model.Modelable[T]] interface {
 	Get(ctx context.Context, id model.ID) (PT, error)
 	GetByExternalID(ctx context.Context, externalID uuid.UUID) (PT, error)
-	List(ctx context.Context, opts ...FilterOption) (*response.ListResponse[T], error)
+	List(ctx context.Context, opts ...clause.FilterOption) (*response.ListResponse[T], error)
 	Save(ctx context.Context, req PT) error
 	Update(ctx context.Context, req PT) error
 	Delete(ctx context.Context, id model.ID) error
