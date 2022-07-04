@@ -31,7 +31,7 @@ func (a *App) GetProfile(ctx context.Context, id model.ID) (*model.Profile, erro
 	return profile, nil
 }
 
-func (a *App) ListProfiles(ctx context.Context, query *request.QueryParams) (*response.ListResponse[model.Profile], error) {
+func (a *App) ListProfiles(ctx context.Context, query *request.QueryParams) (*response.ListResponse[model.Profile, *model.Profile], error) {
 	t := message.NewPrinter(i18n.GetLanguageTagsContext(ctx))
 
 	result, err := a.Srv().Store.Profile().List(ctx, clause.WithFilter(query))

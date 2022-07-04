@@ -118,7 +118,7 @@ func (s *genericStore[T, PT]) GetByExternalID(ctx context.Context, externalID uu
 	}
 }
 
-func (s *genericStore[T, PT]) List(ctx context.Context, opts ...clause.FilterOption) (*response.ListResponse[T], error) {
+func (s *genericStore[T, PT]) List(ctx context.Context, opts ...clause.FilterOption) (*response.ListResponse[T, PT], error) {
 	query := s.builder.From(s.table).Select(s.selectFields...)
 	if s.defaultFilters != nil {
 		query = query.Where(s.defaultFilters)
@@ -126,16 +126,16 @@ func (s *genericStore[T, PT]) List(ctx context.Context, opts ...clause.FilterOpt
 
 	cl := clause.NewClause(opts...)
 
-	results := make([]*T, 0)
+	results := make([]PT, 0)
 	cur, err := cl.ApplyFilters(ctx, s.db, query, &results)
 
 	switch {
 	case errors.Is(err, ErrNoRows):
-		return response.NewListResponse(results, cur), nil
+		return response.NewListResponse[T, PT](results, cur), nil
 	case err != nil:
 		return nil, store.NewRepoError(store.ErrBackend, err)
 	default:
-		return response.NewListResponse(results, cur), nil
+		return response.NewListResponse[T, PT](results, cur), nil
 	}
 }
 

@@ -4,15 +4,18 @@
 
 package response
 
-import "megpoid.xyz/go/go-skel/store/paginator/cursor"
+import (
+	"megpoid.xyz/go/go-skel/model"
+	"megpoid.xyz/go/go-skel/store/paginator/cursor"
+)
 
-type ListResponse[T any] struct {
-	Data []*T       `json:"data"`
+type ListResponse[T any, PT model.Modelable[T]] struct {
+	Data []PT       `json:"data"`
 	Meta Pagination `json:"meta"`
 }
 
-func NewListResponse[T any](results []*T, c *cursor.Cursor) *ListResponse[T] {
-	return &ListResponse[T]{
+func NewListResponse[T any, PT model.Modelable[T]](results []PT, c *cursor.Cursor) *ListResponse[T, PT] {
+	return &ListResponse[T, PT]{
 		Data: results,
 		Meta: Pagination{
 			Items:      len(results),
