@@ -30,6 +30,8 @@ type genericStore[T any, PT model.Modelable[T]] struct {
 	filterConfig    filter.Config
 	selectFields    []any
 	defaultFilters  exp.ExpressionList
+	sortKeys        []string
+	includes        []string
 }
 
 type StoreOption[T any, PT model.Modelable[T]] func(c *genericStore[T, PT])
@@ -124,7 +126,11 @@ func (s *genericStore[T, PT]) List(ctx context.Context, opts ...clause.FilterOpt
 		query = query.Where(s.defaultFilters)
 	}
 
-	cl := clause.NewClause(opts...)
+	cl := clause.NewClause(
+		clause.WithPaginatorKeys(s.sortKeys),
+		clause.WithAllowedIncludes(s.includes),
+	)
+	cl.ApplyOptions(opts...)
 
 	results := make([]PT, 0)
 	cur, err := cl.ApplyFilters(ctx, s.db, query, &results)
