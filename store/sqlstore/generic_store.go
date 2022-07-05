@@ -81,8 +81,8 @@ func (s *genericStore[T, PT]) Get(ctx context.Context, id model.ID) (PT, error) 
 		return nil, store.NewRepoError(store.ErrBackend, err)
 	}
 
-	var result T
-	err = s.db.Get(ctx, &result, sql, args...)
+	result := PT(new(T))
+	err = s.db.Get(ctx, result, sql, args...)
 
 	switch {
 	case errors.Is(err, ErrNoRows):
@@ -90,7 +90,7 @@ func (s *genericStore[T, PT]) Get(ctx context.Context, id model.ID) (PT, error) 
 	case err != nil:
 		return nil, store.NewRepoError(store.ErrBackend, err)
 	default:
-		return &result, nil
+		return result, nil
 	}
 }
 
@@ -105,8 +105,8 @@ func (s *genericStore[T, PT]) GetByExternalID(ctx context.Context, externalID uu
 		return nil, store.NewRepoError(store.ErrBackend, err)
 	}
 
-	var result T
-	err = s.db.Get(ctx, &result, sql, args...)
+	result := PT(new(T))
+	err = s.db.Get(ctx, result, sql, args...)
 
 	switch {
 	case errors.Is(err, ErrNoRows):
@@ -114,7 +114,7 @@ func (s *genericStore[T, PT]) GetByExternalID(ctx context.Context, externalID uu
 	case err != nil:
 		return nil, store.NewRepoError(store.ErrBackend, err)
 	default:
-		return &result, nil
+		return result, nil
 	}
 }
 
