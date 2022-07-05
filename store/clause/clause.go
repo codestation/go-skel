@@ -30,7 +30,9 @@ func WithPaginatorRules(rules []paginator.Rule) FilterOption {
 		if clause.paginator == nil {
 			clause.paginator = paginator.New()
 		}
-		clause.paginator.SetRules(rules...)
+		if len(rules) > 0 {
+			clause.paginator.SetRules(rules...)
+		}
 	}
 }
 
@@ -39,14 +41,18 @@ func WithPaginatorKeys(keys []string) FilterOption {
 		if clause.paginator == nil {
 			clause.paginator = paginator.New()
 		}
-		clause.paginator.SetKeys(keys...)
+		if len(keys) > 0 {
+			clause.paginator.SetKeys(keys...)
+		}
 	}
 }
 
 func WithAllowedIncludes(includes []string) FilterOption {
 	return func(clause *Clause) {
-		clause.allowedIncludes = make([]string, len(includes))
-		copy(clause.allowedIncludes, includes)
+		if len(includes) > 0 {
+			clause.allowedIncludes = make([]string, len(includes))
+			copy(clause.allowedIncludes, includes)
+		}
 	}
 }
 
