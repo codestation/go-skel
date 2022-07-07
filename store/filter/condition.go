@@ -10,6 +10,7 @@ type Condition struct {
 	Field     string
 	Operation OperationType
 	Value     string
+	SkipRule  bool
 }
 
 func (f Condition) Values() []string {

@@ -16,7 +16,6 @@ func attachRelation[T any, PT model.Modelable[T], U any, PU model.Modelable[U]](
 	setRelation func(m PT, r PU),
 	listByIds func(ctx context.Context, ids []model.ID) ([]PU, error),
 ) error {
-	// exit early to don't call listByIds with an empty array
 	if len(entries) == 0 {
 		return nil
 	}

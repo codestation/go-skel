@@ -11,21 +11,46 @@ import (
 	"github.com/stretchr/testify/suite"
 	"megpoid.xyz/go/go-skel/model"
 	"megpoid.xyz/go/go-skel/store"
+	"megpoid.xyz/go/go-skel/store/clause"
 	"testing"
 	"time"
 )
 
 type testUser struct {
 	model.Model
-	Name string
+	Name      string
+	ProfileID model.ID `goqu:"skipupdate"`
+	Profile   *model.Profile
 }
 
-func newUser(name string) *testUser {
+func (t *testUser) AttachProfile(p *model.Profile) {
+	t.ProfileID = 0
+	t.Profile = p
+}
+
+func newUser(name string, profileId model.ID) *testUser {
 	u := &testUser{
-		Model: model.NewModel(),
-		Name:  name,
+		Model:     model.NewModel(),
+		Name:      name,
+		ProfileID: profileId,
 	}
 	return u
+}
+
+type userStore struct {
+	*genericStore[testUser, *testUser]
+}
+
+func (s *userStore) Attach(ctx context.Context, results []*testUser, relation string) error {
+	var err error
+	switch relation {
+	case "profile":
+		err = attachRelation(ctx, results,
+			func(m *testUser) model.ID { return m.ProfileID },
+			func(m *testUser, r *model.Profile) { m.AttachProfile(r) },
+			s.Profile().ListByIds)
+	}
+	return err
 }
 
 func TestStore(t *testing.T) {
@@ -88,16 +113,17 @@ func (s *storeSuite) TestStoreList() {
 func (s *storeSuite) TestStoreSave() {
 	st := NewStore[testUser](s.conn.store)
 	var tests = []struct {
-		name string
-		err  error
+		name      string
+		profileId model.ID
+		err       error
 	}{
-		{"Some user", nil},
-		{"Some user", store.ErrDuplicated}, // do not run more tests after a constraint error
+		{"Some user", 1, nil},
+		{"Some user", 1, store.ErrDuplicated}, // do not run more tests after a constraint error
 	}
 
 	for _, test := range tests {
 		s.Run("Save", func() {
-			user := newUser(test.name)
+			user := newUser(test.name, test.profileId)
 			err := st.Save(context.Background(), user)
 			if test.err != nil {
 				s.ErrorIs(err, test.err)
@@ -121,7 +147,7 @@ func (s *storeSuite) TestStoreUpdate() {
 
 	for _, test := range tests {
 		s.Run("Update", func() {
-			user := newUser("John Doe")
+			user := newUser("John Doe", 1)
 			user.ID = test.id
 			user.UpdatedAt = time.Now()
 			err := st.Update(context.Background(), user)
@@ -214,9 +240,9 @@ func (s *storeSuite) TestBackendError() {
 	s.ErrorIs(err, store.ErrBackend)
 	_, err = st.List(ctx)
 	s.ErrorIs(err, store.ErrBackend)
-	err = st.Save(ctx, newUser("John Doe"))
+	err = st.Save(ctx, newUser("John Doe", 1))
 	s.ErrorIs(err, store.ErrBackend)
-	err = st.Update(ctx, newUser("John Doe"))
+	err = st.Update(ctx, newUser("John Doe", 1))
 	s.ErrorIs(err, store.ErrBackend)
 	err = st.Delete(ctx, 1)
 	s.ErrorIs(err, store.ErrBackend)
@@ -226,10 +252,29 @@ func (s *storeSuite) TestBackendError() {
 	s.ErrorIs(err, store.ErrBackend)
 
 	db.Result = &fakeSqlResult{Error: errors.New("not implemented")}
-	err = st.Update(ctx, newUser("John Doe"))
+	err = st.Update(ctx, newUser("John Doe", 1))
 	s.ErrorIs(err, store.ErrBackend)
 	err = st.Delete(ctx, 1)
 	s.ErrorIs(err, store.ErrBackend)
 	err = st.DeleteByExternalId(ctx, uuid.Must(uuid.FromString("00000000-0000-0000-0000-000000000000")))
 	s.ErrorIs(err, store.ErrBackend)
+}
+
+func (s *storeSuite) TestIncludes() {
+	st := userStore{
+		genericStore: NewStore[testUser](s.conn.store,
+			WithIncludes[testUser]([]string{"profile"}),
+		),
+	}
+
+	st.AttachFunc(st.Attach)
+
+	users, err := st.List(context.Background(), clause.WithIncludes("profile"))
+	if s.NoError(err) {
+		s.Len(users.Data, 1)
+		user := users.Data[0]
+		s.Zero(user.ProfileID)
+		s.NotNil(user.Profile)
+		s.Equal(model.ID(1), user.Profile.ID)
+	}
 }

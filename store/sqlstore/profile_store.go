@@ -19,7 +19,7 @@ type SqlProfileStore struct {
 
 func newSqlProfileStore(sqlStore *SqlStore) store.ProfileStore {
 	s := &SqlProfileStore{
-		genericStore: NewStore(sqlStore, WithFilterConfig[model.Profile](filter.Config{Rules: []filter.Rule{{
+		genericStore: NewStore[model.Profile](sqlStore, WithFilterConfig[model.Profile](filter.Config{Rules: []filter.Rule{{
 			Key:  "first_name",
 			Type: "string",
 		}, {

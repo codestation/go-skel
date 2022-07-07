@@ -51,12 +51,39 @@ func WithPaginatorKeys(keys []string) FilterOption {
 	}
 }
 
+func WithIncludes(includes ...string) FilterOption {
+	return func(clause *Clause) {
+		if len(includes) > 0 {
+			clause.includes = make([]string, len(includes))
+			copy(clause.includes, includes)
+		}
+	}
+}
+
 func WithAllowedIncludes(includes []string) FilterOption {
 	return func(clause *Clause) {
 		if len(includes) > 0 {
 			clause.allowedIncludes = make([]string, len(includes))
 			copy(clause.allowedIncludes, includes)
 		}
+	}
+}
+
+func WithAllowedFilters(rules []filter.Rule) FilterOption {
+	return func(clause *Clause) {
+		if clause.filterer == nil {
+			clause.filterer = filter.New()
+		}
+		clause.filterer.SetRules(rules...)
+	}
+}
+
+func WithConditions(conditions ...filter.Condition) FilterOption {
+	return func(clause *Clause) {
+		if clause.filterer == nil {
+			clause.filterer = filter.New()
+		}
+		clause.filterer.SetConditions(conditions...)
 	}
 }
 

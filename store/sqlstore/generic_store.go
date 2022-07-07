@@ -7,6 +7,7 @@ package sqlstore
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/doug-martin/goqu/v9/exp"
 	"github.com/gofrs/uuid"
@@ -23,6 +24,8 @@ var (
 	_ store.GenericStore[model.Model, *model.Model] = &genericStore[model.Model, *model.Model]{}
 )
 
+type AttachFunc[T any, PT model.Modelable[T]] func(ctx context.Context, results []PT, include string) error
+
 type genericStore[T any, PT model.Modelable[T]] struct {
 	*SqlStore
 	table           string
@@ -32,6 +35,8 @@ type genericStore[T any, PT model.Modelable[T]] struct {
 	defaultFilters  exp.ExpressionList
 	sortKeys        []string
 	includes        []string
+	rules           []filter.Rule
+	attachFunc      AttachFunc[T, PT]
 }
 
 type StoreOption[T any, PT model.Modelable[T]] func(c *genericStore[T, PT])
@@ -54,9 +59,21 @@ func WithSelectFields[T any, PT model.Modelable[T]](fields ...any) StoreOption[T
 	}
 }
 
-func WithFilters[T any, PT model.Modelable[T]](filters exp.ExpressionList) StoreOption[T, PT] {
+func WithExpressions[T any, PT model.Modelable[T]](filters exp.ExpressionList) StoreOption[T, PT] {
 	return func(c *genericStore[T, PT]) {
 		c.defaultFilters = filters
+	}
+}
+
+func WithFilters[T any, PT model.Modelable[T]](rules ...filter.Rule) StoreOption[T, PT] {
+	return func(c *genericStore[T, PT]) {
+		c.rules = rules
+	}
+}
+
+func WithIncludes[T any, PT model.Modelable[T]](includes []string) StoreOption[T, PT] {
+	return func(c *genericStore[T, PT]) {
+		c.includes = includes
 	}
 }
 
@@ -70,6 +87,10 @@ func NewStore[T any, PT model.Modelable[T]](sqlStore *SqlStore, opts ...StoreOpt
 
 	st.table = model.GetTableName[T, PT](new(T))
 	return st
+}
+
+func (s *genericStore[T, PT]) AttachFunc(fn AttachFunc[T, PT]) {
+	s.attachFunc = fn
 }
 
 func (s *genericStore[T, PT]) Get(ctx context.Context, id model.ID) (PT, error) {
@@ -129,6 +150,7 @@ func (s *genericStore[T, PT]) List(ctx context.Context, opts ...clause.FilterOpt
 	cl := clause.NewClause(
 		clause.WithPaginatorKeys(s.sortKeys),
 		clause.WithAllowedIncludes(s.includes),
+		clause.WithAllowedFilters(s.rules),
 	)
 	cl.ApplyOptions(opts...)
 
@@ -140,8 +162,37 @@ func (s *genericStore[T, PT]) List(ctx context.Context, opts ...clause.FilterOpt
 		return response.NewListResponse[T, PT](results, cur), nil
 	case err != nil:
 		return nil, store.NewRepoError(store.ErrBackend, err)
+	}
+
+	if s.attachFunc != nil {
+		if err := cl.Includes(func(include string) error {
+			return s.attachFunc(ctx, results, include)
+		}); err != nil {
+			return nil, store.NewRepoError(store.ErrBackend, err)
+		}
+	}
+
+	return response.NewListResponse[T, PT](results, cur), nil
+}
+
+func (s *genericStore[T, PT]) ListByIds(ctx context.Context, ids []model.ID) ([]PT, error) {
+	query := s.builder.From(s.table).Select(s.selectFields...).Where(goqu.Ex{"id": ids})
+
+	sql, args, err := query.Prepared(true).ToSQL()
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate SQL query: %w", err)
+	}
+
+	results := make([]PT, 0)
+	err = s.db.Select(ctx, &results, sql, args...)
+
+	switch {
+	case errors.Is(err, ErrNoRows):
+		return results, nil
+	case err != nil:
+		return nil, store.NewRepoError(store.ErrBackend, err)
 	default:
-		return response.NewListResponse[T, PT](results, cur), nil
+		return results, nil
 	}
 }
 
