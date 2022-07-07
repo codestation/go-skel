@@ -17,8 +17,7 @@ func TestProfileStore(t *testing.T) {
 
 type profileSuite struct {
 	suite.Suite
-	sqlStore *SqlStore
-	conn     *connection
+	conn *connection
 }
 
 func (s *profileSuite) SetupTest() {
