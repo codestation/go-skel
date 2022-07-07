@@ -31,6 +31,7 @@ type genericStore[T any, PT model.Modelable[T]] struct {
 	table           string
 	paginatorConfig paginator.Config
 	filterConfig    filter.Config
+	listField       string
 	selectFields    []any
 	defaultFilters  exp.ExpressionList
 	sortKeys        []string
@@ -74,6 +75,12 @@ func WithFilters[T any, PT model.Modelable[T]](rules ...filter.Rule) StoreOption
 func WithIncludes[T any, PT model.Modelable[T]](includes []string) StoreOption[T, PT] {
 	return func(c *genericStore[T, PT]) {
 		c.includes = includes
+	}
+}
+
+func WithListByField[T any, PT model.Modelable[T]](field string) StoreOption[T, PT] {
+	return func(c *genericStore[T, PT]) {
+		c.listField = field
 	}
 }
 
@@ -143,6 +150,44 @@ func (s *genericStore[T, PT]) GetByExternalID(ctx context.Context, externalID uu
 
 func (s *genericStore[T, PT]) List(ctx context.Context, opts ...clause.FilterOption) (*response.ListResponse[T, PT], error) {
 	query := s.builder.From(s.table).Select(s.selectFields...)
+	if s.defaultFilters != nil {
+		query = query.Where(s.defaultFilters)
+	}
+
+	cl := clause.NewClause(
+		clause.WithPaginatorKeys(s.sortKeys),
+		clause.WithAllowedIncludes(s.includes),
+		clause.WithAllowedFilters(s.rules),
+	)
+	cl.ApplyOptions(opts...)
+
+	results := make([]PT, 0)
+	cur, err := cl.ApplyFilters(ctx, s.db, query, &results)
+
+	switch {
+	case errors.Is(err, ErrNoRows):
+		return response.NewListResponse[T, PT](results, cur), nil
+	case err != nil:
+		return nil, store.NewRepoError(store.ErrBackend, err)
+	}
+
+	if s.attachFunc != nil {
+		if err := cl.Includes(func(include string) error {
+			return s.attachFunc(ctx, results, include)
+		}); err != nil {
+			return nil, store.NewRepoError(store.ErrBackend, err)
+		}
+	}
+
+	return response.NewListResponse[T, PT](results, cur), nil
+}
+
+func (s *genericStore[T, PT]) ListByRelationId(ctx context.Context, id model.ID, opts ...clause.FilterOption) (*response.ListResponse[T, PT], error) {
+	if s.listField == "" {
+		return nil, store.NewRepoError(store.ErrBackend, errors.New("ListByRelationId isn't configured"))
+	}
+
+	query := s.builder.From(s.table).Select(s.selectFields...).Where(goqu.Ex{s.listField: id})
 	if s.defaultFilters != nil {
 		query = query.Where(s.defaultFilters)
 	}
