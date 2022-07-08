@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"megpoid.xyz/go/go-skel/config"
 	"megpoid.xyz/go/go-skel/testdata"
+	"os"
 	"testing"
 )
 
@@ -43,6 +44,10 @@ func (c *connection) setupDatabase(t *testing.T) {
 	cfg, err := config.NewConfig()
 	if err != nil {
 		assert.FailNowf(t, "Cannot load settings", err.Error())
+	}
+
+	if dsn, ok := os.LookupEnv("APP_DSN"); ok {
+		cfg.SqlSettings.DataSourceName = dsn
 	}
 
 	conn, err := NewConnection(cfg.SqlSettings)
