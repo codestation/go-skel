@@ -7,6 +7,16 @@
             "translation": "ID de perfil inválido"
         },
         {
+            "id": "Failed to read request",
+            "message": "Failed to read request",
+            "translation": "Error al leer la petición"
+        },
+        {
+            "id": "The request did not pass validation",
+            "message": "The request did not pass validation",
+            "translation": "La petición no pasó la validación"
+        },
+        {
             "id": "An error occurred",
             "message": "An error occurred",
             "translation": "Ha ocurrido un error"
@@ -25,6 +35,21 @@
             "id": "Failed to list profiles",
             "message": "Failed to list profiles",
             "translation": "Error al listar perfiles"
+        },
+        {
+            "id": "Failed to save profile",
+            "message": "Failed to save profile",
+            "translation": "Error al guardar el perfil"
+        },
+        {
+            "id": "Failed to update profile",
+            "message": "Failed to update profile",
+            "translation": "Error al actualizar el perfil"
+        },
+        {
+            "id": "Failed to remove profile",
+            "message": "Failed to remove profile",
+            "translation": "Error al eliminar el perfil"
         }
     ]
 }

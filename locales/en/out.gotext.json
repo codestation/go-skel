@@ -9,6 +9,20 @@
             "fuzzy": true
         },
         {
+            "id": "Failed to read request",
+            "message": "Failed to read request",
+            "translation": "Failed to read request",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "The request did not pass validation",
+            "message": "The request did not pass validation",
+            "translation": "The request did not pass validation",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
             "id": "An error occurred",
             "message": "An error occurred",
             "translation": "An error occurred",
@@ -33,6 +47,27 @@
             "id": "Failed to list profiles",
             "message": "Failed to list profiles",
             "translation": "Failed to list profiles",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Failed to save profile",
+            "message": "Failed to save profile",
+            "translation": "Failed to save profile",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Failed to update profile",
+            "message": "Failed to update profile",
+            "translation": "Failed to update profile",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Failed to remove profile",
+            "message": "Failed to remove profile",
+            "translation": "Failed to remove profile",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         }

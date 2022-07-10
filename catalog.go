@@ -39,29 +39,40 @@ func init() {
 }
 
 var messageKeyToIndex = map[string]int{
-	"An error occurred":       1,
-	"Failed to get profile":   3,
-	"Failed to list profiles": 4,
-	"Invalid profile ID":      0,
-	"Profile not found":       2,
+	"An error occurred":                   3,
+	"Failed to get profile":               5,
+	"Failed to list profiles":             6,
+	"Failed to read request":              1,
+	"Failed to remove profile":            9,
+	"Failed to save profile":              7,
+	"Failed to update profile":            8,
+	"Invalid profile ID":                  0,
+	"Profile not found":                   4,
+	"The request did not pass validation": 2,
 }
 
-var enIndex = []uint32{ // 6 elements
-	0x00000000, 0x00000013, 0x00000025, 0x00000037,
-	0x0000004d, 0x00000065,
-} // Size: 48 bytes
+var enIndex = []uint32{ // 11 elements
+	0x00000000, 0x00000013, 0x0000002a, 0x0000004e,
+	0x00000060, 0x00000072, 0x00000088, 0x000000a0,
+	0x000000b7, 0x000000d0, 0x000000e9,
+} // Size: 68 bytes
 
-const enData string = "" + // Size: 101 bytes
-	"\x02Invalid profile ID\x02An error occurred\x02Profile not found\x02Fail" +
-	"ed to get profile\x02Failed to list profiles"
+const enData string = "" + // Size: 233 bytes
+	"\x02Invalid profile ID\x02Failed to read request\x02The request did not " +
+	"pass validation\x02An error occurred\x02Profile not found\x02Failed to g" +
+	"et profile\x02Failed to list profiles\x02Failed to save profile\x02Faile" +
+	"d to update profile\x02Failed to remove profile"
 
-var esIndex = []uint32{ // 6 elements
-	0x00000000, 0x00000017, 0x0000002c, 0x00000041,
-	0x00000059, 0x00000072,
-} // Size: 48 bytes
+var esIndex = []uint32{ // 11 elements
+	0x00000000, 0x00000017, 0x00000032, 0x00000057,
+	0x0000006c, 0x00000081, 0x00000099, 0x000000b2,
+	0x000000cd, 0x000000eb, 0x00000107,
+} // Size: 68 bytes
 
-const esData string = "" + // Size: 114 bytes
-	"\x02ID de perfil inválido\x02Ha ocurrido un error\x02Perfil no encontrad" +
-	"o\x02Error al obtener perfil\x02Error al listar perfiles"
+const esData string = "" + // Size: 263 bytes
+	"\x02ID de perfil inválido\x02Error al leer la petición\x02La petición no" +
+	" pasó la validación\x02Ha ocurrido un error\x02Perfil no encontrado\x02E" +
+	"rror al obtener perfil\x02Error al listar perfiles\x02Error al guardar e" +
+	"l perfil\x02Error al actualizar el perfil\x02Error al eliminar el perfil"
 
-	// Total table size 311 bytes (0KiB); checksum: 4778579D
+	// Total table size 632 bytes (0KiB); checksum: 79946FF9
