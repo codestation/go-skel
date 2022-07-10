@@ -38,7 +38,7 @@ func newUser(name string, profileId model.ID) *testUser {
 }
 
 type userStore struct {
-	*genericStore[testUser, *testUser]
+	*genericStore[*testUser]
 }
 
 func (s *userStore) Attach(ctx context.Context, results []*testUser, relation string) error {
@@ -73,13 +73,13 @@ func (s *storeSuite) TearDownTest() {
 }
 
 func (s *storeSuite) TestNewStore() {
-	st := NewStore[model.Profile](s.conn.store)
+	st := NewStore[*model.Profile](s.conn.store)
 	s.Equal("profiles", st.table)
 	s.Equal([]any{"*"}, st.selectFields)
 }
 
 func (s *storeSuite) TestStoreGet() {
-	st := NewStore[testUser](s.conn.store)
+	st := NewStore[*testUser](s.conn.store)
 	var tests = []struct {
 		id  model.ID
 		err error
@@ -103,7 +103,7 @@ func (s *storeSuite) TestStoreGet() {
 }
 
 func (s *storeSuite) TestStoreList() {
-	st := NewStore[testUser](s.conn.store)
+	st := NewStore[*testUser](s.conn.store)
 	users, err := st.List(context.Background())
 	if s.NoError(err) {
 		s.GreaterOrEqual(len(users.Data), 0)
@@ -111,7 +111,7 @@ func (s *storeSuite) TestStoreList() {
 }
 
 func (s *storeSuite) TestStoreSave() {
-	st := NewStore[testUser](s.conn.store)
+	st := NewStore[*testUser](s.conn.store)
 	var tests = []struct {
 		name      string
 		profileId model.ID
@@ -136,7 +136,7 @@ func (s *storeSuite) TestStoreSave() {
 }
 
 func (s *storeSuite) TestStoreUpdate() {
-	st := NewStore[testUser](s.conn.store)
+	st := NewStore[*testUser](s.conn.store)
 	var tests = []struct {
 		id  model.ID
 		err error
@@ -161,7 +161,7 @@ func (s *storeSuite) TestStoreUpdate() {
 }
 
 func (s *storeSuite) TestStoreDelete() {
-	st := NewStore[testUser](s.conn.store)
+	st := NewStore[*testUser](s.conn.store)
 	var tests = []struct {
 		id  model.ID
 		err error
@@ -183,7 +183,7 @@ func (s *storeSuite) TestStoreDelete() {
 }
 
 func (s *storeSuite) TestStoreGetExternal() {
-	st := NewStore[testUser](s.conn.store)
+	st := NewStore[*testUser](s.conn.store)
 	var tests = []struct {
 		id  uuid.UUID
 		err error
@@ -207,7 +207,7 @@ func (s *storeSuite) TestStoreGetExternal() {
 }
 
 func (s *storeSuite) TestStoreDeleteExternal() {
-	st := NewStore[testUser](s.conn.store)
+	st := NewStore[*testUser](s.conn.store)
 	var tests = []struct {
 		id  uuid.UUID
 		err error
@@ -233,7 +233,7 @@ func (s *storeSuite) TestBackendError() {
 		Error: errors.New("not implemented"),
 	}
 	conn := &SqlStore{db: db}
-	st := NewStore[testUser](conn)
+	st := NewStore[*testUser](conn)
 	ctx := context.Background()
 
 	_, err := st.Get(ctx, 1)
@@ -262,8 +262,8 @@ func (s *storeSuite) TestBackendError() {
 
 func (s *storeSuite) TestIncludes() {
 	st := userStore{
-		genericStore: NewStore[testUser](s.conn.store,
-			WithIncludes[testUser]([]string{"profile"}),
+		genericStore: NewStore[*testUser](s.conn.store,
+			WithIncludes[*testUser]([]string{"profile"}),
 		),
 	}
 

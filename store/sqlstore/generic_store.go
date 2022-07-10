@@ -17,16 +17,17 @@ import (
 	"megpoid.xyz/go/go-skel/store/clause"
 	"megpoid.xyz/go/go-skel/store/filter"
 	"megpoid.xyz/go/go-skel/store/paginator"
+	"reflect"
 )
 
 // compile time validator for the interfaces
 var (
-	_ store.GenericStore[model.Model, *model.Model] = &genericStore[model.Model, *model.Model]{}
+	_ store.GenericStore[*model.Model] = &genericStore[*model.Model]{}
 )
 
-type AttachFunc[T any, PT model.Modelable[T]] func(ctx context.Context, results []PT, include string) error
+type AttachFunc[T model.Modelable] func(ctx context.Context, results []T, include string) error
 
-type genericStore[T any, PT model.Modelable[T]] struct {
+type genericStore[T model.Modelable] struct {
 	*SqlStore
 	table           string
 	paginatorConfig paginator.Config
@@ -37,70 +38,79 @@ type genericStore[T any, PT model.Modelable[T]] struct {
 	sortKeys        []string
 	includes        []string
 	rules           []filter.Rule
-	attachFunc      AttachFunc[T, PT]
+	attachFunc      AttachFunc[T]
 }
 
-type StoreOption[T any, PT model.Modelable[T]] func(c *genericStore[T, PT])
+type StoreOption[T model.Modelable] func(c *genericStore[T])
 
-func WithPaginatorConfig[T any, PT model.Modelable[T]](cfg paginator.Config) StoreOption[T, PT] {
-	return func(c *genericStore[T, PT]) {
+func WithPaginatorConfig[T model.Modelable](cfg paginator.Config) StoreOption[T] {
+	return func(c *genericStore[T]) {
 		c.paginatorConfig = cfg
 	}
 }
 
-func WithFilterConfig[T any, PT model.Modelable[T]](cfg filter.Config) StoreOption[T, PT] {
-	return func(c *genericStore[T, PT]) {
+func WithFilterConfig[T model.Modelable](cfg filter.Config) StoreOption[T] {
+	return func(c *genericStore[T]) {
 		c.filterConfig = cfg
 	}
 }
 
-func WithSelectFields[T any, PT model.Modelable[T]](fields ...any) StoreOption[T, PT] {
-	return func(c *genericStore[T, PT]) {
+func WithSelectFields[T model.Modelable](fields ...any) StoreOption[T] {
+	return func(c *genericStore[T]) {
 		c.selectFields = fields
 	}
 }
 
-func WithExpressions[T any, PT model.Modelable[T]](filters exp.ExpressionList) StoreOption[T, PT] {
-	return func(c *genericStore[T, PT]) {
+func WithExpressions[T model.Modelable](filters exp.ExpressionList) StoreOption[T] {
+	return func(c *genericStore[T]) {
 		c.defaultFilters = filters
 	}
 }
 
-func WithFilters[T any, PT model.Modelable[T]](rules ...filter.Rule) StoreOption[T, PT] {
-	return func(c *genericStore[T, PT]) {
+func WithFilters[T model.Modelable](rules ...filter.Rule) StoreOption[T] {
+	return func(c *genericStore[T]) {
 		c.rules = rules
 	}
 }
 
-func WithIncludes[T any, PT model.Modelable[T]](includes []string) StoreOption[T, PT] {
-	return func(c *genericStore[T, PT]) {
+func WithIncludes[T model.Modelable](includes []string) StoreOption[T] {
+	return func(c *genericStore[T]) {
 		c.includes = includes
 	}
 }
 
-func WithListByField[T any, PT model.Modelable[T]](field string) StoreOption[T, PT] {
-	return func(c *genericStore[T, PT]) {
+func WithListByField[T model.Modelable](field string) StoreOption[T] {
+	return func(c *genericStore[T]) {
 		c.listField = field
 	}
 }
 
-func NewStore[T any, PT model.Modelable[T]](sqlStore *SqlStore, opts ...StoreOption[T, PT]) *genericStore[T, PT] {
-	st := &genericStore[T, PT]{SqlStore: sqlStore}
-	var defaults []StoreOption[T, PT]
-	defaults = append(defaults, WithSelectFields[T, PT]("*"))
+func NewStore[T model.Modelable](sqlStore *SqlStore, opts ...StoreOption[T]) *genericStore[T] {
+	st := &genericStore[T]{SqlStore: sqlStore}
+	var defaults []StoreOption[T]
+	defaults = append(defaults, WithSelectFields[T]("*"))
 	for _, opt := range append(defaults, opts...) {
 		opt(st)
 	}
 
-	st.table = model.GetTableName[T, PT](new(T))
+	st.table = model.GetTableName[T](*new(T))
 	return st
 }
 
-func (s *genericStore[T, PT]) AttachFunc(fn AttachFunc[T, PT]) {
+func (s *genericStore[T]) zero() T {
+	var result T
+	return result
+}
+
+func (s *genericStore[T]) new() T {
+	return reflect.New(reflect.TypeOf(s.zero()).Elem()).Interface().(T)
+}
+
+func (s *genericStore[T]) AttachFunc(fn AttachFunc[T]) {
 	s.attachFunc = fn
 }
 
-func (s *genericStore[T, PT]) Get(ctx context.Context, id model.ID) (PT, error) {
+func (s *genericStore[T]) Get(ctx context.Context, id model.ID) (T, error) {
 	query := s.builder.From(s.table).Select(s.selectFields...).Where(goqu.Ex{"id": id})
 	if s.defaultFilters != nil && !s.defaultFilters.IsEmpty() {
 		query = query.Where(s.defaultFilters)
@@ -108,23 +118,23 @@ func (s *genericStore[T, PT]) Get(ctx context.Context, id model.ID) (PT, error) 
 
 	sql, args, err := query.Prepared(true).ToSQL()
 	if err != nil {
-		return nil, store.NewRepoError(store.ErrBackend, err)
+		return s.zero(), store.NewRepoError(store.ErrBackend, err)
 	}
 
-	result := PT(new(T))
+	result := s.new()
 	err = s.db.Get(ctx, result, sql, args...)
 
 	switch {
 	case errors.Is(err, ErrNoRows):
-		return nil, store.NewRepoError(store.ErrNotFound, err)
+		return s.zero(), store.NewRepoError(store.ErrNotFound, err)
 	case err != nil:
-		return nil, store.NewRepoError(store.ErrBackend, err)
+		return s.zero(), store.NewRepoError(store.ErrBackend, err)
 	default:
 		return result, nil
 	}
 }
 
-func (s *genericStore[T, PT]) GetByExternalID(ctx context.Context, externalID uuid.UUID) (PT, error) {
+func (s *genericStore[T]) GetByExternalID(ctx context.Context, externalID uuid.UUID) (T, error) {
 	query := s.builder.From(s.table).Select(s.selectFields...).Where(goqu.Ex{"external_id": externalID})
 	if s.defaultFilters != nil && !s.defaultFilters.IsEmpty() {
 		query = query.Where(s.defaultFilters)
@@ -132,23 +142,23 @@ func (s *genericStore[T, PT]) GetByExternalID(ctx context.Context, externalID uu
 
 	sql, args, err := query.Prepared(true).ToSQL()
 	if err != nil {
-		return nil, store.NewRepoError(store.ErrBackend, err)
+		return s.zero(), store.NewRepoError(store.ErrBackend, err)
 	}
 
-	result := PT(new(T))
+	result := s.new()
 	err = s.db.Get(ctx, result, sql, args...)
 
 	switch {
 	case errors.Is(err, ErrNoRows):
-		return nil, store.NewRepoError(store.ErrNotFound, err)
+		return s.zero(), store.NewRepoError(store.ErrNotFound, err)
 	case err != nil:
-		return nil, store.NewRepoError(store.ErrBackend, err)
+		return s.zero(), store.NewRepoError(store.ErrBackend, err)
 	default:
 		return result, nil
 	}
 }
 
-func (s *genericStore[T, PT]) List(ctx context.Context, opts ...clause.FilterOption) (*response.ListResponse[T, PT], error) {
+func (s *genericStore[T]) List(ctx context.Context, opts ...clause.FilterOption) (*response.ListResponse[T], error) {
 	query := s.builder.From(s.table).Select(s.selectFields...)
 	if s.defaultFilters != nil {
 		query = query.Where(s.defaultFilters)
@@ -161,12 +171,12 @@ func (s *genericStore[T, PT]) List(ctx context.Context, opts ...clause.FilterOpt
 	)
 	cl.ApplyOptions(opts...)
 
-	results := make([]PT, 0)
+	results := make([]T, 0)
 	cur, err := cl.ApplyFilters(ctx, s.db, query, &results)
 
 	switch {
 	case errors.Is(err, ErrNoRows):
-		return response.NewListResponse[T, PT](results, cur), nil
+		return response.NewListResponse[T](results, cur), nil
 	case err != nil:
 		return nil, store.NewRepoError(store.ErrBackend, err)
 	}
@@ -179,10 +189,10 @@ func (s *genericStore[T, PT]) List(ctx context.Context, opts ...clause.FilterOpt
 		}
 	}
 
-	return response.NewListResponse[T, PT](results, cur), nil
+	return response.NewListResponse[T](results, cur), nil
 }
 
-func (s *genericStore[T, PT]) ListByRelationId(ctx context.Context, id model.ID, opts ...clause.FilterOption) (*response.ListResponse[T, PT], error) {
+func (s *genericStore[T]) ListByRelationId(ctx context.Context, id model.ID, opts ...clause.FilterOption) (*response.ListResponse[T], error) {
 	if s.listField == "" {
 		return nil, store.NewRepoError(store.ErrBackend, errors.New("ListByRelationId isn't configured"))
 	}
@@ -199,12 +209,12 @@ func (s *genericStore[T, PT]) ListByRelationId(ctx context.Context, id model.ID,
 	)
 	cl.ApplyOptions(opts...)
 
-	results := make([]PT, 0)
+	results := make([]T, 0)
 	cur, err := cl.ApplyFilters(ctx, s.db, query, &results)
 
 	switch {
 	case errors.Is(err, ErrNoRows):
-		return response.NewListResponse[T, PT](results, cur), nil
+		return response.NewListResponse[T](results, cur), nil
 	case err != nil:
 		return nil, store.NewRepoError(store.ErrBackend, err)
 	}
@@ -217,10 +227,10 @@ func (s *genericStore[T, PT]) ListByRelationId(ctx context.Context, id model.ID,
 		}
 	}
 
-	return response.NewListResponse[T, PT](results, cur), nil
+	return response.NewListResponse[T](results, cur), nil
 }
 
-func (s *genericStore[T, PT]) ListByIds(ctx context.Context, ids []model.ID) ([]PT, error) {
+func (s *genericStore[T]) ListByIds(ctx context.Context, ids []model.ID) ([]T, error) {
 	query := s.builder.From(s.table).Select(s.selectFields...).Where(goqu.Ex{"id": ids})
 
 	sql, args, err := query.Prepared(true).ToSQL()
@@ -228,7 +238,7 @@ func (s *genericStore[T, PT]) ListByIds(ctx context.Context, ids []model.ID) ([]
 		return nil, fmt.Errorf("failed to generate SQL query: %w", err)
 	}
 
-	results := make([]PT, 0)
+	results := make([]T, 0)
 	err = s.db.Select(ctx, &results, sql, args...)
 
 	switch {
@@ -241,7 +251,7 @@ func (s *genericStore[T, PT]) ListByIds(ctx context.Context, ids []model.ID) ([]
 	}
 }
 
-func (s *genericStore[T, PT]) Save(ctx context.Context, req PT) error {
+func (s *genericStore[T]) Save(ctx context.Context, req T) error {
 	query := s.builder.Insert(s.table).Rows(req).Returning("id")
 
 	sql, args, err := query.Prepared(true).ToSQL()
@@ -264,7 +274,7 @@ func (s *genericStore[T, PT]) Save(ctx context.Context, req PT) error {
 	return nil
 }
 
-func (s *genericStore[T, PT]) Update(ctx context.Context, req PT) error {
+func (s *genericStore[T]) Update(ctx context.Context, req T) error {
 	query := s.builder.Update(s.table).Set(req).Where(goqu.Ex{"id": req.GetID()})
 
 	sql, args, err := query.Prepared(true).ToSQL()
@@ -290,7 +300,7 @@ func (s *genericStore[T, PT]) Update(ctx context.Context, req PT) error {
 	return nil
 }
 
-func (s *genericStore[T, PT]) Delete(ctx context.Context, id model.ID) error {
+func (s *genericStore[T]) Delete(ctx context.Context, id model.ID) error {
 	query := s.builder.Delete(s.table).Where(goqu.Ex{"id": id})
 
 	sql, args, err := query.Prepared(true).ToSQL()
@@ -315,7 +325,7 @@ func (s *genericStore[T, PT]) Delete(ctx context.Context, id model.ID) error {
 	return nil
 }
 
-func (s *genericStore[T, PT]) DeleteByExternalId(ctx context.Context, externalId uuid.UUID) error {
+func (s *genericStore[T]) DeleteByExternalId(ctx context.Context, externalId uuid.UUID) error {
 	query := s.builder.Delete(s.table).Where(goqu.Ex{"external_id": externalId})
 
 	sql, args, err := query.Prepared(true).ToSQL()

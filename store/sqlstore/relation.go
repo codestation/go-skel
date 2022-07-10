@@ -9,12 +9,12 @@ import (
 	"megpoid.xyz/go/go-skel/model"
 )
 
-func attachRelation[T any, PT model.Modelable[T], U any, PU model.Modelable[U]](
+func attachRelation[T, U model.Modelable](
 	ctx context.Context,
-	entries []PT,
-	getRelationId func(m PT) model.ID,
-	setRelation func(m PT, r PU),
-	listByIds func(ctx context.Context, ids []model.ID) ([]PU, error),
+	entries []T,
+	getRelationId func(m T) model.ID,
+	setRelation func(m T, r U),
+	listByIds func(ctx context.Context, ids []model.ID) ([]U, error),
 ) error {
 	if len(entries) == 0 {
 		return nil
@@ -38,7 +38,7 @@ func attachRelation[T any, PT model.Modelable[T], U any, PU model.Modelable[U]](
 	}
 
 	// keep the results in a map for quicker access
-	var resultMap = map[model.ID]PU{}
+	var resultMap = map[model.ID]U{}
 	for _, result := range results {
 		resultMap[result.GetID()] = result
 	}

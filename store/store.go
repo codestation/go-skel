@@ -19,14 +19,14 @@ type Store interface {
 	WithTransaction(ctx context.Context, f func(s Store) error) error
 }
 
-type GenericStore[T any, PT model.Modelable[T]] interface {
-	Get(ctx context.Context, id model.ID) (PT, error)
-	GetByExternalID(ctx context.Context, externalID uuid.UUID) (PT, error)
-	List(ctx context.Context, opts ...clause.FilterOption) (*response.ListResponse[T, PT], error)
-	ListByRelationId(ctx context.Context, id model.ID, opts ...clause.FilterOption) (*response.ListResponse[T, PT], error)
-	ListByIds(ctx context.Context, ids []model.ID) ([]PT, error)
-	Save(ctx context.Context, req PT) error
-	Update(ctx context.Context, req PT) error
+type GenericStore[T model.Modelable] interface {
+	Get(ctx context.Context, id model.ID) (T, error)
+	GetByExternalID(ctx context.Context, externalID uuid.UUID) (T, error)
+	List(ctx context.Context, opts ...clause.FilterOption) (*response.ListResponse[T], error)
+	ListByRelationId(ctx context.Context, id model.ID, opts ...clause.FilterOption) (*response.ListResponse[T], error)
+	ListByIds(ctx context.Context, ids []model.ID) ([]T, error)
+	Save(ctx context.Context, req T) error
+	Update(ctx context.Context, req T) error
 	Delete(ctx context.Context, id model.ID) error
 	DeleteByExternalId(ctx context.Context, externalId uuid.UUID) error
 }
@@ -37,6 +37,6 @@ type HealthCheckStore interface {
 }
 
 type ProfileStore interface {
-	GenericStore[model.Profile, *model.Profile]
+	GenericStore[*model.Profile]
 	GetByUserToken(ctx context.Context, userToken string) (*model.Profile, error)
 }

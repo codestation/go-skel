@@ -9,13 +9,13 @@ import (
 	"megpoid.xyz/go/go-skel/store/paginator/cursor"
 )
 
-type ListResponse[T any, PT model.Modelable[T]] struct {
-	Data []PT       `json:"data"`
+type ListResponse[T model.Modelable] struct {
+	Data []T        `json:"data"`
 	Meta Pagination `json:"meta"`
 }
 
-func NewListResponse[T any, PT model.Modelable[T]](results []PT, c *cursor.Cursor) *ListResponse[T, PT] {
-	return &ListResponse[T, PT]{
+func NewListResponse[T model.Modelable](results []T, c *cursor.Cursor) *ListResponse[T] {
+	return &ListResponse[T]{
 		Data: results,
 		Meta: Pagination{
 			Items:      len(results),

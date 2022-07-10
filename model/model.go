@@ -25,8 +25,7 @@ type Model struct {
 	DeletedAt  *time.Time  `json:"-"`
 }
 
-type Modelable[T any] interface {
-	*T
+type Modelable interface {
 	GetID() ID
 	SetID(id ID)
 }
@@ -55,7 +54,7 @@ func (m *Model) Apply(opts ...Option) {
 	}
 }
 
-func GetModelName[T any, PT Modelable[T]](m PT) string {
+func GetModelName[T Modelable](m T) string {
 	if t := reflect.TypeOf(m); t.Kind() == reflect.Ptr {
 		return t.Elem().Name()
 	} else {
@@ -63,7 +62,7 @@ func GetModelName[T any, PT Modelable[T]](m PT) string {
 	}
 }
 
-func GetTableName[T any, PT Modelable[T]](m PT) string {
+func GetTableName[T Modelable](m T) string {
 	if m, ok := any(m).(Tabler); ok {
 		return m.TableName()
 	}
