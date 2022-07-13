@@ -6,7 +6,7 @@ package api
 
 import (
 	"github.com/labstack/echo/v4"
-	"megpoid.xyz/go/go-skel/app"
+	"megpoid.dev/go/go-skel/app"
 )
 
 const appName = "goapp"

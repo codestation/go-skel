@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"go.uber.org/multierr"
-	"megpoid.xyz/go/go-skel/model/request"
+	"megpoid.dev/go/go-skel/model/request"
 	"strings"
 )
 

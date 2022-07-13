@@ -6,10 +6,10 @@ package app
 
 import (
 	"context"
-	"megpoid.xyz/go/go-skel/config"
-	"megpoid.xyz/go/go-skel/model"
-	"megpoid.xyz/go/go-skel/model/request"
-	"megpoid.xyz/go/go-skel/model/response"
+	"megpoid.dev/go/go-skel/config"
+	"megpoid.dev/go/go-skel/model"
+	"megpoid.dev/go/go-skel/model/request"
+	"megpoid.dev/go/go-skel/model/response"
 )
 
 type IApp interface {

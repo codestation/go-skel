@@ -7,9 +7,9 @@ package store
 import (
 	"context"
 	"github.com/gofrs/uuid"
-	"megpoid.xyz/go/go-skel/model"
-	"megpoid.xyz/go/go-skel/model/response"
-	"megpoid.xyz/go/go-skel/store/clause"
+	"megpoid.dev/go/go-skel/model"
+	"megpoid.dev/go/go-skel/model/response"
+	"megpoid.dev/go/go-skel/store/clause"
 )
 
 // Store lists all the other stores

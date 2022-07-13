@@ -33,13 +33,13 @@ steps:
   - name: build
     image: ghcr.io/codestation/drone-docker
     settings:
-      repo: registry.megpoid.xyz/codestation/goapp
+      repo: registry.megpoid.dev/codestation/goapp
       tags: latest
       buildkit: true
       platforms:
         - linux/amd64
         - linux/arm64
-      registry: registry.megpoid.xyz
+      registry: registry.megpoid.dev
       username:
         from_secret: docker_username
       password:
@@ -62,11 +62,11 @@ steps:
     settings:
       urls: http://updater:8000/apis/swarm/v1/update
       token_value:
-        from_secret: updater_appkey
+        from_secret: updater_apikey
       template: |
         {
           "images": [
-            "registry.megpoid.xyz/codestation/goapp"
+            "registry.megpoid.dev/codestation/goapp"
           ]
         }
 

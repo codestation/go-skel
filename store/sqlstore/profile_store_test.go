@@ -7,7 +7,7 @@ package sqlstore
 import (
 	"context"
 	"github.com/stretchr/testify/suite"
-	"megpoid.xyz/go/go-skel/model"
+	"megpoid.dev/go/go-skel/model"
 	"testing"
 )
 

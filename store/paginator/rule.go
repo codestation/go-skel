@@ -5,7 +5,7 @@
 package paginator
 
 import (
-	"megpoid.xyz/go/go-skel/store/paginator/util"
+	"megpoid.dev/go/go-skel/store/paginator/util"
 	"reflect"
 )
 

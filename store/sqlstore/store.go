@@ -11,8 +11,8 @@ import (
 	"github.com/doug-martin/goqu/v9"
 	_ "github.com/doug-martin/goqu/v9/dialect/postgres"
 	"github.com/georgysavva/scany/dbscan"
-	"megpoid.xyz/go/go-skel/config"
-	"megpoid.xyz/go/go-skel/store"
+	"megpoid.dev/go/go-skel/config"
+	"megpoid.dev/go/go-skel/store"
 )
 
 type Stores struct {

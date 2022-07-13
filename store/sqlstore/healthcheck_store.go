@@ -6,7 +6,7 @@ package sqlstore
 
 import (
 	"context"
-	"megpoid.xyz/go/go-skel/store"
+	"megpoid.dev/go/go-skel/store"
 )
 
 type SqlHealthCheckStore struct {

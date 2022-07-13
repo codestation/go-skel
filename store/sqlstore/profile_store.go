@@ -8,9 +8,9 @@ import (
 	"context"
 	"errors"
 	"github.com/doug-martin/goqu/v9"
-	"megpoid.xyz/go/go-skel/model"
-	"megpoid.xyz/go/go-skel/store"
-	"megpoid.xyz/go/go-skel/store/filter"
+	"megpoid.dev/go/go-skel/model"
+	"megpoid.dev/go/go-skel/store"
+	"megpoid.dev/go/go-skel/store/filter"
 )
 
 type SqlProfileStore struct {

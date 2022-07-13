@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"megpoid.xyz/go/go-skel/store"
+	"megpoid.dev/go/go-skel/store"
 )
 
 type fakeStore struct {

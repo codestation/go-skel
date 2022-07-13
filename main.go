@@ -7,7 +7,7 @@
 package main
 
 import (
-	"megpoid.xyz/go/go-skel/cmd"
+	"megpoid.dev/go/go-skel/cmd"
 )
 
 func main() {

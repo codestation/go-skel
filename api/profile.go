@@ -7,9 +7,9 @@ package api
 import (
 	"github.com/labstack/echo/v4"
 	"golang.org/x/text/message"
-	"megpoid.xyz/go/go-skel/app"
-	"megpoid.xyz/go/go-skel/app/i18n"
-	"megpoid.xyz/go/go-skel/model"
+	"megpoid.dev/go/go-skel/app"
+	"megpoid.dev/go/go-skel/app/i18n"
+	"megpoid.dev/go/go-skel/model"
 	"net/http"
 )
 

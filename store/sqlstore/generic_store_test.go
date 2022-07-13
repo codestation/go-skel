@@ -9,9 +9,9 @@ import (
 	"errors"
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/suite"
-	"megpoid.xyz/go/go-skel/model"
-	"megpoid.xyz/go/go-skel/store"
-	"megpoid.xyz/go/go-skel/store/clause"
+	"megpoid.dev/go/go-skel/model"
+	"megpoid.dev/go/go-skel/store"
+	"megpoid.dev/go/go-skel/store/clause"
 	"testing"
 	"time"
 )

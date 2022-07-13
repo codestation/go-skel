@@ -5,8 +5,8 @@
 package response
 
 import (
-	"megpoid.xyz/go/go-skel/model"
-	"megpoid.xyz/go/go-skel/store/paginator/cursor"
+	"megpoid.dev/go/go-skel/model"
+	"megpoid.dev/go/go-skel/store/paginator/cursor"
 )
 
 type ListResponse[T model.Modelable] struct {

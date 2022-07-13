@@ -16,10 +16,10 @@ RUN set -ex; \
     -trimpath \
     -tags viper_yaml3 \
     -ldflags "-w -s \
-    -X megpoid.xyz/go/go-skel/version.Tag=${CI_COMMIT_TAG}"
+    -X megpoid.dev/go/go-skel/version.Tag=${CI_COMMIT_TAG}"
 
 FROM alpine:3.15
-LABEL maintainer="codestation <codestation404@gmail.com>"
+LABEL maintainer="codestation <codestation@megpoid.dev>"
 
 RUN apk add --no-cache ca-certificates tzdata
 

@@ -1,4 +1,4 @@
-module megpoid.xyz/go/go-skel
+module megpoid.dev/go/go-skel
 
 go 1.18
 

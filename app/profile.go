@@ -8,12 +8,12 @@ import (
 	"context"
 	"errors"
 	"golang.org/x/text/message"
-	"megpoid.xyz/go/go-skel/app/i18n"
-	"megpoid.xyz/go/go-skel/model"
-	"megpoid.xyz/go/go-skel/model/request"
-	"megpoid.xyz/go/go-skel/model/response"
-	"megpoid.xyz/go/go-skel/store"
-	"megpoid.xyz/go/go-skel/store/clause"
+	"megpoid.dev/go/go-skel/app/i18n"
+	"megpoid.dev/go/go-skel/model"
+	"megpoid.dev/go/go-skel/model/request"
+	"megpoid.dev/go/go-skel/model/response"
+	"megpoid.dev/go/go-skel/store"
+	"megpoid.dev/go/go-skel/store/clause"
 )
 
 func (a *App) GetProfile(ctx context.Context, id model.ID) (*model.Profile, error) {

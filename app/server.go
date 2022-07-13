@@ -7,16 +7,16 @@ package app
 import (
 	"context"
 	"log"
-	"megpoid.xyz/go/go-skel/config"
+	"megpoid.dev/go/go-skel/config"
 	"net/http"
 	"time"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"megpoid.xyz/go/go-skel/app/i18n"
-	"megpoid.xyz/go/go-skel/store"
-	"megpoid.xyz/go/go-skel/store/sqlstore"
+	"megpoid.dev/go/go-skel/app/i18n"
+	"megpoid.dev/go/go-skel/store"
+	"megpoid.dev/go/go-skel/store/sqlstore"
 )
 
 type Server struct {

@@ -8,10 +8,10 @@ import (
 	"context"
 	"fmt"
 	"github.com/doug-martin/goqu/v9"
-	"megpoid.xyz/go/go-skel/model/request"
-	"megpoid.xyz/go/go-skel/store/filter"
-	"megpoid.xyz/go/go-skel/store/paginator"
-	"megpoid.xyz/go/go-skel/store/paginator/cursor"
+	"megpoid.dev/go/go-skel/model/request"
+	"megpoid.dev/go/go-skel/store/filter"
+	"megpoid.dev/go/go-skel/store/paginator"
+	"megpoid.dev/go/go-skel/store/paginator/cursor"
 )
 
 type Clause struct {

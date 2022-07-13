@@ -7,7 +7,7 @@ package app
 import (
 	"context"
 
-	"megpoid.xyz/go/go-skel/model"
+	"megpoid.dev/go/go-skel/model"
 )
 
 func (a *App) HealthCheck(ctx context.Context) *model.HealthCheckResult {
