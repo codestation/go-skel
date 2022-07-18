@@ -27,6 +27,9 @@ func NewFilter(c echo.Context) (*request.QueryParams, error) {
 		case "before":
 			// managed by bind
 			fallthrough
+		case "page":
+			// managed by bind
+			fallthrough
 		case "limit":
 			// managed by bind
 		case "includes":

@@ -11,7 +11,6 @@ import (
 	"megpoid.dev/go/go-skel/model/request"
 	"megpoid.dev/go/go-skel/store/filter"
 	"megpoid.dev/go/go-skel/store/paginator"
-	"megpoid.dev/go/go-skel/store/paginator/cursor"
 )
 
 type Clause struct {
@@ -139,7 +138,7 @@ func (c *Clause) ApplyFilters(ctx context.Context, db paginator.SqlSelector, sd 
 			return nil, err
 		}
 
-		cur = &cursor.Cursor{}
+		cur = &paginator.Cursor{}
 	}
 
 	return cur, nil
@@ -164,6 +163,12 @@ func WithFilter(query *request.QueryParams) FilterOption {
 				clause.paginator = paginator.New()
 			}
 			clause.paginator.SetBeforeCursor(*query.Pagination.Before)
+		}
+		if query.Pagination.Page != nil {
+			if clause.paginator == nil {
+				clause.paginator = paginator.New()
+			}
+			clause.paginator.SetPage(*query.Pagination.Page)
 		}
 		if query.Filters != nil {
 			if clause.filterer == nil {

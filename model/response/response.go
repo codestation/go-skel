@@ -6,21 +6,39 @@ package response
 
 import (
 	"megpoid.dev/go/go-skel/model"
-	"megpoid.dev/go/go-skel/store/paginator/cursor"
+	"megpoid.dev/go/go-skel/store/paginator"
 )
 
 type ListResponse[T model.Modelable] struct {
-	Data []T        `json:"data"`
-	Meta Pagination `json:"meta"`
+	Data []T `json:"data"`
+	Meta any `json:"meta,omitempty"`
 }
 
-func NewListResponse[T model.Modelable](results []T, c *cursor.Cursor) *ListResponse[T] {
-	return &ListResponse[T]{
-		Data: results,
-		Meta: Pagination{
-			Items:      len(results),
-			NextCursor: c.After,
-			PrevCursor: c.Before,
-		},
+func NewListResponse[T model.Modelable](results []T, c *paginator.Cursor) *ListResponse[T] {
+	switch c.Type() {
+	case paginator.MetaCursor:
+		cur := c.Cursor()
+		return &ListResponse[T]{
+			Data: results,
+			Meta: CursorPagination{
+				Items:      len(results),
+				NextCursor: cur.After,
+				PrevCursor: cur.Before,
+			},
+		}
+	case paginator.MetaOffset:
+		off := c.Offset()
+		return &ListResponse[T]{
+			Data: results,
+			Meta: OffsetPagination{
+				Items: len(results),
+				Total: off.Total,
+				Page:  off.Page,
+			},
+		}
+	default:
+		return &ListResponse[T]{
+			Data: results,
+		}
 	}
 }

@@ -6,4 +6,46 @@ package paginator
 
 import "megpoid.dev/go/go-skel/store/paginator/cursor"
 
-type Cursor = cursor.Cursor
+type MetaType string
+
+const (
+	MetaCursor MetaType = "cursor"
+	MetaOffset MetaType = "offset"
+	MetaNone   MetaType = "none"
+)
+
+// TODO: rename to Meta
+
+type Cursor struct {
+	cursor *cursor.Cursor
+	offset *Page
+}
+
+func (c *Cursor) Type() MetaType {
+	switch {
+	case c.cursor != nil:
+		return MetaCursor
+	case c.offset != nil:
+		return MetaOffset
+	default:
+		return MetaNone
+	}
+}
+
+func (c *Cursor) SetCursor(cur *cursor.Cursor) {
+	c.cursor = cur
+}
+
+func (c *Cursor) SetOffset(off *Page) {
+	c.offset = off
+}
+
+func (c *Cursor) Cursor() *cursor.Cursor {
+	return c.cursor
+}
+
+func (c *Cursor) Offset() *Page {
+	return c.offset
+}
+
+//type Cursor = cursor.Cursor
