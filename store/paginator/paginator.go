@@ -99,12 +99,13 @@ func (p *Paginator) Paginate(ctx context.Context, db SqlSelector, ds *goqu.Selec
 			return nil, fmt.Errorf("failed to generate count SQL query: %w", err)
 		}
 
-		var count int64
+		var count int
 		err = db.Get(ctx, &count, sql, args...)
 		if err != nil {
 			return nil, fmt.Errorf("failed to execute count SQL query: %w", err)
 		}
 		p.page.Total = count
+		p.page.ItemsPerPage = p.limit
 
 		offset := uint((p.page.Page - 1) * p.limit)
 		query = p.paginateOffset(query, offset)
@@ -162,6 +163,7 @@ func (p *Paginator) paginateCursor(query *goqu.SelectDataset, model any) (*goqu.
 }
 
 func (p *Paginator) paginateCount(query *goqu.SelectDataset, model any) *goqu.SelectDataset {
+	query.ClearSelect()
 	return query.Select(goqu.COUNT(goqu.Star()).As("count"))
 }
 

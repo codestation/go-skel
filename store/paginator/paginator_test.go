@@ -197,7 +197,7 @@ func TestPaginatorPaginateOffset(t *testing.T) {
 		WithPage(1),
 	)
 
-	min := func(x, y int64) int64 {
+	min := func(x, y int) int {
 		if x > y {
 			return y
 		}
@@ -212,14 +212,14 @@ func TestPaginatorPaginateOffset(t *testing.T) {
 				*pDest = users[0:args[0].(int64)]
 			} else {
 				assert.Equal(t, `SELECT "id", "name" FROM "users" ORDER BY "name" ASC, "id" ASC LIMIT $1 OFFSET $2`, query)
-				*pDest = users[args[0].(int64):min(int64(len(users)), args[0].(int64)+args[1].(int64))]
+				*pDest = users[args[0].(int64):min(len(users), int(args[0].(int64)+args[1].(int64)))]
 			}
 			return nil
 		},
 		AssertGet: func(dest any, query string, args ...any) error {
 			assert.Equal(t, `SELECT COUNT(*) AS "count" FROM "users"`, query)
-			pDest := dest.(*int64)
-			*pDest = int64(len(users))
+			pDest := dest.(*int)
+			*pDest = len(users)
 			return nil
 		},
 	}
@@ -232,7 +232,7 @@ func TestPaginatorPaginateOffset(t *testing.T) {
 		assert.Len(t, results, 2)
 		off := meta.Offset()
 		if assert.NotNil(t, off) {
-			assert.Equal(t, off.Total, int64(len(users)))
+			assert.Equal(t, off.Total, len(users))
 		}
 	}
 
@@ -242,7 +242,7 @@ func TestPaginatorPaginateOffset(t *testing.T) {
 		assert.Len(t, results, 1)
 		off := meta.Offset()
 		if assert.NotNil(t, off) {
-			assert.Equal(t, off.Total, int64(len(users)))
+			assert.Equal(t, off.Total, len(users))
 		}
 	}
 }

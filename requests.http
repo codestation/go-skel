@@ -1,5 +1,5 @@
 ###
-GET {{host}}/apis/goapp/v1/profiles
+GET {{host}}/apis/goapp/v1/profiles?limit=2&page=5
 
 ###
 GET {{host}}/apis/goapp/v1/profiles/8

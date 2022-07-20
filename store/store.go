@@ -29,6 +29,7 @@ type GenericStore[T model.Modelable] interface {
 	Update(ctx context.Context, req T) error
 	Delete(ctx context.Context, id model.ID) error
 	DeleteByExternalId(ctx context.Context, externalId uuid.UUID) error
+	Each(ctx context.Context, fn func(entry T) error, opts ...clause.FilterOption) error
 }
 
 // HealthCheckStore handles all healthCheck related operations on the store

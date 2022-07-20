@@ -4,14 +4,23 @@
 
 package response
 
-type CursorPagination struct {
-	Items      int     `json:"items"`
-	NextCursor *string `json:"next_cursor"`
-	PrevCursor *string `json:"prev_cursor"`
+type Meta struct {
+	Items          int     `json:"items"`
+	NextCursor     *string `json:"next_cursor,omitempty"`
+	PrevCursor     *string `json:"prev_cursor,omitempty"`
+	CurrentPage    *int    `json:"current_page,omitempty"`
+	MaxPage        *int    `json:"max_page,omitempty"`
+	TotalRecords   *int    `json:"total,omitempty"`
+	RecordsPerPage *int    `json:"records_per_page,omitempty"`
 }
 
-type OffsetPagination struct {
-	Items int   `json:"items"`
-	Total int64 `json:"total"`
-	Page  int   `json:"page"`
+func (m *Meta) Next() bool {
+	if m.NextCursor != nil {
+		return true
+	}
+	if m.CurrentPage != nil && m.MaxPage != nil && *m.CurrentPage < *m.MaxPage {
+		return true
+	}
+
+	return false
 }

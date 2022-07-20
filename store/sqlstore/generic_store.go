@@ -349,3 +349,34 @@ func (s *genericStore[T]) DeleteByExternalId(ctx context.Context, externalId uui
 
 	return nil
 }
+
+func (s *genericStore[T]) Each(ctx context.Context, fn func(entry T) error, opts ...clause.FilterOption) error {
+	filters := make([]clause.FilterOption, 0, len(opts))
+	copy(filters, opts)
+
+	for {
+		resp, err := s.List(ctx, opts...)
+		if err != nil {
+			return err
+		}
+
+		for _, entry := range resp.Data {
+			if err = fn(entry); err != nil {
+				return err
+			}
+		}
+
+		if resp.Meta.Next() {
+			if resp.Meta.CurrentPage != nil {
+				*resp.Meta.CurrentPage += 1
+			}
+			filters = filters[:0] // clear slice, keep capacity
+			filters = append(filters, clause.WithMeta(resp.Meta))
+			filters = append(filters, opts...)
+		} else {
+			break
+		}
+	}
+
+	return nil
+}

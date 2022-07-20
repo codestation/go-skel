@@ -5,6 +5,8 @@
 package paginator
 
 type Page struct {
-	Total int64
-	Page  int
+	Items        int
+	Total        int
+	Page         int
+	ItemsPerPage int
 }

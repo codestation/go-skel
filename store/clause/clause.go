@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"github.com/doug-martin/goqu/v9"
 	"megpoid.dev/go/go-skel/model/request"
+	"megpoid.dev/go/go-skel/model/response"
 	"megpoid.dev/go/go-skel/store/filter"
 	"megpoid.dev/go/go-skel/store/paginator"
 )
@@ -142,6 +143,29 @@ func (c *Clause) ApplyFilters(ctx context.Context, db paginator.SqlSelector, sd 
 	}
 
 	return cur, nil
+}
+
+func WithMeta(meta response.Meta) FilterOption {
+	return func(clause *Clause) {
+		if meta.NextCursor != nil {
+			if clause.paginator == nil {
+				clause.paginator = paginator.New()
+			}
+			clause.paginator.SetAfterCursor(*meta.NextCursor)
+		}
+		if meta.PrevCursor != nil {
+			if clause.paginator == nil {
+				clause.paginator = paginator.New()
+			}
+			clause.paginator.SetBeforeCursor(*meta.PrevCursor)
+		}
+		if meta.CurrentPage != nil {
+			if clause.paginator == nil {
+				clause.paginator = paginator.New()
+			}
+			clause.paginator.SetPage(*meta.CurrentPage)
+		}
+	}
 }
 
 func WithFilter(query *request.QueryParams) FilterOption {

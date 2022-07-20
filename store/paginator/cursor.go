@@ -14,8 +14,6 @@ const (
 	MetaNone   MetaType = "none"
 )
 
-// TODO: rename to Meta
-
 type Cursor struct {
 	cursor *cursor.Cursor
 	offset *Page
