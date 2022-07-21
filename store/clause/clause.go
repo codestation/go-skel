@@ -29,6 +29,14 @@ func NewClause(opts ...FilterOption) *Clause {
 	return r
 }
 
+func WithConfig(opts []paginator.Option) FilterOption {
+	return func(clause *Clause) {
+		if clause.paginator == nil {
+			clause.paginator = paginator.New(opts...)
+		}
+	}
+}
+
 func WithPaginatorRules(rules []paginator.Rule) FilterOption {
 	return func(clause *Clause) {
 		if clause.paginator == nil {
