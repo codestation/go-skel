@@ -11,8 +11,8 @@ import (
 )
 
 type ListResponse[T model.Modelable] struct {
-	Data []T  `json:"data"`
-	Meta Meta `json:"meta,omitempty"`
+	Data []T  `json:"records"`
+	Meta Meta `json:"metadata,omitempty"`
 }
 
 func NewListResponse[T model.Modelable](results []T, c *paginator.Cursor) *ListResponse[T] {
@@ -22,9 +22,12 @@ func NewListResponse[T model.Modelable](results []T, c *paginator.Cursor) *ListR
 		return &ListResponse[T]{
 			Data: results,
 			Meta: Meta{
-				Items:      len(results),
-				NextCursor: cur.After,
-				PrevCursor: cur.Before,
+				Items: len(results),
+				Type:  string(c.Type()),
+				CursorMeta: CursorMeta{
+					NextCursor: cur.After,
+					PrevCursor: cur.Before,
+				},
 			},
 		}
 	case paginator.MetaOffset:
@@ -32,11 +35,14 @@ func NewListResponse[T model.Modelable](results []T, c *paginator.Cursor) *ListR
 		return &ListResponse[T]{
 			Data: results,
 			Meta: Meta{
-				Items:          len(results),
-				TotalRecords:   model.NewType(off.Total),
-				CurrentPage:    model.NewType(off.Page),
-				MaxPage:        model.NewType(int(math.Ceil(float64(off.Total) / float64(off.ItemsPerPage)))),
-				RecordsPerPage: model.NewType(off.ItemsPerPage),
+				Items: len(results),
+				Type:  string(c.Type()),
+				OffsetMeta: OffsetMeta{
+					TotalRecords:   model.NewType(off.Total),
+					CurrentPage:    model.NewType(off.Page),
+					MaxPage:        model.NewType(int(math.Ceil(float64(off.Total) / float64(off.ItemsPerPage)))),
+					RecordsPerPage: model.NewType(off.ItemsPerPage),
+				},
 			},
 		}
 	default:
