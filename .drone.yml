@@ -36,9 +36,6 @@ steps:
       repo: registry.megpoid.dev/codestation/goapp
       tags: latest
       buildkit: true
-      platforms:
-        - linux/amd64
-        - linux/arm64
       registry: registry.megpoid.dev
       username:
         from_secret: docker_username
