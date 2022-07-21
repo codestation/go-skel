@@ -16,10 +16,6 @@ import (
 	"syscall"
 )
 
-func unmarshalFunc(val any) error {
-	return viper.Unmarshal(val, unmarshalDecoder)
-}
-
 // migrateCmd represents the migrate command
 var migrateCmd = &cobra.Command{
 	Use:   "migrate",

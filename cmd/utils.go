@@ -21,6 +21,10 @@ var unmarshalDecoder = viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
 	mapstructure.StringToSliceHookFunc(","),
 ))
 
+func unmarshalFunc(val any) error {
+	return viper.Unmarshal(val, unmarshalDecoder)
+}
+
 func HexStringToByteArray() mapstructure.DecodeHookFuncType {
 	return func(
 		f reflect.Type,
