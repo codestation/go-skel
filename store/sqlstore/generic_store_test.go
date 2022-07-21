@@ -274,7 +274,7 @@ func (s *storeSuite) TestBackendError() {
 func (s *storeSuite) TestIncludes() {
 	st := userStore{
 		genericStore: NewStore[*testUser](s.conn.store,
-			WithIncludes[*testUser]([]string{"profile"}),
+			WithIncludes[*testUser]("profile"),
 		),
 	}
 

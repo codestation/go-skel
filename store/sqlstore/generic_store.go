@@ -72,7 +72,7 @@ func WithFilters[T model.Modelable](rules ...filter.Rule) StoreOption[T] {
 	}
 }
 
-func WithIncludes[T model.Modelable](includes []string) StoreOption[T] {
+func WithIncludes[T model.Modelable](includes ...string) StoreOption[T] {
 	return func(c *genericStore[T]) {
 		c.includes = includes
 	}
