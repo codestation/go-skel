@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"io/ioutil"
+	"os"
 	"path"
 	"regexp"
 	"strings"
@@ -51,7 +51,7 @@ var migrationCmd = &cobra.Command{
 		}
 
 		filename := path.Join(baseDir, timestamp+"_"+name+".sql")
-		err := ioutil.WriteFile(filename, []byte(templateContent), 0644)
+		err := os.WriteFile(filename, []byte(templateContent), 0644)
 		if err != nil {
 			return fmt.Errorf("failed to create migration file: %w", err)
 		}
