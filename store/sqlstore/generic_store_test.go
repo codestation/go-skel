@@ -200,7 +200,7 @@ func (s *storeSuite) TestStoreGetExternal() {
 		err error
 	}{
 		{uuid.Must(uuid.FromString("00000000-0000-0000-0000-000000000001")), nil},
-		{uuid.Must(uuid.NewV7(uuid.MillisecondPrecision)), store.ErrNotFound},
+		{uuid.Must(uuid.NewV7()), store.ErrNotFound},
 	}
 
 	for _, test := range tests {
@@ -224,7 +224,7 @@ func (s *storeSuite) TestStoreDeleteExternal() {
 		err error
 	}{
 		{uuid.Must(uuid.FromString("00000000-0000-0000-0000-000000000001")), nil},
-		{uuid.Must(uuid.NewV7(uuid.MillisecondPrecision)), store.ErrNotFound},
+		{uuid.Must(uuid.NewV7()), store.ErrNotFound},
 	}
 
 	for _, test := range tests {
