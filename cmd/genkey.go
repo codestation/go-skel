@@ -9,7 +9,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"os"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -45,7 +45,7 @@ var genkeyCmd = &cobra.Command{
 				fmt.Printf("Generated key: %s\n", hexKey)
 			}
 		} else {
-			err = ioutil.WriteFile(outputFile, []byte(hexKey+"\n"), 0600)
+			err = os.WriteFile(outputFile, []byte(hexKey+"\n"), 0600)
 			if err != nil {
 				return err
 			}
