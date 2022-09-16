@@ -55,7 +55,7 @@ func (p PgxWrapper) Begin(ctx context.Context) (*PgxTxWrapper, error) {
 	return newPgxTxWrapper(tx), nil
 }
 
-func (p PgxWrapper) Exec(ctx context.Context, query string, arguments ...interface{}) (sql.Result, error) {
+func (p PgxWrapper) Exec(ctx context.Context, query string, arguments ...any) (sql.Result, error) {
 	tag, err := p.pool.Exec(ctx, query, arguments...)
 	if err != nil {
 		return nil, err
@@ -63,11 +63,11 @@ func (p PgxWrapper) Exec(ctx context.Context, query string, arguments ...interfa
 	return pgxWrapperResult{tag}, nil
 }
 
-func (p PgxWrapper) Get(ctx context.Context, dst interface{}, query string, args ...interface{}) error {
+func (p PgxWrapper) Get(ctx context.Context, dst any, query string, args ...any) error {
 	return pgxscan.Get(ctx, p.pool, dst, query, args...)
 }
 
-func (p PgxWrapper) Select(ctx context.Context, dest interface{}, query string, args ...interface{}) error {
+func (p PgxWrapper) Select(ctx context.Context, dest any, query string, args ...any) error {
 	return pgxscan.Select(ctx, p.pool, dest, query, args...)
 }
 
@@ -106,7 +106,7 @@ func (p PgxTxWrapper) Rollback(ctx context.Context) error {
 	return p.tx.Rollback(ctx)
 }
 
-func (p PgxTxWrapper) Exec(ctx context.Context, query string, arguments ...interface{}) (sql.Result, error) {
+func (p PgxTxWrapper) Exec(ctx context.Context, query string, arguments ...any) (sql.Result, error) {
 	tag, err := p.tx.Exec(ctx, query, arguments...)
 	if err != nil {
 		return nil, err
@@ -114,11 +114,11 @@ func (p PgxTxWrapper) Exec(ctx context.Context, query string, arguments ...inter
 	return pgxWrapperResult{tag}, nil
 }
 
-func (p PgxTxWrapper) Get(ctx context.Context, dst interface{}, query string, args ...interface{}) error {
+func (p PgxTxWrapper) Get(ctx context.Context, dst any, query string, args ...any) error {
 	return pgxscan.Get(ctx, p.tx, dst, query, args...)
 }
 
-func (p PgxTxWrapper) Select(ctx context.Context, dest interface{}, query string, args ...interface{}) error {
+func (p PgxTxWrapper) Select(ctx context.Context, dest any, query string, args ...any) error {
 	return pgxscan.Select(ctx, p.tx, dest, query, args...)
 }
 

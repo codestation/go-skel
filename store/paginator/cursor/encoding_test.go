@@ -267,15 +267,15 @@ func (s *encoderSuite) TestMultipleFieldsToStructWithZeroValue() {
 	s.Equal((*time.Time)(nil), model.CreatedAt)
 }
 
-func (s *encodingSuite) encodeValue(v interface{}) (string, error) {
+func (s *encodingSuite) encodeValue(v any) (string, error) {
 	return NewEncoder([]EncoderField{{Key: "Value"}}).Encode(v)
 }
 
-func (s *encodingSuite) encodeValuePtr(v interface{}) (string, error) {
+func (s *encodingSuite) encodeValuePtr(v any) (string, error) {
 	return NewEncoder([]EncoderField{{Key: "ValuePtr"}}).Encode(v)
 }
 
-func (s *encodingSuite) decodeValue(m interface{}, c string) (interface{}, error) {
+func (s *encodingSuite) decodeValue(m any, c string) (any, error) {
 	fields, err := NewDecoder([]DecoderField{{Key: "Value"}}).Decode(c, m)
 	if err != nil {
 		return nil, err
@@ -286,7 +286,7 @@ func (s *encodingSuite) decodeValue(m interface{}, c string) (interface{}, error
 	return fields[0], nil
 }
 
-func (s *encodingSuite) decodeValuePtr(m interface{}, c string) (interface{}, error) {
+func (s *encodingSuite) decodeValuePtr(m any, c string) (any, error) {
 	fields, err := NewDecoder([]DecoderField{{Key: "ValuePtr"}}).Decode(c, m)
 	if err != nil {
 		return nil, err
@@ -299,11 +299,11 @@ func (s *encodingSuite) decodeValuePtr(m interface{}, c string) (interface{}, er
 
 /* Custom Types Encoding Decoding */
 
-type MyJSON map[string]interface{}
+type MyJSON map[string]any
 
 var MyJSONError = errors.New("meta should be string")
 
-func (t MyJSON) GetCustomTypeValue(meta interface{}) (interface{}, error) {
+func (t MyJSON) GetCustomTypeValue(meta any) (any, error) {
 	key, ok := meta.(string)
 	if !ok {
 		return nil, MyJSONError
@@ -315,7 +315,7 @@ func (s *encodingSuite) TestEncodeDecodeCustomTypes() {
 	testCases := []struct {
 		name  string
 		typ   reflect.Type
-		value interface{}
+		value any
 	}{
 		{
 			"nil int",

@@ -99,18 +99,18 @@ func (d fakeDatabase) Begin(ctx context.Context) (*PgxTxWrapper, error) {
 	return nil, d.Error
 }
 
-func (d fakeDatabase) Exec(ctx context.Context, query string, arguments ...interface{}) (sql.Result, error) {
+func (d fakeDatabase) Exec(ctx context.Context, query string, arguments ...any) (sql.Result, error) {
 	if d.Result != nil {
 		return d.Result, nil
 	}
 	return nil, d.Error
 }
 
-func (d fakeDatabase) Get(ctx context.Context, dst interface{}, query string, args ...interface{}) error {
+func (d fakeDatabase) Get(ctx context.Context, dst any, query string, args ...any) error {
 	return d.Error
 }
 
-func (d fakeDatabase) Select(ctx context.Context, dest interface{}, query string, args ...interface{}) error {
+func (d fakeDatabase) Select(ctx context.Context, dest any, query string, args ...any) error {
 	return d.Error
 }
 

@@ -12,9 +12,9 @@ import (
 type SqlExecutor interface {
 	BeginFunc(ctx context.Context, f func(db SqlExecutor) error) error
 	Begin(ctx context.Context) (*PgxTxWrapper, error)
-	Exec(ctx context.Context, query string, arguments ...interface{}) (sql.Result, error)
-	Get(ctx context.Context, dst interface{}, query string, args ...interface{}) error
-	Select(ctx context.Context, dest interface{}, query string, args ...interface{}) error
+	Exec(ctx context.Context, query string, arguments ...any) (sql.Result, error)
+	Get(ctx context.Context, dst any, query string, args ...any) error
+	Select(ctx context.Context, dest any, query string, args ...any) error
 }
 
 type SqlFuncExecutor interface {

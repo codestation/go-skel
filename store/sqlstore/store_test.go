@@ -25,15 +25,15 @@ func (d *FakeDbConn) Begin(_ context.Context) (*PgxTxWrapper, error) {
 	panic("implement me")
 }
 
-func (d *FakeDbConn) Exec(_ context.Context, _ string, x ...interface{}) (sql.Result, error) {
+func (d *FakeDbConn) Exec(_ context.Context, _ string, x ...any) (sql.Result, error) {
 	panic("implement me")
 }
 
-func (d *FakeDbConn) Get(_ context.Context, _ interface{}, _ string, _ ...interface{}) error {
+func (d *FakeDbConn) Get(_ context.Context, _ any, _ string, _ ...any) error {
 	panic("implement me")
 }
 
-func (d *FakeDbConn) Select(_ context.Context, _ interface{}, _ string, _ ...interface{}) error {
+func (d *FakeDbConn) Select(_ context.Context, _ any, _ string, _ ...any) error {
 	panic("implement me")
 }
 

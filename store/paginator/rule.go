@@ -20,7 +20,7 @@ type Rule struct {
 
 // CustomType for paginator. It provides extra info needed to paginate across custom types (e.g. JSON)
 type CustomType struct {
-	Meta interface{}
+	Meta any
 	Type reflect.Type
 }
 
