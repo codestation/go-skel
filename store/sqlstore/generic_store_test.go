@@ -44,12 +44,12 @@ func newUser(name string, profileId model.ID) *testUser {
 }
 
 type userStore struct {
-	*genericStore[*testUser]
+	*GenericStore[*testUser]
 	profile *profileStore
 }
 
 type profileStore struct {
-	*genericStore[*testProfile]
+	*GenericStore[*testProfile]
 }
 
 func (s *userStore) Attach(ctx context.Context, results []*testUser, relation string) error {
@@ -70,7 +70,7 @@ func TestStore(t *testing.T) {
 
 type storeSuite struct {
 	suite.Suite
-	conn *connection
+	conn *Connection
 }
 
 func (s *storeSuite) SetupTest() {
@@ -273,13 +273,13 @@ func (s *storeSuite) TestBackendError() {
 
 func (s *storeSuite) TestIncludes() {
 	st := userStore{
-		genericStore: NewStore[*testUser](s.conn.store,
+		GenericStore: NewStore[*testUser](s.conn.store,
 			WithIncludes[*testUser]("profile"),
 		),
 	}
 
 	st.profile = &profileStore{
-		genericStore: NewStore[*testProfile](s.conn.store),
+		GenericStore: NewStore[*testProfile](s.conn.store),
 	}
 
 	st.AttachFunc(st.Attach)
@@ -295,7 +295,7 @@ func (s *storeSuite) TestIncludes() {
 }
 
 func (s *storeSuite) TestEach() {
-	st := userStore{genericStore: NewStore[*testUser](s.conn.store,
+	st := userStore{GenericStore: NewStore[*testUser](s.conn.store,
 		WithPaginatorOptions[*testUser](
 			paginator.WithLimit(2),
 		),

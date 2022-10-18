@@ -14,12 +14,12 @@ import (
 )
 
 type SqlProfileStore struct {
-	*genericStore[*model.Profile]
+	*GenericStore[*model.Profile]
 }
 
 func newSqlProfileStore(sqlStore *SqlStore) store.ProfileStore {
 	s := &SqlProfileStore{
-		genericStore: NewStore(sqlStore, WithFilters[*model.Profile](
+		GenericStore: NewStore(sqlStore, WithFilters[*model.Profile](
 			filter.Rule{
 				Key:  "first_name",
 				Type: "string",

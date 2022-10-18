@@ -14,19 +14,19 @@ import (
 	"testing"
 )
 
-type connection struct {
+type Connection struct {
 	store           *SqlStore
 	db              *PgxWrapper
 	withTransaction bool
 }
 
-func NewTestConnection(t *testing.T, withTransaction bool) *connection {
-	c := &connection{withTransaction: withTransaction}
+func NewTestConnection(t *testing.T, withTransaction bool) *Connection {
+	c := &Connection{withTransaction: withTransaction}
 	c.setupDatabase(t)
 	return c
 }
 
-func (c *connection) Close(t *testing.T) {
+func (c *Connection) Close(t *testing.T) {
 	t.Helper()
 	if c.withTransaction {
 		// do not save the changes to the database
@@ -38,7 +38,7 @@ func (c *connection) Close(t *testing.T) {
 	c.db.Close()
 }
 
-func (c *connection) setupDatabase(t *testing.T) {
+func (c *Connection) setupDatabase(t *testing.T) {
 	t.Helper()
 
 	cfg, err := config.NewConfig()
@@ -52,7 +52,7 @@ func (c *connection) setupDatabase(t *testing.T) {
 
 	conn, err := NewConnection(cfg.SqlSettings)
 	if err != nil {
-		assert.FailNowf(t, "Failed to create database connection", err.Error())
+		assert.FailNowf(t, "Failed to create database Connection", err.Error())
 	}
 
 	c.db = conn
@@ -73,7 +73,7 @@ func (c *connection) setupDatabase(t *testing.T) {
 	}
 }
 
-func (c *connection) seedDatabase(t *testing.T, conn SqlExecutor) {
+func (c *Connection) seedDatabase(t *testing.T, conn SqlExecutor) {
 	assets := testdata.Assets()
 	data, err := assets.ReadFile("seed/base.sql")
 	if err != nil {

@@ -16,7 +16,7 @@ func TestHealthCheckStore(t *testing.T) {
 
 type healthCheckSuite struct {
 	suite.Suite
-	conn *connection
+	conn *Connection
 }
 
 func (s *healthCheckSuite) SetupTest() {

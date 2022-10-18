@@ -143,17 +143,17 @@ func newPgxTxWrapper(tx pgx.Tx) *PgxTxWrapper {
 }
 
 func NewConnection(settings config.SqlSettings) (*PgxWrapper, error) {
-	config, err := pgxpool.ParseConfig(settings.DataSourceName)
+	parseConfig, err := pgxpool.ParseConfig(settings.DataSourceName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to configure database, aborting: %w", err)
 	}
 
-	config.MaxConnLifetime = settings.ConnMaxLifetime
-	config.MaxConnIdleTime = settings.ConnMaxIdleTime
-	config.MaxConns = int32(settings.MaxOpenConns)
-	config.MinConns = int32(settings.MaxIdleConns)
+	parseConfig.MaxConnLifetime = settings.ConnMaxLifetime
+	parseConfig.MaxConnIdleTime = settings.ConnMaxIdleTime
+	parseConfig.MaxConns = int32(settings.MaxOpenConns)
+	parseConfig.MinConns = int32(settings.MaxIdleConns)
 
-	db, err := pgxpool.ConnectConfig(context.Background(), config)
+	db, err := pgxpool.ConnectConfig(context.Background(), parseConfig)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database, aborting: %w", err)
 	}
