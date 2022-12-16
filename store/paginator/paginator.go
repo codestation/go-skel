@@ -12,7 +12,7 @@ import (
 	"fmt"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/doug-martin/goqu/v9/exp"
-	"github.com/georgysavva/scany/dbscan"
+	"github.com/georgysavva/scany/v2/dbscan"
 	"megpoid.dev/go/go-skel/store/paginator/cursor"
 	"reflect"
 )

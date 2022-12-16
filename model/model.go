@@ -5,9 +5,8 @@
 package model
 
 import (
-	"github.com/georgysavva/scany/dbscan"
+	"github.com/georgysavva/scany/v2/dbscan"
 	"github.com/gofrs/uuid"
-	"github.com/jackc/pgtype"
 	"github.com/jinzhu/inflection"
 	"reflect"
 	"time"
@@ -18,11 +17,11 @@ type ID uint
 
 // Model is the base that will be used by other entity who need a primary key and timestamps.
 type Model struct {
-	ID         ID          `json:"-" goqu:"skipinsert,skipupdate"`
-	ExternalID pgtype.UUID `json:"external_id"`
-	CreatedAt  time.Time   `json:"created_at" goqu:"skipupdate"`
-	UpdatedAt  time.Time   `json:"updated_at"`
-	DeletedAt  *time.Time  `json:"-"`
+	ID         ID         `json:"-" goqu:"skipinsert,skipupdate"`
+	ExternalID uuid.UUID  `json:"external_id"`
+	CreatedAt  time.Time  `json:"created_at" goqu:"skipupdate"`
+	UpdatedAt  time.Time  `json:"updated_at"`
+	DeletedAt  *time.Time `json:"-"`
 }
 
 type Modelable interface {
@@ -82,7 +81,7 @@ func WithTime(now time.Time) Option {
 
 func WithUUID(id uuid.UUID) Option {
 	return func(m *Model) {
-		_ = m.ExternalID.Set(id)
+		m.ExternalID = id
 	}
 }
 
@@ -92,9 +91,9 @@ func NewModel(opts ...Option) Model {
 	if e.CreatedAt.IsZero() {
 		e.SetTimestamps(time.Now())
 	}
-	if e.ExternalID.Status == pgtype.Undefined {
+	if e.ExternalID.IsNil() {
 		externalId := uuid.Must(uuid.NewV6())
-		_ = e.ExternalID.Set(externalId)
+		e.ExternalID = externalId
 	}
 	return e
 }

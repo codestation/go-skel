@@ -15,11 +15,11 @@ import (
 
 	"github.com/doug-martin/goqu/v9"
 	_ "github.com/doug-martin/goqu/v9/dialect/postgres"
-	"github.com/georgysavva/scany/pgxscan"
-	"github.com/jackc/pgconn"
-	"github.com/jackc/pgx/v4"
-	"github.com/jackc/pgx/v4/pgxpool"
-	_ "github.com/jackc/pgx/v4/stdlib"
+	"github.com/georgysavva/scany/v2/pgxscan"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/pgxpool"
+	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 const (
@@ -41,7 +41,7 @@ type PgxWrapper struct {
 }
 
 func (p PgxWrapper) BeginFunc(ctx context.Context, f func(db SqlExecutor) error) error {
-	return p.pool.BeginFunc(ctx, func(tx pgx.Tx) error {
+	return pgx.BeginFunc(ctx, p.pool, func(tx pgx.Tx) error {
 		return f(newPgxTxWrapper(tx))
 	})
 }
@@ -84,7 +84,7 @@ type PgxTxWrapper struct {
 }
 
 func (p PgxTxWrapper) BeginFunc(ctx context.Context, f func(db SqlExecutor) error) error {
-	return p.tx.BeginFunc(ctx, func(tx pgx.Tx) error {
+	return pgx.BeginFunc(ctx, p.tx, func(tx pgx.Tx) error {
 		return f(PgxTxWrapper{tx})
 	})
 }
@@ -153,7 +153,7 @@ func NewConnection(settings config.SqlSettings) (*PgxWrapper, error) {
 	parseConfig.MaxConns = int32(settings.MaxOpenConns)
 	parseConfig.MinConns = int32(settings.MaxIdleConns)
 
-	db, err := pgxpool.ConnectConfig(context.Background(), parseConfig)
+	db, err := pgxpool.NewWithConfig(context.Background(), parseConfig)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database, aborting: %w", err)
 	}
