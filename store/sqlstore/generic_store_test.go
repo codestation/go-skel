@@ -217,6 +217,30 @@ func (s *storeSuite) TestStoreGetExternal() {
 	}
 }
 
+func (s *storeSuite) TestStoreGetByExpr() {
+	st := NewStore[*testUser](s.conn.store)
+	var tests = []struct {
+		name string
+		err  error
+	}{
+		{"John Doe 1", nil},
+		{"John Doe 6", store.ErrNotFound},
+	}
+
+	for _, test := range tests {
+		s.Run("GetBy", func() {
+			user, err := st.GetBy(context.Background(), store.Expr{"name": test.name})
+			if test.err != nil {
+				s.ErrorIs(err, test.err)
+			} else {
+				s.NoError(err)
+				s.NotZero(user.ID)
+				s.NotZero(user.CreatedAt)
+			}
+		})
+	}
+}
+
 func (s *storeSuite) TestStoreDeleteExternal() {
 	st := NewStore[*testUser](s.conn.store)
 	var tests = []struct {

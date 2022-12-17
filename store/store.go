@@ -12,6 +12,8 @@ import (
 	"megpoid.dev/go/go-skel/store/clause"
 )
 
+type Expr map[string]any
+
 // Store lists all the other stores
 type Store interface {
 	HealthCheck() HealthCheckStore
@@ -21,13 +23,17 @@ type Store interface {
 
 type GenericStore[T model.Modelable] interface {
 	Get(ctx context.Context, id model.ID) (T, error)
+	GetBy(ctx context.Context, expr Expr) (T, error)
 	GetByExternalID(ctx context.Context, externalID uuid.UUID) (T, error)
 	List(ctx context.Context, opts ...clause.FilterOption) (*response.ListResponse[T], error)
-	ListByRelationId(ctx context.Context, id model.ID, opts ...clause.FilterOption) (*response.ListResponse[T], error)
-	ListByIds(ctx context.Context, ids []model.ID) ([]T, error)
+	ListBy(ctx context.Context, expr Expr, opts ...clause.FilterOption) (*response.ListResponse[T], error)
+	ListByIds(ctx context.Context, ids []model.ID) (*response.ListResponse[T], error)
+	ListEach(ctx context.Context, fn func(item T) error, opts ...clause.FilterOption) error
+	ListByEach(ctx context.Context, expr Expr, fn func(item T) error, opts ...clause.FilterOption) error
 	Save(ctx context.Context, req T) error
 	Update(ctx context.Context, req T) error
 	Delete(ctx context.Context, id model.ID) error
+	DeleteBy(ctx context.Context, expr Expr) error
 	DeleteByExternalId(ctx context.Context, externalId uuid.UUID) error
 	Each(ctx context.Context, fn func(entry T) error, opts ...clause.FilterOption) error
 }

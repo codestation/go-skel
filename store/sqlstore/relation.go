@@ -7,6 +7,7 @@ package sqlstore
 import (
 	"context"
 	"megpoid.dev/go/go-skel/model"
+	"megpoid.dev/go/go-skel/model/response"
 )
 
 func attachRelation[T, U model.Modelable](
@@ -14,7 +15,7 @@ func attachRelation[T, U model.Modelable](
 	entries []T,
 	getRelationId func(m T) model.ID,
 	setRelation func(m T, r U),
-	listByIds func(ctx context.Context, ids []model.ID) ([]U, error),
+	listByIds func(ctx context.Context, ids []model.ID) (*response.ListResponse[U], error),
 ) error {
 	if len(entries) == 0 {
 		return nil
@@ -39,7 +40,7 @@ func attachRelation[T, U model.Modelable](
 
 	// keep the results in a map for quicker access
 	var resultMap = map[model.ID]U{}
-	for _, result := range results {
+	for _, result := range results.Data {
 		resultMap[result.GetID()] = result
 	}
 
