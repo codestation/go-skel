@@ -53,7 +53,7 @@ func (m *Model) Apply(opts ...Option) {
 	}
 }
 
-func GetModelName[T Modelable](m T) string {
+func GetModelName[T any](m T) string {
 	if t := reflect.TypeOf(m); t.Kind() == reflect.Ptr {
 		return t.Elem().Name()
 	} else {
