@@ -7,14 +7,16 @@ package sqlstore
 import (
 	"context"
 	"errors"
+	"testing"
+	"time"
+
+	"github.com/doug-martin/goqu/v9"
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/suite"
 	"megpoid.dev/go/go-skel/model"
 	"megpoid.dev/go/go-skel/store"
 	"megpoid.dev/go/go-skel/store/clause"
 	"megpoid.dev/go/go-skel/store/paginator"
-	"testing"
-	"time"
 )
 
 type testProfile struct {
@@ -332,4 +334,22 @@ func (s *storeSuite) TestEach() {
 	})
 	s.NoError(err)
 	s.Equal(5, count)
+}
+
+func (s *storeSuite) TestWithFilters() {
+	st := userStore{GenericStore: NewStore[*testUser](s.conn.store,
+		WithExpressions[*testUser](goqu.Ex{"name": "John Doe 3"}),
+	)}
+
+	response, err := st.List(context.Background())
+	s.NoError(err)
+	s.Equal(1, len(response.Data))
+}
+
+func (s *storeSuite) TestEmptyResult() {
+	st := userStore{GenericStore: NewStore[*testUser](s.conn.store)}
+
+	response, err := st.ListBy(context.Background(), store.Expr{"name": "Not Found"})
+	s.NoError(err)
+	s.Equal(0, len(response.Data))
 }

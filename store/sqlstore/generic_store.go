@@ -53,9 +53,9 @@ func WithSelectFields[T model.Modelable](fields ...any) StoreOption[T] {
 	}
 }
 
-func WithExpressions[T model.Modelable](filters exp.ExpressionList) StoreOption[T] {
+func WithExpressions[T model.Modelable](filters ...exp.Expression) StoreOption[T] {
 	return func(c *GenericStore[T]) {
-		c.defaultFilters = filters
+		c.defaultFilters = exp.NewExpressionList(exp.AndType, filters...)
 	}
 }
 
