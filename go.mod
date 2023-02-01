@@ -1,6 +1,6 @@
 module megpoid.dev/go/go-skel
 
-go 1.19
+go 1.20
 
 require (
 	github.com/doug-martin/goqu/v9 v9.18.0
@@ -17,7 +17,6 @@ require (
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/viper v1.15.0
 	github.com/stretchr/testify v1.8.1
-	go.uber.org/multierr v1.9.0
 	golang.org/x/text v0.6.0
 )
 

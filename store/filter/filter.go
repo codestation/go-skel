@@ -5,13 +5,14 @@
 package filter
 
 import (
+	"errors"
 	"fmt"
+	"strconv"
+	"time"
+
 	"github.com/doug-martin/goqu/v9"
 	"github.com/doug-martin/goqu/v9/exp"
 	"github.com/shopspring/decimal"
-	"go.uber.org/multierr"
-	"strconv"
-	"time"
 )
 
 // New creates a query filter
@@ -110,7 +111,7 @@ func (f *Filter) Apply(query *goqu.SelectDataset) (*goqu.SelectDataset, error) {
 
 func (f *Filter) buildWhereExpression() (exp.ExpressionList, error) {
 	queries := make([]exp.Expression, 0)
-	var err error
+	var errorList []error
 
 	for _, filter := range f.conditions {
 		rule, ok := f.rules[filter.Field]
@@ -120,7 +121,7 @@ func (f *Filter) buildWhereExpression() (exp.ExpressionList, error) {
 
 		value, valueErr := f.getValueFromFilter(rule, filter)
 		if valueErr != nil {
-			err = multierr.Append(err, valueErr)
+			errorList = append(errorList, valueErr)
 			continue
 		}
 
@@ -135,7 +136,7 @@ func (f *Filter) buildWhereExpression() (exp.ExpressionList, error) {
 
 			if !found {
 				notFoundErr := fmt.Errorf("operator not permitted for field %s: %s", filter.Field, filter.Operation)
-				err = multierr.Append(err, notFoundErr)
+				errorList = append(errorList, notFoundErr)
 				continue
 			}
 		}
@@ -168,14 +169,14 @@ func (f *Filter) buildWhereExpression() (exp.ExpressionList, error) {
 				}
 			} else {
 				nullErr := fmt.Errorf("value for operator 'isnull' must be a boolean for field %s", filter.Field)
-				err = multierr.Append(err, nullErr)
+				errorList = append(errorList, nullErr)
 			}
 		}
 		queries = append(queries, queryFilter)
 	}
 
-	if err != nil {
-		return nil, err
+	if len(errorList) > 0 {
+		return nil, errors.Join(errorList...)
 	}
 
 	return goqu.And(queries...), nil

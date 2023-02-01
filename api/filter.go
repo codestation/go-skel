@@ -5,11 +5,12 @@
 package api
 
 import (
+	"errors"
 	"fmt"
-	"github.com/labstack/echo/v4"
-	"go.uber.org/multierr"
-	"megpoid.dev/go/go-skel/model/request"
 	"strings"
+
+	"github.com/labstack/echo/v4"
+	"megpoid.dev/go/go-skel/model/request"
 )
 
 func NewFilter(c echo.Context) (*request.QueryParams, error) {
@@ -18,7 +19,7 @@ func NewFilter(c echo.Context) (*request.QueryParams, error) {
 		return nil, fmt.Errorf("failed to bind pagination filter: %w", err)
 	}
 
-	var err error
+	var errorList []error
 	for key, value := range c.QueryParams() {
 		switch key {
 		case "after":
@@ -49,14 +50,14 @@ func NewFilter(c echo.Context) (*request.QueryParams, error) {
 					Value:     value[0], //ignore other repeated filters
 				})
 			} else {
-				err = multierr.Append(err, fmt.Errorf("invalid query param: %s", key))
+				errorList = append(errorList, fmt.Errorf("invalid query param: %s", key))
 				continue
 			}
 		}
 	}
 
-	if err != nil {
-		return nil, err
+	if len(errorList) > 0 {
+		return nil, errors.Join(errorList...)
 	}
 
 	return query, nil

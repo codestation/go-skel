@@ -5,11 +5,11 @@
 package filter
 
 import (
-	"github.com/doug-martin/goqu/v9"
-	"github.com/stretchr/testify/assert"
-	"go.uber.org/multierr"
 	"strings"
 	"testing"
+
+	"github.com/doug-martin/goqu/v9"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestFilter_Apply(t *testing.T) {
@@ -108,16 +108,18 @@ func TestFilterErrors(t *testing.T) {
 	query := goqu.Dialect("postgres").From("profiles")
 	_, err := f.Apply(query)
 	if assert.Error(t, err) {
-		errors := multierr.Errors(err)
-		if assert.Len(t, errors, 8) {
-			assert.Contains(t, errors[0].Error(), "invalid filter value for value1, must be integer")
-			assert.Contains(t, errors[1].Error(), "invalid filter value for value2, must be decimal")
-			assert.Contains(t, errors[2].Error(), "invalid filter value for value3, must match format yyyy-MM-dd")
-			assert.Contains(t, errors[3].Error(), "invalid filter value for value4, must be a timestamp")
-			assert.Contains(t, errors[4].Error(), "invalid filter value for value5, must be a timestamp with milliseconds")
-			assert.Contains(t, errors[5].Error(), "invalid filter value for value6, must be boolean")
-			assert.Contains(t, errors[6].Error(), "unknown rule type for field value7")
-			assert.Contains(t, errors[7].Error(), "operator not permitted for field value8")
+		if e, ok := err.(interface{ Unwrap() []error }); ok {
+			errorList := e.Unwrap()
+			if assert.Len(t, errorList, 8) {
+				assert.Contains(t, errorList[0].Error(), "invalid filter value for value1, must be integer")
+				assert.Contains(t, errorList[1].Error(), "invalid filter value for value2, must be decimal")
+				assert.Contains(t, errorList[2].Error(), "invalid filter value for value3, must match format yyyy-MM-dd")
+				assert.Contains(t, errorList[3].Error(), "invalid filter value for value4, must be a timestamp")
+				assert.Contains(t, errorList[4].Error(), "invalid filter value for value5, must be a timestamp with milliseconds")
+				assert.Contains(t, errorList[5].Error(), "invalid filter value for value6, must be boolean")
+				assert.Contains(t, errorList[6].Error(), "unknown rule type for field value7")
+				assert.Contains(t, errorList[7].Error(), "operator not permitted for field value8")
+			}
 		}
 	}
 }
