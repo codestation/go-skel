@@ -10,6 +10,7 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.4.3
 	github.com/jackc/pgx/v5 v5.2.0
 	github.com/jinzhu/inflection v1.0.0
+	github.com/labstack/echo-jwt/v4 v4.1.0
 	github.com/labstack/echo/v4 v4.10.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/rubenv/sql-migrate v1.3.0
