@@ -8,11 +8,10 @@ platform:
   arch: arm64
 
 steps:
-# Disabling linter: golangci-lint v1.50.1 isn't compatible with Go 1.20
-#  - name: lint
-#    image: golangci/golangci-lint:v1.50.1
-#    commands:
-#     - golangci-lint run --no-config -v --timeout 10m ./...
+  - name: lint
+    image: golangci/golangci-lint:v1.51.0
+    commands:
+     - golangci-lint run --no-config -v --timeout 10m ./...
 
   - name: postgres-healthcheck
     image: postgres:14
