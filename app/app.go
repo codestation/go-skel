@@ -5,8 +5,9 @@
 package app
 
 import (
-	"megpoid.dev/go/go-skel/config"
 	"time"
+
+	"megpoid.dev/go/go-skel/config"
 )
 
 // compile time validator for the interfaces

@@ -5,12 +5,13 @@
 package api
 
 import (
+	"net/http"
+
 	"github.com/labstack/echo/v4"
 	"golang.org/x/text/message"
 	"megpoid.dev/go/go-skel/app"
 	"megpoid.dev/go/go-skel/app/i18n"
 	"megpoid.dev/go/go-skel/model"
-	"net/http"
 )
 
 func (api *API) InitProfile() {

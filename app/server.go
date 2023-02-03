@@ -7,7 +7,6 @@ package app
 import (
 	"context"
 	"log"
-	"megpoid.dev/go/go-skel/config"
 	"net/http"
 	"time"
 
@@ -15,6 +14,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"megpoid.dev/go/go-skel/app/i18n"
+	"megpoid.dev/go/go-skel/config"
 	"megpoid.dev/go/go-skel/store"
 	"megpoid.dev/go/go-skel/store/sqlstore"
 )

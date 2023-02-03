@@ -6,13 +6,14 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"os"
 	"path"
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var matchFirstCap = regexp.MustCompile(`(.)([A-Z][a-z]+)`)

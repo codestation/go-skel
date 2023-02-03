@@ -6,15 +6,16 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"megpoid.dev/go/go-skel/api"
 	"megpoid.dev/go/go-skel/app"
 	"megpoid.dev/go/go-skel/config"
 	"megpoid.dev/go/go-skel/web"
-	"os"
-	"os/signal"
-	"syscall"
 )
 
 // serveCmd represents the serve command

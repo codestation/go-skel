@@ -6,14 +6,15 @@ package cmd
 
 import (
 	"context"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"log"
-	"megpoid.dev/go/go-skel/config"
-	"megpoid.dev/go/go-skel/store/sqlstore"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+	"megpoid.dev/go/go-skel/config"
+	"megpoid.dev/go/go-skel/store/sqlstore"
 )
 
 // migrateCmd represents the migrate command

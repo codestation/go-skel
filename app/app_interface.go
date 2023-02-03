@@ -6,6 +6,7 @@ package app
 
 import (
 	"context"
+
 	"megpoid.dev/go/go-skel/config"
 	"megpoid.dev/go/go-skel/model"
 	"megpoid.dev/go/go-skel/model/request"

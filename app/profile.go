@@ -7,6 +7,7 @@ package app
 import (
 	"context"
 	"errors"
+
 	"golang.org/x/text/message"
 	"megpoid.dev/go/go-skel/app/i18n"
 	"megpoid.dev/go/go-skel/model"
