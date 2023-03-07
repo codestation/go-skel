@@ -2,9 +2,9 @@
     "language": "es",
     "messages": [
         {
-            "id": "Invalid profile ID",
-            "message": "Invalid profile ID",
-            "translation": "ID de perfil inválido"
+            "id": "An error occurred",
+            "message": "An error occurred",
+            "translation": "Ha ocurrido un error"
         },
         {
             "id": "Failed to read request",
@@ -15,11 +15,6 @@
             "id": "The request did not pass validation",
             "message": "The request did not pass validation",
             "translation": "La petición no pasó la validación"
-        },
-        {
-            "id": "An error occurred",
-            "message": "An error occurred",
-            "translation": "Ha ocurrido un error"
         },
         {
             "id": "Profile not found",
@@ -35,6 +30,11 @@
             "id": "Failed to list profiles",
             "message": "Failed to list profiles",
             "translation": "Error al listar perfiles"
+        },
+        {
+            "id": "Email is already registered with another profile",
+            "message": "Email is already registered with another profile",
+            "translation": "El correo está siendo utilizado por otro perfil"
         },
         {
             "id": "Failed to save profile",

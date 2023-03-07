@@ -2,9 +2,9 @@
     "language": "en",
     "messages": [
         {
-            "id": "Invalid profile ID",
-            "message": "Invalid profile ID",
-            "translation": "Invalid profile ID",
+            "id": "An error occurred",
+            "message": "An error occurred",
+            "translation": "An error occurred",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
@@ -19,13 +19,6 @@
             "id": "The request did not pass validation",
             "message": "The request did not pass validation",
             "translation": "The request did not pass validation",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "An error occurred",
-            "message": "An error occurred",
-            "translation": "An error occurred",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
@@ -47,6 +40,13 @@
             "id": "Failed to list profiles",
             "message": "Failed to list profiles",
             "translation": "Failed to list profiles",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Email is already registered with another profile",
+            "message": "Email is already registered with another profile",
+            "translation": "Email is already registered with another profile",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },

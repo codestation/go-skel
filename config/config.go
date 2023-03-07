@@ -1,4 +1,4 @@
-// Copyright 2022 codestation. All rights reserved.
+// Copyright 2023 codestation. All rights reserved.
 // Use of this source code is governed by a MIT-license
 // that can be found in the LICENSE file.
 
@@ -8,9 +8,13 @@ import (
 	"errors"
 	"fmt"
 	"time"
+
+	"github.com/spf13/pflag"
 )
 
 const (
+	DefaultWorkers       = 5
+	DefaultRedisAddr     = "127.0.0.1:6379"
 	DefaultListenAddress = ":8000"
 	DefaultReadTimeout   = 1 * time.Minute
 	DefaultWriteTimeout  = 1 * time.Minute
@@ -74,7 +78,6 @@ func (cfg *Config) Unmarshal(fn func(val any) error) error {
 }
 
 func (cfg *Config) SetDefaults() {
-	cfg.GeneralSettings.SetDefaults()
 	cfg.ServerSettings.SetDefaults()
 	cfg.SqlSettings.SetDefaults()
 	cfg.MigrationSettings.SetDefaults()
@@ -84,40 +87,40 @@ func (cfg *Config) Validate() error {
 	if err := cfg.GeneralSettings.Validate(); err != nil {
 		return err
 	}
+	if err := cfg.ServerSettings.Validate(); err != nil {
+		return err
+	}
+	if err := cfg.SqlSettings.Validate(); err != nil {
+		return err
+	}
 	return nil
 }
 
 type GeneralSettings struct {
-	Debug            bool     `mapstructure:"debug"`
-	RunMigrations    bool     `mapstructure:"run-migrations"`
-	EncryptionKey    []byte   `mapstructure:"encryption-key"`
-	JwtSecret        []byte   `mapstructure:"jwt-secret"`
-	CorsAllowOrigins []string `mapstructure:"cors-allow-origin"`
-}
-
-func (cfg *GeneralSettings) SetDefaults() {
-	if len(cfg.CorsAllowOrigins) == 0 {
-		cfg.CorsAllowOrigins = append(cfg.CorsAllowOrigins, "*")
-	}
+	Debug         bool   `mapstructure:"debug"`
+	RunMigrations bool   `mapstructure:"run-migrations"`
+	EncryptionKey []byte `mapstructure:"encryption-key"`
+	RedisAddr     string `mapstructure:"redis-addr"`
+	Workers       int    `mapstructure:"workers"`
 }
 
 func (cfg *GeneralSettings) Validate() error {
 	if len(cfg.EncryptionKey) > 0 && len(cfg.EncryptionKey) < 32 {
 		return errors.New("GeneralSettings: encryption key must have at least 32 bytes")
 	}
-	if len(cfg.JwtSecret) > 0 && len(cfg.JwtSecret) < 32 {
-		return errors.New("GeneralSettings: jwt secret must have at least 32 bytes")
-	}
+
 	return nil
 }
 
 type ServerSettings struct {
-	ListenAddress string        `mapstructure:"listen"`
-	Timeout       time.Duration `mapstructure:"timeout"`
-	ReadTimeout   time.Duration `mapstructure:"read-timeout"`
-	WriteTimeout  time.Duration `mapstructure:"write-timeout"`
-	IdleTimeout   time.Duration `mapstructure:"idle-timeout"`
-	BodyLimit     string        `mapstore:"body-limit"`
+	ListenAddress    string        `mapstructure:"listen"`
+	Timeout          time.Duration `mapstructure:"timeout"`
+	ReadTimeout      time.Duration `mapstructure:"read-timeout"`
+	WriteTimeout     time.Duration `mapstructure:"write-timeout"`
+	IdleTimeout      time.Duration `mapstructure:"idle-timeout"`
+	BodyLimit        string        `mapstore:"body-limit"`
+	CorsAllowOrigins []string      `mapstructure:"cors-allow-origin"`
+	JwtSecret        []byte        `mapstructure:"jwt-secret"`
 }
 
 func (cfg *ServerSettings) SetDefaults() {
@@ -149,6 +152,18 @@ func (cfg *ServerSettings) SetDefaults() {
 	if cfg.BodyLimit == "" {
 		cfg.BodyLimit = DefaultBodyLimit
 	}
+
+	if len(cfg.CorsAllowOrigins) == 0 {
+		cfg.CorsAllowOrigins = append(cfg.CorsAllowOrigins, "*")
+	}
+}
+
+func (cfg *ServerSettings) Validate() error {
+	if len(cfg.JwtSecret) > 0 && len(cfg.JwtSecret) < 32 {
+		return errors.New("GeneralSettings: jwt secret must have at least 32 bytes")
+	}
+
+	return nil
 }
 
 type SqlSettings struct {
@@ -185,6 +200,10 @@ func (cfg *SqlSettings) SetDefaults() {
 	}
 }
 
+func (cfg *SqlSettings) Validate() error {
+	return nil
+}
+
 type MigrationSettings struct {
 	Redo     bool
 	Rollback bool
@@ -197,4 +216,50 @@ func (cfg *MigrationSettings) SetDefaults() {
 	if cfg.Step == 0 && (cfg.Rollback || cfg.Redo) {
 		cfg.Step = 1
 	}
+}
+
+func LoadDatabaseFlags() *pflag.FlagSet {
+	fs := pflag.FlagSet{}
+	fs.String("dsn", DefaultDataSourceName, "Database connection string")
+	fs.String("driver", DefaultDriverName, "Database driver")
+	fs.Int("max-open-conns", DefaultMaxOpenConns, "Max open connections")
+	fs.Int("max-idle-conns", DefaultMaxIdleConns, "Max idle connections")
+	fs.Duration("conn-max-lifetime", DefaultConnMaxLifetime, "Max lifetime of the connection")
+	fs.Duration("conn-max-idle-time", DefaultConnMaxIdleTime, "Max idle time of the connection")
+	fs.Int("query-limit", DefaultQueryLimit, "Max results per query")
+
+	return &fs
+}
+
+func LoadGeneralFlags() *pflag.FlagSet {
+	fs := pflag.FlagSet{}
+	fs.String("encryption-key", "", "Application encryption key")
+	fs.Int("workers", DefaultWorkers, "Workers")
+	fs.String("redis-addr", DefaultRedisAddr, "Redis address")
+
+	return &fs
+}
+
+func LoadServerFlags() *pflag.FlagSet {
+	fs := pflag.FlagSet{}
+	fs.StringP("listen", "l", DefaultListenAddress, "Listen address")
+	fs.DurationP("timeout", "t", DefaultReadTimeout, "Request timeout")
+	fs.Duration("read-timeout", 0, "Request read timeout")
+	fs.Duration("write-timeout", 0, "Request write timeout")
+	fs.Duration("idle-timeout", 0, "Request idle timeout")
+	fs.String("body-limit", DefaultBodyLimit, "Max body size for http requests")
+	fs.StringSlice("cors-allow-origin", []string{}, "CORS Allowed origins")
+	fs.String("jwt-secret", "", "JWT secret key")
+
+	return &fs
+}
+
+func LoadMigrateFlags() *pflag.FlagSet {
+	fs := pflag.FlagSet{}
+	fs.Bool("rollback", false, "Rollback last migration")
+	fs.Bool("redo", false, "Rollback last migration then migrate again")
+	fs.Bool("reset", false, "Drop all tables and run migration")
+	fs.Int("step", 1, "Steps to rollback/redo")
+
+	return &fs
 }

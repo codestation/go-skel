@@ -1,5 +1,78 @@
 ###
-GET {{host}}/apis/goapp/v1/profiles?limit=2&page=5
+GET {{host}}/apis/goapp/v1/status/livez?verbose=true
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
 
 ###
-GET {{host}}/apis/goapp/v1/profiles/8
+GET {{host}}/apis/goapp/v1/status/readyz?verbose=true
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+###
+POST {{host}}/apis/goapp/v1/profiles
+Content-Type: application/json
+
+{
+  "first_name": "John",
+  "last_name": "Doe",
+  "email": "john.doe@example.com"
+}
+
+> {%
+    client.test("Profile created successfully", function () {
+        client.assert(response.status === 201, "Response status is not 201");
+    });
+    client.global.set("profile_id", response.body.id);
+%}
+
+###
+PATCH {{host}}/apis/goapp/v1/profiles/{{profile_id}}
+Content-Type: application/json
+
+{
+  "first_name": "John",
+  "last_name": "Other",
+  "email": "john.doe@example.com"
+}
+
+> {%
+    client.test("Profile found successfully", function () {
+        client.assert(response.status === 200, "Response status is not 200");
+        client.assert(response.body.last_name === "Other", "Profile not modified")
+    });
+%}
+
+###
+GET {{host}}/apis/goapp/v1/profiles?limit=1&page=1
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+###
+GET {{host}}/apis/goapp/v1/profiles/{{profile_id}}
+
+> {%
+    client.test("Profile found successfully", function () {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+###
+DELETE {{host}}/apis/goapp/v1/profiles/{{profile_id}}
+
+> {%
+    client.test("Profile deleted successfully", function () {
+        client.assert(response.status === 204, "Response status is not 204");
+    });
+%}

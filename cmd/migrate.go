@@ -1,4 +1,4 @@
-// Copyright 2022 codestation. All rights reserved.
+// Copyright 2023 codestation. All rights reserved.
 // Use of this source code is governed by a MIT-license
 // that can be found in the LICENSE file.
 
@@ -14,7 +14,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"megpoid.dev/go/go-skel/config"
-	"megpoid.dev/go/go-skel/store/sqlstore"
+	"megpoid.dev/go/go-skel/repository/sqlrepo"
 )
 
 // migrateCmd represents the migrate command
@@ -34,17 +34,18 @@ var migrateCmd = &cobra.Command{
 		quit := make(chan os.Signal, 1)
 
 		// Database initialization
-		conn, err := sqlstore.NewConnection(cfg.SqlSettings)
+		pool, err := sqlrepo.NewConnection(cfg.SqlSettings)
 		if err != nil {
 			return err
 		}
-		defer conn.Close()
+		defer pool.Close()
 
 		go func() {
-			err := sqlstore.RunMigrations(ctx, conn, cfg)
+			err := sqlrepo.RunMigrations(ctx, pool, cfg)
 			if err != nil {
 				log.Println(err.Error())
 			}
+
 			quit <- os.Interrupt
 		}()
 
@@ -59,12 +60,13 @@ var migrateCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(migrateCmd)
-	migrateCmd.Flags().Bool("rollback", false, "Rollback last migration")
-	migrateCmd.Flags().Bool("redo", false, "Rollback last migration then migrate again")
-	migrateCmd.Flags().Bool("reset", false, "Drop all tables and run migration")
-	migrateCmd.Flags().Int("step", 1, "Steps to rollback/redo")
-	migrateCmd.Flags().String("dsn", "", "Database connection string. Setting the DSN ignores the db-* settings")
-	migrateCmd.Flags().String("driver", "postgres", "Database driver")
-	err := viper.BindPFlags(migrateCmd.Flags())
-	cobra.CheckErr(err)
+
+	databaseFlags := config.LoadDatabaseFlags()
+	migrateFlags := config.LoadMigrateFlags()
+
+	migrateCmd.Flags().AddFlagSet(databaseFlags)
+	migrateCmd.Flags().AddFlagSet(migrateFlags)
+
+	cobra.CheckErr(viper.BindPFlags(databaseFlags))
+	cobra.CheckErr(viper.BindPFlags(migrateFlags))
 }

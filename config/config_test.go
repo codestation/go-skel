@@ -1,4 +1,4 @@
-// Copyright 2022 codestation. All rights reserved.
+// Copyright 2023 codestation. All rights reserved.
 // Use of this source code is governed by a MIT-license
 // that can be found in the LICENSE file.
 
@@ -27,7 +27,7 @@ func TestConfig_Validate_InvalidKey(t *testing.T) {
 
 func TestConfig_Validate_InvalidJwt(t *testing.T) {
 	cfg := &Config{}
-	cfg.GeneralSettings.JwtSecret = []byte("too short")
+	cfg.ServerSettings.JwtSecret = []byte("too short")
 	cfg.SetDefaults()
 	err := cfg.Validate()
 	assert.Error(t, err)

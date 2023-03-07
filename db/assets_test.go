@@ -1,4 +1,4 @@
-// Copyright 2022 codestation. All rights reserved.
+// Copyright 2023 codestation. All rights reserved.
 // Use of this source code is governed by a MIT-license
 // that can be found in the LICENSE file.
 
@@ -13,6 +13,13 @@ import (
 func TestAssets(t *testing.T) {
 	fs := Assets()
 	entries, err := fs.ReadDir("migrations")
+	assert.NoError(t, err)
+	assert.NotEmpty(t, entries)
+}
+
+func TestSeeds(t *testing.T) {
+	fs := Seeds()
+	entries, err := fs.ReadDir("seed")
 	assert.NoError(t, err)
 	assert.NotEmpty(t, entries)
 }

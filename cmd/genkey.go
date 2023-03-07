@@ -1,4 +1,4 @@
-// Copyright 2022 codestation. All rights reserved.
+// Copyright 2023 codestation. All rights reserved.
 // Use of this source code is governed by a MIT-license
 // that can be found in the LICENSE file.
 
@@ -61,9 +61,10 @@ var genkeyCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(genkeyCmd)
+
 	genkeyCmd.Flags().StringP("output", "o", "", "Save generated key to file")
 	genkeyCmd.Flags().BoolP("quiet", "q", false, "Do not print extra messages")
 	genkeyCmd.Flags().IntP("length", "l", ApplicationKeySize, "Use an specific key length")
-	err := viper.BindPFlags(genkeyCmd.Flags())
-	cobra.CheckErr(err)
+
+	cobra.CheckErr(viper.BindPFlags(genkeyCmd.Flags()))
 }

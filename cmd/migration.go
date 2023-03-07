@@ -1,4 +1,4 @@
-// Copyright 2022 codestation. All rights reserved.
+// Copyright 2023 codestation. All rights reserved.
 // Use of this source code is governed by a MIT-license
 // that can be found in the LICENSE file.
 
@@ -62,7 +62,8 @@ var migrationCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(migrationCmd)
+
 	migrationCmd.Flags().Bool("seed", false, "Create a seed file")
-	err := viper.BindPFlags(migrationCmd.Flags())
-	cobra.CheckErr(err)
+
+	cobra.CheckErr(viper.BindPFlags(migrationCmd.Flags()))
 }

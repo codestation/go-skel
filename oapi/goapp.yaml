@@ -1,0 +1,341 @@
+---
+openapi: 3.0.2
+info:
+  title: Skel API
+  description: Skel API
+  version: 1.0.0
+servers:
+  - # noinspection HttpUrlsUsage
+    url: 'http://{host}:{port}/apis/goapp/v1'
+    description: Development server
+    variables:
+      host:
+        default: localhost
+      port:
+        default: '8000'
+security:
+  - BearerAuth: []
+paths:
+  "/health/live":
+    get:
+      summary: Check if app is started
+      description: Check if app is started
+      operationId: liveCheck
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/verbose"
+      responses:
+        '200':
+          description: Successful operation
+        default:
+          $ref: "#/components/responses/UnexpectedError"
+      tags:
+        - status
+  "/health/ready":
+    get:
+      summary: Check if app is ready to accept connections
+      description: Check if app is ready to accept connections
+      operationId: readyCheck
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/verbose"
+      responses:
+        '200':
+          description: Successful operation
+        default:
+          $ref: "#/components/responses/UnexpectedError"
+      tags:
+        - status
+  "/profiles":
+    get:
+      parameters:
+        # cursor pagination
+        - $ref: "#/components/parameters/before"
+        - $ref: "#/components/parameters/after"
+        # offset pagination
+        - $ref: "#/components/parameters/page"
+        # filtering params
+        - $ref: "#/components/parameters/query"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/includes"
+        - $ref: "#/components/parameters/filters"
+        # not implemented yet
+        - $ref: "#/components/parameters/fields"
+        - $ref: "#/components/parameters/sort"
+      summary: Obtain a list of profiles
+      operationId: listProfiles
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfileList"
+        default:
+          $ref: "#/components/responses/UnexpectedError"
+      tags:
+        - Profile
+    post:
+      summary: cretes a new profile
+      operationId: saveProfile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfileRequest"
+      responses:
+        '201':
+          description: Created profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Profile"
+        default:
+          $ref: "#/components/responses/UnexpectedError"
+      tags:
+        - Profile
+  "/profiles/{id}":
+    parameters:
+      - $ref: "#/components/parameters/profileId"
+    get:
+      summary: Gets a profile by ID
+      operationId: getProfile
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Profile"
+        default:
+          $ref: "#/components/responses/UnexpectedError"
+      tags:
+        - Profile
+    patch:
+      summary: Updates a profile by ID
+      operationId: updateProfile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfileRequest"
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Profile"
+        default:
+          $ref: "#/components/responses/UnexpectedError"
+      tags:
+        - Profile
+    delete:
+      summary: Deletes a profile by ID
+      operationId: removeProfile
+      responses:
+        '204':
+          description: Profile deleted
+        default:
+          $ref: "#/components/responses/UnexpectedError"
+      tags:
+        - Profile
+components:
+  schemas:
+    ProfileList:
+      type: object
+      properties:
+        items:
+          $ref: "#/components/schemas/Profile"
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+    ProfileRequest:
+      type: object
+      properties:
+        first_name:
+          type: string
+          example: John
+        last_name:
+          type: string
+          example: Doe
+        email:
+          type: string
+          example: john.doe@example.com
+      required:
+        - first_name
+        - last_name
+        - email
+    Model:
+      type: object
+      properties:
+        id:
+          type: integer
+        created_at:
+          type: string
+        updated_at:
+          type: string
+        external_id:
+          type: string
+      required:
+        - id
+        - created_at
+        - updated_at
+        - external_id
+    Profile:
+      allOf:
+        - $ref: "#/components/schemas/Model"
+        - $ref: "#/components/schemas/ProfileRequest"
+    Pagination:
+      oneOf:
+        - $ref: "#/components/schemas/PaginationCursor"
+        - $ref: "#/components/schemas/PaginationPage"
+    PaginationType:
+      discriminator:
+        propertyName: type
+        mapping:
+          cursor: "#/components/schemas/PaginationCursor"
+          page: "#/components/schemas/PaginationPage"
+      type: object
+      properties:
+        type:
+          type: string
+          example: cursor
+      required:
+        - type
+    PaginationCursor:
+      allOf:
+        - $ref: "#/components/schemas/PaginationType"
+        - type: object
+          properties:
+            next_cursor:
+              type: string
+            prev_cursor:
+              type: string
+          required:
+            - next_cursor
+            - prev_cursor
+    PaginationPage:
+      allOf:
+        - $ref: "#/components/schemas/PaginationType"
+        - type: object
+          properties:
+            current_page:
+              type: integer
+            max_page:
+              type: integer
+            total_records:
+              type: integer
+            records_per_page:
+              type: integer
+          required:
+            - current_page
+            - max_page
+            - total_records
+            - records_per_page
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+        location:
+          type: string
+        detailed_error:
+          type: string
+        status_code:
+          type: string
+      required:
+        - message
+        - status_code
+  parameters:
+    verbose:
+      name: verbose
+      in: query
+      description: Give a verbose response
+      schema:
+        type: boolean
+    profileId:
+      name: id
+      in: path
+      description: Profile ID
+      schema:
+        type: integer
+        example: 1
+      required: true
+    limit:
+      name: limit
+      in: query
+      description: Max items to return
+      schema:
+        type: integer
+        example: 10
+    after:
+      name: after
+      in: query
+      description: Cursor for the next page
+      schema:
+        type: string
+    before:
+      name: before
+      in: query
+      description: Cursor for the previous page
+      schema:
+        type: string
+    page:
+      name: page
+      in: query
+      description: Page number
+      schema:
+        type: integer
+        example: 1
+    includes:
+      name: includes
+      in: query
+      description: Additional relationships
+      schema:
+        type: array
+        items:
+          type: string
+          example: profiles
+    query:
+      name: q
+      in: query
+      description: Default query parameter
+      schema:
+        type: string
+        example: john@example.com
+    fields:
+      name: fields
+      in: query
+      description: Comma-separated list of fields to only return in the response. Not implemented
+      schema:
+        type: string
+        example: id,name
+    sort:
+      name: sort
+      in: query
+      description: Comma-separated list of fields to provide a sort order. Use + or - as a prefix. Not implemented
+      schema:
+        type: string
+        example: +name,-id
+    filters:
+      name: filters
+      in: query
+      description: Additional filters
+      schema:
+        type: object
+        additionalProperties:
+          type: string
+  responses:
+    UnexpectedError:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
