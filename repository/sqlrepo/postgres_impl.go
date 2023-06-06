@@ -6,22 +6,20 @@ package sqlrepo
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"fmt"
 	"log"
 	"time"
 
-	"github.com/georgysavva/scany/v2/dbscan"
-	"megpoid.dev/go/go-skel/config"
-
 	"github.com/doug-martin/goqu/v9"
 	_ "github.com/doug-martin/goqu/v9/dialect/postgres"
+	"github.com/georgysavva/scany/v2/dbscan"
 	"github.com/georgysavva/scany/v2/pgxscan"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/jackc/pgx/v5/stdlib"
+	"megpoid.dev/go/go-skel/config"
 )
 
 const (
@@ -57,7 +55,7 @@ func (p PgxWrapper) Begin(ctx context.Context) (*PgxTxWrapper, error) {
 	return newPgxTxWrapper(tx), nil
 }
 
-func (p PgxWrapper) Exec(ctx context.Context, query string, arguments ...any) (sql.Result, error) {
+func (p PgxWrapper) Exec(ctx context.Context, query string, arguments ...any) (Result, error) {
 	tag, err := p.pool.Exec(ctx, query, arguments...)
 	if err != nil {
 		return nil, err
@@ -108,7 +106,7 @@ func (p PgxTxWrapper) Rollback(ctx context.Context) error {
 	return p.tx.Rollback(ctx)
 }
 
-func (p PgxTxWrapper) Exec(ctx context.Context, query string, arguments ...any) (sql.Result, error) {
+func (p PgxTxWrapper) Exec(ctx context.Context, query string, arguments ...any) (Result, error) {
 	tag, err := p.tx.Exec(ctx, query, arguments...)
 	if err != nil {
 		return nil, err

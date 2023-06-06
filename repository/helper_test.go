@@ -6,7 +6,6 @@ package repository
 
 import (
 	"context"
-	"database/sql"
 	"os"
 	"testing"
 
@@ -101,7 +100,7 @@ func (d fakeDatabase) Begin(ctx context.Context) (*sqlrepo.PgxTxWrapper, error) 
 	return nil, d.Error
 }
 
-func (d fakeDatabase) Exec(ctx context.Context, query string, arguments ...any) (sql.Result, error) {
+func (d fakeDatabase) Exec(ctx context.Context, query string, arguments ...any) (sqlrepo.Result, error) {
 	if d.Result != nil {
 		return d.Result, nil
 	}
@@ -130,4 +129,4 @@ func (f fakeSqlResult) RowsAffected() (int64, error) {
 	return 0, f.Error
 }
 
-var _ sql.Result = &fakeSqlResult{}
+var _ sqlrepo.Result = &fakeSqlResult{}
