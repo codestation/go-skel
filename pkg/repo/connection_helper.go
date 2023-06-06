@@ -49,10 +49,10 @@ func (c *Connection) setupDatabase(t *testing.T) {
 	}
 
 	if dsn, ok := os.LookupEnv("APP_DSN"); ok {
-		cfg.SqlSettings.DataSourceName = dsn
+		cfg.DatabaseSettings.DataSourceName = dsn
 	}
 
-	conn, err := sql.NewConnection(cfg.SqlSettings)
+	conn, err := sql.NewConnection(cfg.DatabaseSettings)
 	if err != nil {
 		assert.FailNowf(t, "Failed to create database Connection", err.Error())
 	}

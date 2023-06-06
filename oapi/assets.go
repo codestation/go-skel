@@ -6,8 +6,8 @@ package oapi
 
 import "embed"
 
-//go:generate go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen@0cfaaa77 -package oapi -generate types -o types.gen.go goapp.yaml
-//go:generate go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen@0cfaaa77 -package oapi -generate server -o server.gen.go goapp.yaml
+//go:generate go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v1.13.0 -package oapi -generate types -o types.gen.go goapp.yaml
+//go:generate go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v1.13.0 -package oapi -generate server -o server.gen.go goapp.yaml
 
 //go:embed goapp.yaml
 var content embed.FS

@@ -25,7 +25,7 @@ var queueCmd = &cobra.Command{
 		}
 
 		// Database initialization
-		pool, err := sql.NewConnection(cfg.SqlSettings)
+		pool, err := sql.NewConnection(cfg.DatabaseSettings)
 		if err != nil {
 			return err
 		}

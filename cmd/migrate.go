@@ -35,7 +35,7 @@ var migrateCmd = &cobra.Command{
 		quit := make(chan os.Signal, 1)
 
 		// Database initialization
-		pool, err := sql.NewConnection(cfg.SqlSettings)
+		pool, err := sql.NewConnection(cfg.DatabaseSettings)
 		if err != nil {
 			return err
 		}

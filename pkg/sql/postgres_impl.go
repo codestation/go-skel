@@ -142,7 +142,7 @@ func newPgxTxWrapper(tx pgx.Tx) *PgxTxWrapper {
 	return &PgxTxWrapper{tx}
 }
 
-func NewConnection(settings config.SqlSettings) (*pgxpool.Pool, error) {
+func NewConnection(settings config.DatabaseSettings) (*pgxpool.Pool, error) {
 	parseConfig, err := pgxpool.ParseConfig(settings.DataSourceName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to configure database, aborting: %w", err)

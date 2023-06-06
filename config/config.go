@@ -33,7 +33,7 @@ const (
 type Config struct {
 	GeneralSettings   GeneralSettings
 	ServerSettings    ServerSettings
-	SqlSettings       SqlSettings
+	DatabaseSettings  DatabaseSettings
 	MigrationSettings MigrationSettings
 }
 
@@ -66,20 +66,20 @@ func (cfg *Config) Unmarshal(fn func(val any) error) error {
 		return fmt.Errorf("failed to read general settings: %w", err)
 	}
 	if err = fn(&cfg.ServerSettings); err != nil {
-		return fmt.Errorf("failed to read general settings: %w", err)
+		return fmt.Errorf("failed to read server settings: %w", err)
 	}
-	if err = fn(&cfg.SqlSettings); err != nil {
-		return fmt.Errorf("failed to read general settings: %w", err)
+	if err = fn(&cfg.DatabaseSettings); err != nil {
+		return fmt.Errorf("failed to read database settings: %w", err)
 	}
 	if err = fn(&cfg.MigrationSettings); err != nil {
-		return fmt.Errorf("failed to read general settings: %w", err)
+		return fmt.Errorf("failed to read migration settings: %w", err)
 	}
 	return nil
 }
 
 func (cfg *Config) SetDefaults() {
 	cfg.ServerSettings.SetDefaults()
-	cfg.SqlSettings.SetDefaults()
+	cfg.DatabaseSettings.SetDefaults()
 	cfg.MigrationSettings.SetDefaults()
 }
 
@@ -90,7 +90,7 @@ func (cfg *Config) Validate() error {
 	if err := cfg.ServerSettings.Validate(); err != nil {
 		return err
 	}
-	if err := cfg.SqlSettings.Validate(); err != nil {
+	if err := cfg.DatabaseSettings.Validate(); err != nil {
 		return err
 	}
 	return nil
@@ -166,7 +166,7 @@ func (cfg *ServerSettings) Validate() error {
 	return nil
 }
 
-type SqlSettings struct {
+type DatabaseSettings struct {
 	DriverName      string        `mapstructure:"driver"`
 	DataSourceName  string        `mapstructure:"dsn"`
 	MaxIdleConns    int           `mapstructure:"max-idle-conns"`
@@ -176,7 +176,7 @@ type SqlSettings struct {
 	QueryLimit      uint          `mapstructure:"query-limit"`
 }
 
-func (cfg *SqlSettings) SetDefaults() {
+func (cfg *DatabaseSettings) SetDefaults() {
 	if cfg.DriverName == "" {
 		cfg.DriverName = DefaultDriverName
 	}
@@ -200,7 +200,7 @@ func (cfg *SqlSettings) SetDefaults() {
 	}
 }
 
-func (cfg *SqlSettings) Validate() error {
+func (cfg *DatabaseSettings) Validate() error {
 	return nil
 }
 

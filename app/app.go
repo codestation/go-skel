@@ -38,7 +38,7 @@ func NewApp(cfg *config.Config) (*App, error) {
 	s := &App{cfg: cfg}
 
 	// Database initialization
-	pool, err := sql.NewConnection(cfg.SqlSettings)
+	pool, err := sql.NewConnection(cfg.DatabaseSettings)
 	if err != nil {
 		return nil, err
 	}
