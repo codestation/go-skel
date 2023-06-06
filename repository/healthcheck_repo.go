@@ -7,6 +7,7 @@ package repository
 import (
 	"context"
 
+	"megpoid.dev/go/go-skel/pkg/repo"
 	"megpoid.dev/go/go-skel/pkg/sql"
 )
 
@@ -25,7 +26,7 @@ func NewHealthcheckRepo(conn sql.Pinger) HealthcheckRepo {
 // Execute returns an error if the database doesn't respond
 func (s HealthcheckRepoImpl) Execute(ctx context.Context) error {
 	if err := s.db.Ping(ctx); err != nil {
-		return NewRepoError(ErrBackend, err)
+		return repo.NewRepoError(repo.ErrBackend, err)
 	}
 	return nil
 }

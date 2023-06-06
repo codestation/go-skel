@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT-license
 // that can be found in the LICENSE file.
 
-package repository
+package repo
 
 import (
 	"context"
@@ -87,13 +87,13 @@ func (s *storeSuite) TearDownTest() {
 }
 
 func (s *storeSuite) TestNewStore() {
-	st := NewStore[*testUser](s.conn.store)
+	st := NewStore[*testUser](s.conn.Store)
 	s.Equal("test_users", st.table)
 	s.Equal([]any{"*"}, st.selectFields)
 }
 
 func (s *storeSuite) TestStoreGet() {
-	st := NewStore[*testUser](s.conn.store)
+	st := NewStore[*testUser](s.conn.Store)
 	var tests = []struct {
 		id  model.ID
 		err error
@@ -117,7 +117,7 @@ func (s *storeSuite) TestStoreGet() {
 }
 
 func (s *storeSuite) TestStoreList() {
-	st := NewStore[*testUser](s.conn.store)
+	st := NewStore[*testUser](s.conn.Store)
 	users, err := st.List(context.Background())
 	if s.NoError(err) {
 		s.GreaterOrEqual(len(users.Items), 0)
@@ -125,7 +125,7 @@ func (s *storeSuite) TestStoreList() {
 }
 
 func (s *storeSuite) TestStoreSave() {
-	st := NewStore[*testUser](s.conn.store)
+	st := NewStore[*testUser](s.conn.Store)
 	var tests = []struct {
 		name      string
 		profileId model.ID
@@ -150,7 +150,7 @@ func (s *storeSuite) TestStoreSave() {
 }
 
 func (s *storeSuite) TestStoreUpsert() {
-	st := NewStore[*testUser](s.conn.store)
+	st := NewStore[*testUser](s.conn.Store)
 	var tests = []struct {
 		name      string
 		profileId model.ID
@@ -178,7 +178,7 @@ func (s *storeSuite) TestStoreUpsert() {
 }
 
 func (s *storeSuite) TestStoreUpdate() {
-	st := NewStore[*testUser](s.conn.store)
+	st := NewStore[*testUser](s.conn.Store)
 	var tests = []struct {
 		id  model.ID
 		err error
@@ -203,7 +203,7 @@ func (s *storeSuite) TestStoreUpdate() {
 }
 
 func (s *storeSuite) TestStoreUpdateMap() {
-	st := NewStore[*testUser](s.conn.store)
+	st := NewStore[*testUser](s.conn.Store)
 	var tests = []struct {
 		id  model.ID
 		err error
@@ -230,7 +230,7 @@ func (s *storeSuite) TestStoreUpdateMap() {
 }
 
 func (s *storeSuite) TestStoreDelete() {
-	st := NewStore[*testUser](s.conn.store)
+	st := NewStore[*testUser](s.conn.Store)
 	var tests = []struct {
 		id  model.ID
 		err error
@@ -252,7 +252,7 @@ func (s *storeSuite) TestStoreDelete() {
 }
 
 func (s *storeSuite) TestStoreGetExternal() {
-	st := NewStore[*testUser](s.conn.store)
+	st := NewStore[*testUser](s.conn.Store)
 	var tests = []struct {
 		id     uuid.UUID
 		err    error
@@ -282,7 +282,7 @@ func (s *storeSuite) TestStoreGetExternal() {
 }
 
 func (s *storeSuite) TestStoreGetByExpr() {
-	st := NewStore[*testUser](s.conn.store)
+	st := NewStore[*testUser](s.conn.Store)
 	var tests = []struct {
 		name   string
 		err    error
@@ -312,7 +312,7 @@ func (s *storeSuite) TestStoreGetByExpr() {
 }
 
 func (s *storeSuite) TestStoreDeleteExternal() {
-	st := NewStore[*testUser](s.conn.store)
+	st := NewStore[*testUser](s.conn.Store)
 	var tests = []struct {
 		id    uuid.UUID
 		err   error
@@ -369,13 +369,13 @@ func (s *storeSuite) TestBackendError() {
 
 func (s *storeSuite) TestIncludes() {
 	st := userStore{
-		GenericStoreImpl: NewStore[*testUser](s.conn.store,
+		GenericStoreImpl: NewStore[*testUser](s.conn.Store,
 			WithIncludes[*testUser]("profile"),
 		),
 	}
 
 	st.profile = &profileStore{
-		GenericStoreImpl: NewStore[*testProfile](s.conn.store),
+		GenericStoreImpl: NewStore[*testProfile](s.conn.Store),
 	}
 
 	st.AttachFunc(st.Attach)
@@ -391,7 +391,7 @@ func (s *storeSuite) TestIncludes() {
 }
 
 func (s *storeSuite) TestEach() {
-	st := userStore{GenericStoreImpl: NewStore[*testUser](s.conn.store,
+	st := userStore{GenericStoreImpl: NewStore[*testUser](s.conn.Store,
 		WithPaginatorOptions[*testUser](
 			paginator.WithLimit(2),
 		),
@@ -407,7 +407,7 @@ func (s *storeSuite) TestEach() {
 }
 
 func (s *storeSuite) TestWithFilters() {
-	st := userStore{GenericStoreImpl: NewStore[*testUser](s.conn.store,
+	st := userStore{GenericStoreImpl: NewStore[*testUser](s.conn.Store,
 		WithExpressions[*testUser](goqu.Ex{"name": "John Doe 3"}),
 	)}
 
@@ -417,7 +417,7 @@ func (s *storeSuite) TestWithFilters() {
 }
 
 func (s *storeSuite) TestEmptyResult() {
-	st := userStore{GenericStoreImpl: NewStore[*testUser](s.conn.store)}
+	st := userStore{GenericStoreImpl: NewStore[*testUser](s.conn.Store)}
 
 	response, err := st.ListBy(context.Background(), Expr{"name": "Not Found"})
 	s.NoError(err)
@@ -425,6 +425,6 @@ func (s *storeSuite) TestEmptyResult() {
 }
 
 func (s *storeSuite) TestPrefix() {
-	st := NewStore[*testUser](s.conn.store, WithTablePrefix[*testUser]("app_"))
+	st := NewStore[*testUser](s.conn.Store, WithTablePrefix[*testUser]("app_"))
 	s.Equal("app_test_users", st.table)
 }

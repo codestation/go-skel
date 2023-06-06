@@ -9,14 +9,14 @@ import (
 	"fmt"
 
 	"github.com/doug-martin/goqu/v9"
-	paginator2 "megpoid.dev/go/go-skel/pkg/paginator"
+	"megpoid.dev/go/go-skel/pkg/paginator"
+	"megpoid.dev/go/go-skel/pkg/repo/filter"
 	"megpoid.dev/go/go-skel/pkg/request"
 	"megpoid.dev/go/go-skel/pkg/response"
-	"megpoid.dev/go/go-skel/repository/filter"
 )
 
 type Clause struct {
-	paginator       *paginator2.Paginator
+	paginator       *paginator.Paginator
 	filterer        *filter.Filter
 	includes        []string
 	allowedIncludes []string
@@ -30,18 +30,18 @@ func NewClause(opts ...FilterOption) *Clause {
 	return r
 }
 
-func WithConfig(opts []paginator2.Option) FilterOption {
+func WithConfig(opts []paginator.Option) FilterOption {
 	return func(clause *Clause) {
 		if clause.paginator == nil {
-			clause.paginator = paginator2.New(opts...)
+			clause.paginator = paginator.New(opts...)
 		}
 	}
 }
 
-func WithPaginatorRules(rules []paginator2.Rule) FilterOption {
+func WithPaginatorRules(rules []paginator.Rule) FilterOption {
 	return func(clause *Clause) {
 		if clause.paginator == nil {
-			clause.paginator = paginator2.New()
+			clause.paginator = paginator.New()
 		}
 		if len(rules) > 0 {
 			clause.paginator.SetRules(rules...)
@@ -52,7 +52,7 @@ func WithPaginatorRules(rules []paginator2.Rule) FilterOption {
 func WithPaginatorKeys(keys []string) FilterOption {
 	return func(clause *Clause) {
 		if clause.paginator == nil {
-			clause.paginator = paginator2.New()
+			clause.paginator = paginator.New()
 		}
 		if len(keys) > 0 {
 			clause.paginator.SetKeys(keys...)
@@ -116,10 +116,10 @@ func (c *Clause) Includes(fn func(include string) error) error {
 	return nil
 }
 
-func (c *Clause) ApplyFilters(ctx context.Context, db paginator2.SqlSelector, sd *goqu.SelectDataset, dest any) (*paginator2.Cursor, error) {
+func (c *Clause) ApplyFilters(ctx context.Context, db paginator.SqlSelector, sd *goqu.SelectDataset, dest any) (*paginator.Cursor, error) {
 	var (
 		err   error
-		cur   *paginator2.Cursor
+		cur   *paginator.Cursor
 		query *goqu.SelectDataset
 	)
 
@@ -148,7 +148,7 @@ func (c *Clause) ApplyFilters(ctx context.Context, db paginator2.SqlSelector, sd
 			return nil, err
 		}
 
-		cur = &paginator2.Cursor{}
+		cur = &paginator.Cursor{}
 	}
 
 	return cur, nil
@@ -158,19 +158,19 @@ func WithMeta(meta response.Pagination) FilterOption {
 	return func(clause *Clause) {
 		if meta.NextCursor != nil {
 			if clause.paginator == nil {
-				clause.paginator = paginator2.New()
+				clause.paginator = paginator.New()
 			}
 			clause.paginator.SetAfterCursor(*meta.NextCursor)
 		}
 		if meta.PrevCursor != nil {
 			if clause.paginator == nil {
-				clause.paginator = paginator2.New()
+				clause.paginator = paginator.New()
 			}
 			clause.paginator.SetBeforeCursor(*meta.PrevCursor)
 		}
 		if meta.CurrentPage != nil {
 			if clause.paginator == nil {
-				clause.paginator = paginator2.New()
+				clause.paginator = paginator.New()
 			}
 			clause.paginator.SetPage(*meta.CurrentPage)
 		}
@@ -181,25 +181,25 @@ func WithFilter(query *request.QueryParams) FilterOption {
 	return func(clause *Clause) {
 		if query.Pagination.Limit != nil {
 			if clause.paginator == nil {
-				clause.paginator = paginator2.New()
+				clause.paginator = paginator.New()
 			}
 			clause.paginator.SetLimit(*query.Pagination.Limit)
 		}
 		if query.Pagination.After != nil {
 			if clause.paginator == nil {
-				clause.paginator = paginator2.New()
+				clause.paginator = paginator.New()
 			}
 			clause.paginator.SetAfterCursor(*query.Pagination.After)
 		}
 		if query.Pagination.Before != nil {
 			if clause.paginator == nil {
-				clause.paginator = paginator2.New()
+				clause.paginator = paginator.New()
 			}
 			clause.paginator.SetBeforeCursor(*query.Pagination.Before)
 		}
 		if query.Pagination.Page != nil {
 			if clause.paginator == nil {
-				clause.paginator = paginator2.New()
+				clause.paginator = paginator.New()
 			}
 			clause.paginator.SetPage(*query.Pagination.Page)
 		}

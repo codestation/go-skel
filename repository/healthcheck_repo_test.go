@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/suite"
+	"megpoid.dev/go/go-skel/pkg/repo"
 )
 
 func TestHealthcheckStore(t *testing.T) {
@@ -17,11 +18,11 @@ func TestHealthcheckStore(t *testing.T) {
 
 type healthcheckSuite struct {
 	suite.Suite
-	conn *Connection
+	conn *repo.Connection
 }
 
 func (s *healthcheckSuite) SetupTest() {
-	s.conn = NewTestConnection(s.T(), false)
+	s.conn = repo.NewTestConnection(s.T(), false)
 }
 
 func (s *healthcheckSuite) TearDownTest() {
@@ -31,7 +32,7 @@ func (s *healthcheckSuite) TearDownTest() {
 }
 
 func (s *healthcheckSuite) TestPing() {
-	store := NewHealthcheckRepo(s.conn.db)
+	store := NewHealthcheckRepo(s.conn.Db)
 	err := store.Execute(context.Background())
 	s.NoError(err)
 }

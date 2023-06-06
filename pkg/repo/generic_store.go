@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT-license
 // that can be found in the LICENSE file.
 
-package repository
+package repo
 
 import (
 	"context"
@@ -14,9 +14,9 @@ import (
 	"megpoid.dev/go/go-skel/app/model"
 	"megpoid.dev/go/go-skel/pkg/clause"
 	"megpoid.dev/go/go-skel/pkg/paginator"
+	"megpoid.dev/go/go-skel/pkg/repo/filter"
 	"megpoid.dev/go/go-skel/pkg/response"
 	"megpoid.dev/go/go-skel/pkg/sql"
-	"megpoid.dev/go/go-skel/repository/filter"
 )
 
 // compile time validator for the interfaces

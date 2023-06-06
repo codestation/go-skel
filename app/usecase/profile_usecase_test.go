@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"megpoid.dev/go/go-skel/app/model"
 	"megpoid.dev/go/go-skel/pkg/paginator"
+	"megpoid.dev/go/go-skel/pkg/repo"
 	"megpoid.dev/go/go-skel/pkg/request"
 	"megpoid.dev/go/go-skel/pkg/response"
 	"megpoid.dev/go/go-skel/repository"
@@ -108,7 +109,7 @@ func TestProfileDelete(t *testing.T) {
 
 func TestProfileError(t *testing.T) {
 	r := repository.NewMockProfileRepo(t)
-	r.EXPECT().Get(mock.Anything, model.ID(1)).Return(nil, repository.ErrNotFound)
+	r.EXPECT().Get(mock.Anything, model.ID(1)).Return(nil, repo.ErrNotFound)
 
 	u := uow.NewMockUnitOfWork(t)
 	uc := NewProfile(u, r)

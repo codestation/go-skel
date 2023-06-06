@@ -12,7 +12,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
-	"megpoid.dev/go/go-skel/repository"
+	"megpoid.dev/go/go-skel/pkg/repo"
 )
 
 type ValidationError struct {
@@ -54,7 +54,7 @@ func NewAppError(message string, err error) *Error {
 
 		appErr.DetailedError = err.Error()
 		switch {
-		case errors.Is(err, repository.ErrNotFound):
+		case errors.Is(err, repo.ErrNotFound):
 			appErr.StatusCode = http.StatusNotFound
 		case errors.As(err, &httpErr):
 			appErr.StatusCode = httpErr.Code

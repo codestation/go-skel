@@ -10,6 +10,7 @@ import (
 
 	"megpoid.dev/go/go-skel/app/model"
 	"megpoid.dev/go/go-skel/pkg/clause"
+	"megpoid.dev/go/go-skel/pkg/repo"
 	"megpoid.dev/go/go-skel/pkg/request"
 	"megpoid.dev/go/go-skel/pkg/response"
 	"megpoid.dev/go/go-skel/repository"
@@ -30,7 +31,7 @@ func (u *ProfileInteractor) GetProfile(ctx context.Context, id model.ID) (*model
 
 	profile, err := u.profileRepo.Get(ctx, id)
 	if err != nil {
-		if errors.Is(err, repository.ErrNotFound) {
+		if errors.Is(err, repo.ErrNotFound) {
 			return nil, NewAppError(t.Sprintf("Profile not found"), err)
 		} else {
 			return nil, NewAppError(t.Sprintf("Failed to get profile"), err)
@@ -57,7 +58,7 @@ func (u *ProfileInteractor) SaveProfile(ctx context.Context, req *model.ProfileR
 	profile := req.Profile()
 	err := u.profileRepo.Save(ctx, profile)
 	if err != nil {
-		if errors.Is(err, repository.ErrDuplicated) {
+		if errors.Is(err, repo.ErrDuplicated) {
 			return nil, NewAppError(t.Sprintf("Email is already registered with another profile"), err)
 		}
 

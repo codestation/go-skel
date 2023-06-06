@@ -6,21 +6,20 @@ package repository
 
 import (
 	"context"
-	"errors"
 
-	"github.com/doug-martin/goqu/v9"
 	"megpoid.dev/go/go-skel/app/model"
+	"megpoid.dev/go/go-skel/pkg/repo"
+	"megpoid.dev/go/go-skel/pkg/repo/filter"
 	"megpoid.dev/go/go-skel/pkg/sql"
-	"megpoid.dev/go/go-skel/repository/filter"
 )
 
 type ProfileRepoImpl struct {
-	*GenericStoreImpl[*model.Profile]
+	*repo.GenericStoreImpl[*model.Profile]
 }
 
 func NewProfileRepo(conn sql.Executor) ProfileRepo {
 	s := &ProfileRepoImpl{
-		GenericStoreImpl: NewStore(conn, WithFilters[*model.Profile](
+		GenericStoreImpl: repo.NewStore(conn, repo.WithFilters[*model.Profile](
 			filter.Rule{
 				Key:  "first_name",
 				Type: "string",
@@ -37,24 +36,5 @@ func NewProfileRepo(conn sql.Executor) ProfileRepo {
 }
 
 func (s *ProfileRepoImpl) GetByEmail(ctx context.Context, email string) (*model.Profile, error) {
-	queryBuilder := s.builder.From(s.table).
-		Select(s.selectFields...).
-		Where(goqu.Ex{"email": email})
-
-	query, args, err := queryBuilder.Prepared(true).ToSQL()
-	if err != nil {
-		return nil, NewRepoError(ErrBackend, err)
-	}
-
-	var result model.Profile
-	err = s.db.Get(ctx, &result, query, args...)
-
-	switch {
-	case errors.Is(err, sql.ErrNoRows):
-		return nil, NewRepoError(ErrNotFound, err)
-	case err != nil:
-		return nil, NewRepoError(ErrBackend, err)
-	default:
-		return &result, nil
-	}
+	return s.GetBy(ctx, repo.Expr{"email": email})
 }

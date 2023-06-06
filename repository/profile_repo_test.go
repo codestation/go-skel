@@ -10,7 +10,8 @@ import (
 
 	"github.com/stretchr/testify/suite"
 	"megpoid.dev/go/go-skel/pkg/clause"
-	"megpoid.dev/go/go-skel/repository/filter"
+	"megpoid.dev/go/go-skel/pkg/repo"
+	filter2 "megpoid.dev/go/go-skel/pkg/repo/filter"
 )
 
 func TestProfileStore(t *testing.T) {
@@ -19,11 +20,11 @@ func TestProfileStore(t *testing.T) {
 
 type profileSuite struct {
 	suite.Suite
-	conn *Connection
+	conn *repo.Connection
 }
 
 func (s *profileSuite) SetupTest() {
-	s.conn = NewTestConnection(s.T(), true)
+	s.conn = repo.NewTestConnection(s.T(), true)
 }
 
 func (s *profileSuite) TearDownTest() {
@@ -33,10 +34,10 @@ func (s *profileSuite) TearDownTest() {
 }
 
 func (s *profileSuite) TestFilterSingleMatch() {
-	store := NewProfileRepo(s.conn.store)
-	result, err := store.List(context.Background(), clause.WithConditions(filter.Condition{
+	store := NewProfileRepo(s.conn.Store)
+	result, err := store.List(context.Background(), clause.WithConditions(filter2.Condition{
 		Field:     "first_name",
-		Operation: filter.OperationEqual,
+		Operation: filter2.OperationEqual,
 		Value:     "John",
 	}))
 	if s.NoError(err) {
@@ -45,10 +46,10 @@ func (s *profileSuite) TestFilterSingleMatch() {
 }
 
 func (s *profileSuite) TestFilterMultipleMatch() {
-	store := NewProfileRepo(s.conn.store)
-	result, err := store.List(context.Background(), clause.WithConditions(filter.Condition{
+	store := NewProfileRepo(s.conn.Store)
+	result, err := store.List(context.Background(), clause.WithConditions(filter2.Condition{
 		Field:     "last_name",
-		Operation: filter.OperationEqual,
+		Operation: filter2.OperationEqual,
 		Value:     "Doe",
 	}))
 	if s.NoError(err) {
@@ -57,10 +58,10 @@ func (s *profileSuite) TestFilterMultipleMatch() {
 }
 
 func (s *profileSuite) TestFilterNoMatch() {
-	store := NewProfileRepo(s.conn.store)
-	result, err := store.List(context.Background(), clause.WithConditions(filter.Condition{
+	store := NewProfileRepo(s.conn.Store)
+	result, err := store.List(context.Background(), clause.WithConditions(filter2.Condition{
 		Field:     "last_name",
-		Operation: filter.OperationEqual,
+		Operation: filter2.OperationEqual,
 		Value:     "Unknown",
 	}))
 	if s.NoError(err) {
@@ -69,7 +70,7 @@ func (s *profileSuite) TestFilterNoMatch() {
 }
 
 func (s *profileSuite) TestProfileByEmail() {
-	store := NewProfileRepo(s.conn.store)
+	store := NewProfileRepo(s.conn.Store)
 	profile, err := store.GetByEmail(context.Background(), "john.doe@example.com")
 	if s.NoError(err) {
 		s.Equal("john.doe@example.com", profile.Email)

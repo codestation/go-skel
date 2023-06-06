@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT-license
 // that can be found in the LICENSE file.
 
-package repository
+package repo
 
 import (
 	"context"
@@ -16,8 +16,8 @@ import (
 )
 
 type Connection struct {
-	db              sql.Database
-	store           sql.Executor
+	Db              sql.Database
+	Store           sql.Executor
 	tx              sql.Transactor
 	withTransaction bool
 }
@@ -37,7 +37,7 @@ func (c *Connection) Close(t *testing.T) {
 			assert.FailNowf(t, "Failed to rollback transaction", err.Error())
 		}
 	}
-	c.db.Close()
+	c.Db.Close()
 }
 
 func (c *Connection) setupDatabase(t *testing.T) {
@@ -57,20 +57,20 @@ func (c *Connection) setupDatabase(t *testing.T) {
 		assert.FailNowf(t, "Failed to create database Connection", err.Error())
 	}
 
-	c.db = sql.NewPgxWrapper(conn)
+	c.Db = sql.NewPgxWrapper(conn)
 
 	if c.withTransaction {
 		// create a new transaction so a test doesn't interfere with another
-		tx, err := c.db.Begin(context.Background())
+		tx, err := c.Db.Begin(context.Background())
 		if err != nil {
 			assert.FailNowf(t, "Failed to create transaction", err.Error())
 		}
 
 		c.seedDatabase(t, tx)
 		c.tx = tx
-		c.store = tx
+		c.Store = tx
 	} else {
-		c.store = c.db
+		c.Store = c.Db
 	}
 }
 
