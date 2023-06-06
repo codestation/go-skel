@@ -9,13 +9,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"megpoid.dev/go/go-skel/app/model"
-	paginator2 "megpoid.dev/go/go-skel/pkg/paginator"
+	"megpoid.dev/go/go-skel/pkg/paginator"
 	"megpoid.dev/go/go-skel/pkg/paginator/cursor"
 )
 
 func TestNewListResponseEmpty(t *testing.T) {
 	results := make([]*model.Profile, 0)
-	response := NewListResponse(results, &paginator2.Cursor{})
+	response := NewListResponse(results, &paginator.Cursor{})
 	assert.Equal(t, 0, len(response.Items))
 	assert.NotNil(t, response.Pagination)
 }
@@ -25,7 +25,7 @@ func TestNewListResponseCursor(t *testing.T) {
 		model.NewProfile(),
 	}
 
-	cur := &paginator2.Cursor{}
+	cur := &paginator.Cursor{}
 	cur.SetCursor(&cursor.Cursor{
 		After:  model.NewType("after"),
 		Before: model.NewType("before"),
@@ -44,8 +44,8 @@ func TestNewListResponseOffset(t *testing.T) {
 		model.NewProfile(),
 	}
 
-	cur := &paginator2.Cursor{}
-	cur.SetOffset(&paginator2.Page{
+	cur := &paginator.Cursor{}
+	cur.SetOffset(&paginator.Page{
 		Items:        1,
 		Total:        10,
 		Page:         4,

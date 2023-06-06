@@ -7,8 +7,8 @@ package uow
 import (
 	"context"
 
+	"megpoid.dev/go/go-skel/app/repository"
 	"megpoid.dev/go/go-skel/pkg/sql"
-	"megpoid.dev/go/go-skel/repository"
 )
 
 //go:generate go run github.com/vektra/mockery/v2@v2.23.1 --name UnitOfWorkStore

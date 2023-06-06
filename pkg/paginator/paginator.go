@@ -15,7 +15,7 @@ import (
 	"github.com/doug-martin/goqu/v9"
 	"github.com/doug-martin/goqu/v9/exp"
 	"github.com/georgysavva/scany/v2/dbscan"
-	cursor2 "megpoid.dev/go/go-skel/pkg/paginator/cursor"
+	"megpoid.dev/go/go-skel/pkg/paginator/cursor"
 )
 
 type SqlSelector interface {
@@ -34,7 +34,7 @@ func New(opts ...Option) *Paginator {
 
 // Paginator a builder doing pagination
 type Paginator struct {
-	cursor cursor2.Cursor
+	cursor cursor.Cursor
 	rules  []Rule
 	limit  int
 	order  Order
@@ -172,7 +172,7 @@ func (p *Paginator) paginateOffset(query *goqu.SelectDataset, offset uint) *goqu
 	return query.Limit(uint(p.limit)).Offset(offset)
 }
 
-func (p *Paginator) paginateResultsCursor(dest any) (*cursor2.Cursor, error) {
+func (p *Paginator) paginateResultsCursor(dest any) (*cursor.Cursor, error) {
 	if err := p.validate(dest); err != nil {
 		return nil, err
 	}
@@ -192,7 +192,7 @@ func (p *Paginator) paginateResultsCursor(dest any) (*cursor2.Cursor, error) {
 			return c, nil
 		}
 	}
-	return &cursor2.Cursor{}, nil
+	return &cursor.Cursor{}, nil
 }
 
 func (p *Paginator) validate(dest any) (err error) {
@@ -238,11 +238,11 @@ func isNil(i any) bool {
 
 func (p *Paginator) decodeCursor(dest any) (result []any, err error) {
 	if p.isForward() {
-		if result, err = cursor2.NewDecoder(p.getDecoderFields()).Decode(*p.cursor.After, dest); err != nil {
+		if result, err = cursor.NewDecoder(p.getDecoderFields()).Decode(*p.cursor.After, dest); err != nil {
 			err = ErrInvalidCursor
 		}
 	} else if p.isBackward() {
-		if result, err = cursor2.NewDecoder(p.getDecoderFields()).Decode(*p.cursor.Before, dest); err != nil {
+		if result, err = cursor.NewDecoder(p.getDecoderFields()).Decode(*p.cursor.Before, dest); err != nil {
 			err = ErrInvalidCursor
 		}
 	}
@@ -303,9 +303,9 @@ func (p *Paginator) buildWhereExpression(fields []any) exp.ExpressionList {
 	return goqu.Or(queries...)
 }
 
-func (p *Paginator) encodeCursor(elems reflect.Value, hasMore bool) (*cursor2.Cursor, error) {
-	result := &cursor2.Cursor{}
-	encoder := cursor2.NewEncoder(p.getEncoderFields())
+func (p *Paginator) encodeCursor(elems reflect.Value, hasMore bool) (*cursor.Cursor, error) {
+	result := &cursor.Cursor{}
+	encoder := cursor.NewEncoder(p.getEncoderFields())
 	// encode after cursor
 	if p.isBackward() || hasMore {
 		c, err := encoder.Encode(elems.Index(elems.Len() - 1))
@@ -326,8 +326,8 @@ func (p *Paginator) encodeCursor(elems reflect.Value, hasMore bool) (*cursor2.Cu
 }
 
 /* custom types */
-func (p *Paginator) getEncoderFields() []cursor2.EncoderField {
-	fields := make([]cursor2.EncoderField, len(p.rules))
+func (p *Paginator) getEncoderFields() []cursor.EncoderField {
+	fields := make([]cursor.EncoderField, len(p.rules))
 	for i, rule := range p.rules {
 		fields[i].Key = rule.Key
 		if rule.CustomType != nil {
@@ -337,8 +337,8 @@ func (p *Paginator) getEncoderFields() []cursor2.EncoderField {
 	return fields
 }
 
-func (p *Paginator) getDecoderFields() []cursor2.DecoderField {
-	fields := make([]cursor2.DecoderField, len(p.rules))
+func (p *Paginator) getDecoderFields() []cursor.DecoderField {
+	fields := make([]cursor.DecoderField, len(p.rules))
 	for i, rule := range p.rules {
 		fields[i].Key = rule.Key
 		if rule.CustomType != nil {

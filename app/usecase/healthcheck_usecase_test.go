@@ -11,7 +11,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"megpoid.dev/go/go-skel/repository"
+	"megpoid.dev/go/go-skel/app/repository"
 )
 
 func TestApp_Healthcheck(t *testing.T) {

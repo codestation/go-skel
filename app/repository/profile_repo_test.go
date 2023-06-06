@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/suite"
 	"megpoid.dev/go/go-skel/pkg/clause"
 	"megpoid.dev/go/go-skel/pkg/repo"
-	filter2 "megpoid.dev/go/go-skel/pkg/repo/filter"
+	"megpoid.dev/go/go-skel/pkg/repo/filter"
 )
 
 func TestProfileStore(t *testing.T) {
@@ -35,9 +35,9 @@ func (s *profileSuite) TearDownTest() {
 
 func (s *profileSuite) TestFilterSingleMatch() {
 	store := NewProfileRepo(s.conn.Store)
-	result, err := store.List(context.Background(), clause.WithConditions(filter2.Condition{
+	result, err := store.List(context.Background(), clause.WithConditions(filter.Condition{
 		Field:     "first_name",
-		Operation: filter2.OperationEqual,
+		Operation: filter.OperationEqual,
 		Value:     "John",
 	}))
 	if s.NoError(err) {
@@ -47,9 +47,9 @@ func (s *profileSuite) TestFilterSingleMatch() {
 
 func (s *profileSuite) TestFilterMultipleMatch() {
 	store := NewProfileRepo(s.conn.Store)
-	result, err := store.List(context.Background(), clause.WithConditions(filter2.Condition{
+	result, err := store.List(context.Background(), clause.WithConditions(filter.Condition{
 		Field:     "last_name",
-		Operation: filter2.OperationEqual,
+		Operation: filter.OperationEqual,
 		Value:     "Doe",
 	}))
 	if s.NoError(err) {
@@ -59,9 +59,9 @@ func (s *profileSuite) TestFilterMultipleMatch() {
 
 func (s *profileSuite) TestFilterNoMatch() {
 	store := NewProfileRepo(s.conn.Store)
-	result, err := store.List(context.Background(), clause.WithConditions(filter2.Condition{
+	result, err := store.List(context.Background(), clause.WithConditions(filter.Condition{
 		Field:     "last_name",
-		Operation: filter2.OperationEqual,
+		Operation: filter.OperationEqual,
 		Value:     "Unknown",
 	}))
 	if s.NoError(err) {

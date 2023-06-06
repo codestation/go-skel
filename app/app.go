@@ -17,13 +17,13 @@ import (
 	"github.com/swaggest/swgui"
 	"github.com/swaggest/swgui/v4emb"
 	"megpoid.dev/go/go-skel/app/controller"
+	"megpoid.dev/go/go-skel/app/repository"
+	"megpoid.dev/go/go-skel/app/repository/uow"
 	"megpoid.dev/go/go-skel/app/usecase"
 	"megpoid.dev/go/go-skel/config"
 	"megpoid.dev/go/go-skel/oapi"
 	"megpoid.dev/go/go-skel/pkg/i18n"
 	"megpoid.dev/go/go-skel/pkg/sql"
-	"megpoid.dev/go/go-skel/repository"
-	"megpoid.dev/go/go-skel/repository/uow"
 	"megpoid.dev/go/go-skel/web"
 )
 

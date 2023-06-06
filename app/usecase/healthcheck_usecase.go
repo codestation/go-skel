@@ -8,7 +8,7 @@ import (
 	"context"
 
 	"megpoid.dev/go/go-skel/app/model"
-	"megpoid.dev/go/go-skel/repository"
+	"megpoid.dev/go/go-skel/app/repository"
 )
 
 // used to validate that the implementation matches the interface

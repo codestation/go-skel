@@ -12,9 +12,9 @@ import (
 
 	"github.com/hibiken/asynq"
 	"megpoid.dev/go/go-skel/app/model"
+	"megpoid.dev/go/go-skel/app/repository"
 	"megpoid.dev/go/go-skel/app/usecase"
 	"megpoid.dev/go/go-skel/pkg/sql"
-	"megpoid.dev/go/go-skel/repository"
 )
 
 const (
