@@ -1,5 +1,5 @@
 ###
-GET {{host}}/apis/goapp/v1/status/livez?verbose=true
+GET {{host}}/apis/goapp/v1/health/live?verbose=true
 
 > {%
     client.test("Request executed successfully", function () {
@@ -8,7 +8,7 @@ GET {{host}}/apis/goapp/v1/status/livez?verbose=true
 %}
 
 ###
-GET {{host}}/apis/goapp/v1/status/readyz?verbose=true
+GET {{host}}/apis/goapp/v1/health/ready?verbose=true
 
 > {%
     client.test("Request executed successfully", function () {

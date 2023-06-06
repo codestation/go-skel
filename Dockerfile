@@ -18,7 +18,7 @@ RUN set -ex; \
     -ldflags "-w -s \
     -X megpoid.dev/go/go-skel/version.Tag=${CI_COMMIT_TAG}"
 
-FROM alpine:3.17
+FROM alpine:3.18
 LABEL maintainer="codestation <codestation@megpoid.dev>"
 
 RUN apk add --no-cache ca-certificates tzdata
