@@ -14,8 +14,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"megpoid.dev/go/go-skel/config"
+	"megpoid.dev/go/go-skel/db"
 	"megpoid.dev/go/go-skel/pkg/sql"
-	"megpoid.dev/go/go-skel/repository/sqlrepo"
 )
 
 // migrateCmd represents the migrate command
@@ -42,7 +42,7 @@ var migrateCmd = &cobra.Command{
 		defer pool.Close()
 
 		go func() {
-			err := sqlrepo.RunMigrations(ctx, pool, cfg)
+			err := db.RunMigrations(ctx, pool, cfg)
 			if err != nil {
 				log.Println(err.Error())
 			}

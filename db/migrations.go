@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT-license
 // that can be found in the LICENSE file.
 
-package sqlrepo
+package db
 
 import (
 	"context"
@@ -14,12 +14,11 @@ import (
 	migrate "github.com/heroiclabs/sql-migrate"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"megpoid.dev/go/go-skel/config"
-	"megpoid.dev/go/go-skel/db"
 )
 
 func RunMigrations(ctx context.Context, pool *pgxpool.Pool, config *config.Config) error {
 	migrations := migrate.EmbedFileSystemMigrationSource{
-		FileSystem: db.Assets(),
+		FileSystem: Assets(),
 		Root:       "migrations",
 	}
 
@@ -81,7 +80,7 @@ func RunMigrations(ctx context.Context, pool *pgxpool.Pool, config *config.Confi
 
 // ApplySeed initializes the database with data
 func ApplySeed(ctx context.Context, pool *pgxpool.Pool) error {
-	assets := db.Seeds()
+	assets := Seeds()
 	entries, err := assets.ReadDir("seed")
 	if err != nil {
 		return err
