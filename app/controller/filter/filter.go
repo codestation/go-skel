@@ -13,7 +13,7 @@ import (
 	"megpoid.dev/go/go-skel/pkg/request"
 )
 
-type FilterParams struct {
+type Params struct {
 	Before   *oapi.Before
 	After    *oapi.After
 	Page     *oapi.Page
@@ -25,7 +25,7 @@ type FilterParams struct {
 	Sort     *oapi.Sort
 }
 
-func NewFilterFromParams(params FilterParams) (*request.QueryParams, error) {
+func NewFilterFromParams(params Params) (*request.QueryParams, error) {
 	query := &request.QueryParams{
 		Pagination: request.Pagination{
 			Limit:  params.Limit,

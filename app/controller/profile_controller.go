@@ -8,11 +8,11 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"megpoid.dev/go/go-skel/app/controller/filter"
 	"megpoid.dev/go/go-skel/app/model"
 	"megpoid.dev/go/go-skel/app/usecase"
 	"megpoid.dev/go/go-skel/config"
 	"megpoid.dev/go/go-skel/oapi"
-	"megpoid.dev/go/go-skel/pkg/filter"
 )
 
 type ProfileController struct {
@@ -28,7 +28,7 @@ func NewProfileCtrl(cfg *config.Config, profile usecase.Profile) ProfileControll
 }
 
 func (a *ProfileController) ListProfiles(ctx echo.Context, params oapi.ListProfilesParams) error {
-	query, err := filter.NewFilterFromParams(filter.FilterParams(params))
+	query, err := filter.NewFilterFromParams(filter.Params(params))
 	if err != nil {
 		return err
 	}
