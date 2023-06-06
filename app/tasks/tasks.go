@@ -9,8 +9,8 @@ import (
 	"github.com/hibiken/asynq"
 	"megpoid.dev/go/go-skel/app/model"
 	"megpoid.dev/go/go-skel/app/usecase"
+	"megpoid.dev/go/go-skel/pkg/sql"
 	"megpoid.dev/go/go-skel/repository"
-	"megpoid.dev/go/go-skel/repository/sqlrepo"
 )
 
 const (
@@ -53,7 +53,7 @@ func HandleSayHelloTask(ctx context.Context, t *asynq.Task) error {
 }
 
 type ProfileChecker struct {
-	pool sqlrepo.SqlExecutor
+	pool sql.Executor
 }
 
 func (process *ProfileChecker) ProcessTask(ctx context.Context, t *asynq.Task) error {
@@ -75,6 +75,6 @@ func (process *ProfileChecker) ProcessTask(ctx context.Context, t *asynq.Task) e
 	return nil
 }
 
-func NewProfileProcessor(pool sqlrepo.SqlExecutor) *ProfileChecker {
+func NewProfileProcessor(pool sql.Executor) *ProfileChecker {
 	return &ProfileChecker{pool: pool}
 }

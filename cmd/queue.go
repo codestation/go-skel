@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/viper"
 	"megpoid.dev/go/go-skel/app/tasks"
 	"megpoid.dev/go/go-skel/config"
-	"megpoid.dev/go/go-skel/repository/sqlrepo"
+	"megpoid.dev/go/go-skel/pkg/sql"
 )
 
 // migrateCmd represents the migrate command
@@ -25,13 +25,13 @@ var queueCmd = &cobra.Command{
 		}
 
 		// Database initialization
-		pool, err := sqlrepo.NewConnection(cfg.SqlSettings)
+		pool, err := sql.NewConnection(cfg.SqlSettings)
 		if err != nil {
 			return err
 		}
 		defer pool.Close()
 
-		conn := sqlrepo.NewPgxWrapper(pool)
+		conn := sql.NewPgxWrapper(pool)
 
 		queue := asynq.NewServer(
 			asynq.RedisClientOpt{Addr: cfg.GeneralSettings.RedisAddr},

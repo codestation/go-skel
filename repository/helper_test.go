@@ -11,14 +11,14 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"megpoid.dev/go/go-skel/config"
-	"megpoid.dev/go/go-skel/repository/sqlrepo"
+	"megpoid.dev/go/go-skel/pkg/sql"
 	"megpoid.dev/go/go-skel/test"
 )
 
 type Connection struct {
-	db              sqlrepo.SqlDb
-	store           sqlrepo.SqlExecutor
-	tx              sqlrepo.SqlTransactor
+	db              sql.Database
+	store           sql.Executor
+	tx              sql.Transactor
 	withTransaction bool
 }
 
@@ -52,12 +52,12 @@ func (c *Connection) setupDatabase(t *testing.T) {
 		cfg.SqlSettings.DataSourceName = dsn
 	}
 
-	conn, err := sqlrepo.NewConnection(cfg.SqlSettings)
+	conn, err := sql.NewConnection(cfg.SqlSettings)
 	if err != nil {
 		assert.FailNowf(t, "Failed to create database Connection", err.Error())
 	}
 
-	c.db = sqlrepo.NewPgxWrapper(conn)
+	c.db = sql.NewPgxWrapper(conn)
 
 	if c.withTransaction {
 		// create a new transaction so a test doesn't interfere with another
@@ -74,7 +74,7 @@ func (c *Connection) setupDatabase(t *testing.T) {
 	}
 }
 
-func (c *Connection) seedDatabase(t *testing.T, conn sqlrepo.SqlExecutor) {
+func (c *Connection) seedDatabase(t *testing.T, conn sql.Executor) {
 	assets := test.Assets()
 	data, err := assets.ReadFile("seed/base.sql")
 	if err != nil {
@@ -92,15 +92,15 @@ type fakeDatabase struct {
 	Result *fakeSqlResult
 }
 
-func (d fakeDatabase) BeginFunc(ctx context.Context, f func(conn sqlrepo.SqlExecutor) error) error {
+func (d fakeDatabase) BeginFunc(ctx context.Context, f func(conn sql.Executor) error) error {
 	return d.Error
 }
 
-func (d fakeDatabase) Begin(ctx context.Context) (*sqlrepo.PgxTxWrapper, error) {
+func (d fakeDatabase) Begin(ctx context.Context) (*sql.PgxTxWrapper, error) {
 	return nil, d.Error
 }
 
-func (d fakeDatabase) Exec(ctx context.Context, query string, arguments ...any) (sqlrepo.Result, error) {
+func (d fakeDatabase) Exec(ctx context.Context, query string, arguments ...any) (sql.Result, error) {
 	if d.Result != nil {
 		return d.Result, nil
 	}
@@ -115,7 +115,7 @@ func (d fakeDatabase) Select(ctx context.Context, dest any, query string, args .
 	return d.Error
 }
 
-var _ sqlrepo.SqlExecutor = &fakeDatabase{}
+var _ sql.Executor = &fakeDatabase{}
 
 type fakeSqlResult struct {
 	Error error
@@ -129,4 +129,4 @@ func (f fakeSqlResult) RowsAffected() (int64, error) {
 	return 0, f.Error
 }
 
-var _ sqlrepo.Result = &fakeSqlResult{}
+var _ sql.Result = &fakeSqlResult{}

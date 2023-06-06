@@ -7,14 +7,14 @@ package repository
 import (
 	"context"
 
-	"megpoid.dev/go/go-skel/repository/sqlrepo"
+	"megpoid.dev/go/go-skel/pkg/sql"
 )
 
 type HealthcheckRepoImpl struct {
-	db sqlrepo.SqlPinger
+	db sql.Pinger
 }
 
-func NewHealthcheckRepo(conn sqlrepo.SqlPinger) HealthcheckRepo {
+func NewHealthcheckRepo(conn sql.Pinger) HealthcheckRepo {
 	s := &HealthcheckRepoImpl{
 		db: conn,
 	}

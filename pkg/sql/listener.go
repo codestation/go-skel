@@ -1,4 +1,4 @@
-package sqlrepo
+package sql
 
 import (
 	"context"

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT-license
 // that can be found in the LICENSE file.
 
-package sqlrepo
+package sql
 
 import (
 	"context"
@@ -30,8 +30,8 @@ const (
 
 // compile time validator for the interfaces
 var (
-	_ SqlExecutor = PgxWrapper{}
-	_ SqlExecutor = PgxTxWrapper{}
+	_ Executor = PgxWrapper{}
+	_ Executor = PgxTxWrapper{}
 
 	ErrNoRows = pgx.ErrNoRows
 )
@@ -40,7 +40,7 @@ type PgxWrapper struct {
 	pool *pgxpool.Pool
 }
 
-func (p PgxWrapper) BeginFunc(ctx context.Context, f func(conn SqlExecutor) error) error {
+func (p PgxWrapper) BeginFunc(ctx context.Context, f func(conn Executor) error) error {
 	return pgx.BeginFunc(ctx, p.pool, func(tx pgx.Tx) error {
 		return f(newPgxTxWrapper(tx))
 	})
@@ -83,7 +83,7 @@ type PgxTxWrapper struct {
 	tx pgx.Tx
 }
 
-func (p PgxTxWrapper) BeginFunc(ctx context.Context, f func(conn SqlExecutor) error) error {
+func (p PgxTxWrapper) BeginFunc(ctx context.Context, f func(conn Executor) error) error {
 	return pgx.BeginFunc(ctx, p.tx, func(tx pgx.Tx) error {
 		return f(PgxTxWrapper{tx})
 	})
@@ -224,7 +224,7 @@ func WithConstraintName(name string) Option {
 }
 
 //go:generate go run github.com/vektra/mockery/v2@v2.23.1 --name Querier
-//go:generate go run github.com/vektra/mockery/v2@v2.23.1 --srcpkg github.com/jackc/pgx/v5 --inpackage=false --output . --outpkg=sqlrepo --filename=rows_mock.go --name Rows --structname MockRows
+//go:generate go run github.com/vektra/mockery/v2@v2.23.1 --srcpkg github.com/jackc/pgx/v5 --inpackage=false --output . --outpkg=sql --filename=rows_mock.go --name Rows --structname MockRows
 type Querier interface {
 	Query(ctx context.Context, query string, args ...interface{}) (pgx.Rows, error)
 }

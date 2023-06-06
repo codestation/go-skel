@@ -21,15 +21,15 @@ import (
 	"megpoid.dev/go/go-skel/config"
 	"megpoid.dev/go/go-skel/oapi"
 	"megpoid.dev/go/go-skel/pkg/i18n"
+	"megpoid.dev/go/go-skel/pkg/sql"
 	"megpoid.dev/go/go-skel/repository"
-	"megpoid.dev/go/go-skel/repository/sqlrepo"
 	"megpoid.dev/go/go-skel/repository/uow"
 	"megpoid.dev/go/go-skel/web"
 )
 
 type App struct {
 	cfg        *config.Config
-	conn       sqlrepo.SqlDb
+	conn       sql.Database
 	Server     *http.Server
 	EchoServer *echo.Echo
 }
@@ -38,12 +38,12 @@ func NewApp(cfg *config.Config) (*App, error) {
 	s := &App{cfg: cfg}
 
 	// Database initialization
-	pool, err := sqlrepo.NewConnection(cfg.SqlSettings)
+	pool, err := sql.NewConnection(cfg.SqlSettings)
 	if err != nil {
 		return nil, err
 	}
 
-	s.conn = sqlrepo.NewPgxWrapper(pool)
+	s.conn = sql.NewPgxWrapper(pool)
 
 	// Repository initialization
 	healthcheckRepo := repository.NewHealthcheckRepo(s.conn)

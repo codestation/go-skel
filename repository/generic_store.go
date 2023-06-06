@@ -15,8 +15,8 @@ import (
 	"megpoid.dev/go/go-skel/pkg/clause"
 	"megpoid.dev/go/go-skel/pkg/paginator"
 	"megpoid.dev/go/go-skel/pkg/response"
+	"megpoid.dev/go/go-skel/pkg/sql"
 	"megpoid.dev/go/go-skel/repository/filter"
-	"megpoid.dev/go/go-skel/repository/sqlrepo"
 )
 
 // compile time validator for the interfaces
@@ -27,7 +27,7 @@ var (
 type AttachFunc[T model.Modelable] func(ctx context.Context, results []T, include string) error
 
 type GenericStoreImpl[T model.Modelable] struct {
-	db             sqlrepo.SqlExecutor
+	db             sql.Executor
 	builder        goqu.DialectWrapper
 	prefix         string
 	table          string
@@ -84,9 +84,9 @@ func WithTablePrefix[T model.Modelable](prefix string) StoreOption[T] {
 	}
 }
 
-func NewStore[T model.Modelable](conn sqlrepo.SqlExecutor, opts ...StoreOption[T]) *GenericStoreImpl[T] {
+func NewStore[T model.Modelable](conn sql.Executor, opts ...StoreOption[T]) *GenericStoreImpl[T] {
 	st := &GenericStoreImpl[T]{db: conn}
-	st.builder = sqlrepo.NewQueryBuilder()
+	st.builder = sql.NewQueryBuilder()
 	var defaults []StoreOption[T]
 	defaults = append(defaults, WithSelectFields[T]("*"))
 	for _, opt := range append(defaults, opts...) {
@@ -124,21 +124,21 @@ func (s *GenericStoreImpl[T]) Get(ctx context.Context, id model.ID) (T, error) {
 }
 
 func (s *GenericStoreImpl[T]) GetBy(ctx context.Context, expr Expr) (T, error) {
-	query := s.builder.From(s.table).Select(s.selectFields...).Where(goqu.Ex(expr))
+	queryBuilder := s.builder.From(s.table).Select(s.selectFields...).Where(goqu.Ex(expr))
 	if s.defaultFilters != nil && !s.defaultFilters.IsEmpty() {
-		query = query.Where(s.defaultFilters)
+		queryBuilder = queryBuilder.Where(s.defaultFilters)
 	}
 
-	sql, args, err := query.Prepared(true).ToSQL()
+	query, args, err := queryBuilder.Prepared(true).ToSQL()
 	if err != nil {
 		return s.zero(), NewRepoError(ErrBackend, err)
 	}
 
 	result := s.new()
-	err = s.db.Get(ctx, result, sql, args...)
+	err = s.db.Get(ctx, result, query, args...)
 
 	switch {
-	case errors.Is(err, sqlrepo.ErrNoRows):
+	case errors.Is(err, sql.ErrNoRows):
 		return s.zero(), nil
 	case err != nil:
 		return s.zero(), NewRepoError(ErrBackend, err)
@@ -169,7 +169,7 @@ func (s *GenericStoreImpl[T]) ListBy(ctx context.Context, expr Expr, opts ...cla
 	cur, err := cl.ApplyFilters(ctx, s.db, query, &results)
 
 	switch {
-	case errors.Is(err, sqlrepo.ErrNoRows):
+	case errors.Is(err, sql.ErrNoRows):
 		return response.NewListResponse[T](results, cur), nil
 	case err != nil:
 		return nil, NewRepoError(ErrBackend, err)
@@ -225,18 +225,18 @@ func (s *GenericStoreImpl[T]) ListByEach(ctx context.Context, expr Expr, fn func
 }
 
 func (s *GenericStoreImpl[T]) Save(ctx context.Context, req T) error {
-	query := s.builder.Insert(s.table).Rows(req).Returning("id")
+	queryBuilder := s.builder.Insert(s.table).Rows(req).Returning("id")
 
-	sql, args, err := query.Prepared(true).ToSQL()
+	query, args, err := queryBuilder.Prepared(true).ToSQL()
 	if err != nil {
 		return NewRepoError(ErrBackend, err)
 	}
 
 	var id model.ID
-	err = s.db.Get(ctx, &id, sql, args...)
+	err = s.db.Get(ctx, &id, query, args...)
 
 	if err != nil {
-		if sqlrepo.IsUniqueError(err) {
+		if sql.IsUniqueError(err) {
 			return NewRepoError(ErrDuplicated, err)
 		}
 		return NewRepoError(ErrBackend, err)
@@ -302,9 +302,9 @@ func (s *GenericStoreImpl[T]) UpdateMap(ctx context.Context, id model.ID, req ma
 func (s *GenericStoreImpl[T]) Upsert(ctx context.Context, req T, target string) (bool, error) {
 	conflict := exp.NewDoUpdateConflictExpression(target, req)
 	inserted := goqu.Case().When(goqu.L("xmax::text::int").Gt(0), "updated").Else("inserted").As("upsert_status")
-	query := s.builder.Insert(s.table).Rows(req).Returning("id", inserted).OnConflict(conflict)
+	queryBuilder := s.builder.Insert(s.table).Rows(req).Returning("id", inserted).OnConflict(conflict)
 
-	sql, args, err := query.Prepared(true).ToSQL()
+	query, args, err := queryBuilder.Prepared(true).ToSQL()
 	if err != nil {
 		return false, NewRepoError(ErrBackend, err)
 	}
@@ -314,10 +314,10 @@ func (s *GenericStoreImpl[T]) Upsert(ctx context.Context, req T, target string) 
 		UpsertStatus string   `db:"upsert_status"`
 	}{}
 
-	err = s.db.Get(ctx, &result, sql, args...)
+	err = s.db.Get(ctx, &result, query, args...)
 
 	if err != nil {
-		if sqlrepo.IsUniqueError(err) {
+		if sql.IsUniqueError(err) {
 			return false, NewRepoError(ErrDuplicated, err)
 		}
 		return false, NewRepoError(ErrBackend, err)

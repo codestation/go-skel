@@ -14,6 +14,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"megpoid.dev/go/go-skel/config"
+	"megpoid.dev/go/go-skel/pkg/sql"
 	"megpoid.dev/go/go-skel/repository/sqlrepo"
 )
 
@@ -34,7 +35,7 @@ var migrateCmd = &cobra.Command{
 		quit := make(chan os.Signal, 1)
 
 		// Database initialization
-		pool, err := sqlrepo.NewConnection(cfg.SqlSettings)
+		pool, err := sql.NewConnection(cfg.SqlSettings)
 		if err != nil {
 			return err
 		}

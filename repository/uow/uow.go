@@ -7,8 +7,8 @@ package uow
 import (
 	"context"
 
+	"megpoid.dev/go/go-skel/pkg/sql"
 	"megpoid.dev/go/go-skel/repository"
-	"megpoid.dev/go/go-skel/repository/sqlrepo"
 )
 
 //go:generate go run github.com/vektra/mockery/v2@v2.23.1 --name UnitOfWorkStore
@@ -21,7 +21,7 @@ type uowStore struct {
 	profiles repository.ProfileRepo
 }
 
-func newUowStore(conn sqlrepo.SqlExecutor) *uowStore {
+func newUowStore(conn sql.Executor) *uowStore {
 	return &uowStore{
 		profiles: repository.NewProfileRepo(conn),
 	}
@@ -40,11 +40,11 @@ type UnitOfWork interface {
 }
 
 type unitOfWork struct {
-	conn  sqlrepo.SqlConnector
+	conn  sql.Connector
 	store *uowStore
 }
 
-func New(conn sqlrepo.SqlConnector) UnitOfWork {
+func New(conn sql.Connector) UnitOfWork {
 	return &unitOfWork{
 		conn:  conn,
 		store: newUowStore(conn),
@@ -56,7 +56,7 @@ func (u *unitOfWork) Store() UnitOfWorkStore {
 }
 
 func (u *unitOfWork) Do(ctx context.Context, fn UnitOfWorkBlock) error {
-	err := u.conn.BeginFunc(ctx, func(conn sqlrepo.SqlExecutor) error {
+	err := u.conn.BeginFunc(ctx, func(conn sql.Executor) error {
 		uows := newUowStore(conn)
 		if err := fn(uows); err != nil {
 			return err
