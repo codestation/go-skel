@@ -8,9 +8,9 @@ import (
 	"context"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
-	"megpoid.dev/go/go-skel/config"
 	"megpoid.dev/go/go-skel/pkg/sql"
 	"megpoid.dev/go/go-skel/test"
 )
@@ -43,16 +43,19 @@ func (c *Connection) Close(t *testing.T) {
 func (c *Connection) setupDatabase(t *testing.T) {
 	t.Helper()
 
-	cfg, err := config.NewConfig()
-	if err != nil {
-		assert.FailNowf(t, "Cannot load settings", err.Error())
+	cfg := sql.Config{
+		DataSourceName:  "postgres://goapp:secret@localhost/goapp?sslmode=disable",
+		ConnMaxLifetime: 1 * time.Hour,
+		ConnMaxIdleTime: 5 * time.Minute,
+		MaxOpenConns:    10,
+		MaxIdleConns:    1,
 	}
 
 	if dsn, ok := os.LookupEnv("APP_DSN"); ok {
-		cfg.DatabaseSettings.DataSourceName = dsn
+		cfg.DataSourceName = dsn
 	}
 
-	conn, err := sql.NewConnection(cfg.DatabaseSettings)
+	conn, err := sql.NewConnection(cfg)
 	if err != nil {
 		assert.FailNowf(t, "Failed to create database Connection", err.Error())
 	}

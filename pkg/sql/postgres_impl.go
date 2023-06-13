@@ -19,7 +19,6 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/jackc/pgx/v5/stdlib"
-	"megpoid.dev/go/go-skel/config"
 )
 
 const (
@@ -142,16 +141,25 @@ func newPgxTxWrapper(tx pgx.Tx) *PgxTxWrapper {
 	return &PgxTxWrapper{tx}
 }
 
-func NewConnection(settings config.DatabaseSettings) (*pgxpool.Pool, error) {
-	parseConfig, err := pgxpool.ParseConfig(settings.DataSourceName)
+type Config struct {
+	DataSourceName  string
+	MaxIdleConns    int
+	MaxOpenConns    int
+	ConnMaxLifetime time.Duration
+	ConnMaxIdleTime time.Duration
+	QueryLimit      uint
+}
+
+func NewConnection(config Config) (*pgxpool.Pool, error) {
+	parseConfig, err := pgxpool.ParseConfig(config.DataSourceName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to configure database, aborting: %w", err)
 	}
 
-	parseConfig.MaxConnLifetime = settings.ConnMaxLifetime
-	parseConfig.MaxConnIdleTime = settings.ConnMaxIdleTime
-	parseConfig.MaxConns = int32(settings.MaxOpenConns)
-	parseConfig.MinConns = int32(settings.MaxIdleConns)
+	parseConfig.MaxConnLifetime = config.ConnMaxLifetime
+	parseConfig.MaxConnIdleTime = config.ConnMaxIdleTime
+	parseConfig.MaxConns = int32(config.MaxOpenConns)
+	parseConfig.MinConns = int32(config.MaxIdleConns)
 
 	pool, err := pgxpool.NewWithConfig(context.Background(), parseConfig)
 	if err != nil {

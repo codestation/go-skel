@@ -27,6 +27,10 @@ import (
 	"megpoid.dev/go/go-skel/web"
 )
 
+const (
+	shutdownTimeout = 30 * time.Second
+)
+
 type App struct {
 	cfg        *config.Config
 	conn       sql.Database
@@ -38,7 +42,7 @@ func NewApp(cfg *config.Config) (*App, error) {
 	s := &App{cfg: cfg}
 
 	// Database initialization
-	pool, err := sql.NewConnection(cfg.DatabaseSettings)
+	pool, err := sql.NewConnection(sql.Config(cfg.DatabaseSettings))
 	if err != nil {
 		return nil, err
 	}
@@ -108,10 +112,6 @@ func NewApp(cfg *config.Config) (*App, error) {
 
 	return s, nil
 }
-
-const (
-	shutdownTimeout = 30 * time.Second
-)
 
 func (s *App) Start() error {
 	s.Server = &http.Server{

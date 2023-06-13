@@ -167,7 +167,6 @@ func (cfg *ServerSettings) Validate() error {
 }
 
 type DatabaseSettings struct {
-	DriverName      string        `mapstructure:"driver"`
 	DataSourceName  string        `mapstructure:"dsn"`
 	MaxIdleConns    int           `mapstructure:"max-idle-conns"`
 	MaxOpenConns    int           `mapstructure:"max-open-conns"`
@@ -177,9 +176,6 @@ type DatabaseSettings struct {
 }
 
 func (cfg *DatabaseSettings) SetDefaults() {
-	if cfg.DriverName == "" {
-		cfg.DriverName = DefaultDriverName
-	}
 	if cfg.DataSourceName == "" {
 		cfg.DataSourceName = DefaultDataSourceName
 	}

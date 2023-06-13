@@ -25,7 +25,14 @@ var queueCmd = &cobra.Command{
 		}
 
 		// Database initialization
-		pool, err := sql.NewConnection(cfg.DatabaseSettings)
+		pool, err := sql.NewConnection(sql.Config{
+			DataSourceName:  cfg.DatabaseSettings.DataSourceName,
+			MaxIdleConns:    cfg.DatabaseSettings.MaxIdleConns,
+			MaxOpenConns:    cfg.DatabaseSettings.MaxOpenConns,
+			ConnMaxLifetime: cfg.DatabaseSettings.ConnMaxLifetime,
+			ConnMaxIdleTime: cfg.DatabaseSettings.ConnMaxIdleTime,
+			QueryLimit:      cfg.DatabaseSettings.QueryLimit,
+		})
 		if err != nil {
 			return err
 		}
