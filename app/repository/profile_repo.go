@@ -17,7 +17,7 @@ type ProfileRepoImpl struct {
 	*repo.GenericStoreImpl[*model.Profile]
 }
 
-func NewProfileRepo(conn sql.Executor) ProfileRepo {
+func NewProfileRepo(conn sql.Executor) *ProfileRepoImpl {
 	s := &ProfileRepoImpl{
 		GenericStoreImpl: repo.NewStore(conn, repo.WithFilters[*model.Profile](
 			filter.Rule{

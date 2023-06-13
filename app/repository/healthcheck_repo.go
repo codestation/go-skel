@@ -15,7 +15,7 @@ type HealthcheckRepoImpl struct {
 	db sql.Pinger
 }
 
-func NewHealthcheckRepo(conn sql.Pinger) HealthcheckRepo {
+func NewHealthcheckRepo(conn sql.Pinger) *HealthcheckRepoImpl {
 	s := &HealthcheckRepoImpl{
 		db: conn,
 	}
