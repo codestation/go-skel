@@ -59,7 +59,7 @@ func (s *userStore) Attach(ctx context.Context, results []*testUser, relation st
 	var err error
 	switch relation {
 	case "profile":
-		err = attachRelation(ctx, results,
+		err = AttachRelation(ctx, results,
 			func(m *testUser) *int64 { return model.NewType(m.ProfileID) },
 			func(m *testUser, r *testProfile) { m.AttachProfile(r) },
 			s.profile.ListByIds)

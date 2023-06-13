@@ -11,7 +11,7 @@ import (
 	"megpoid.dev/go/go-skel/pkg/response"
 )
 
-func attachRelation[T, U model.Modelable](
+func AttachRelation[T, U model.Modelable](
 	ctx context.Context,
 	entries []T,
 	getRelationId func(m T) *int64,
