@@ -51,12 +51,3 @@ func TestModelName(t *testing.T) {
 	name = GetModelName(LocalCompany{})
 	assert.Equal(t, "LocalCompany", name)
 }
-
-func TestNewType(t *testing.T) {
-	intVal := 1
-	value := NewType(intVal)
-	var intPointer *int
-	assert.IsType(t, intPointer, value)
-	assert.Equal(t, 1, *value)
-	assert.NotEqual(t, &intVal, intPointer)
-}

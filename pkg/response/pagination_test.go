@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"megpoid.dev/go/go-skel/pkg/model"
+	"megpoid.dev/go/go-skel/pkg/types"
 )
 
 func TestMetaEmpty(t *testing.T) {
@@ -21,7 +21,7 @@ func TestMetaCursor(t *testing.T) {
 	meta := Pagination{
 		Type: "cursor",
 		PaginationCursor: PaginationCursor{
-			NextCursor: model.NewType("cursor"),
+			NextCursor: types.AsPointer("cursor"),
 		},
 	}
 
@@ -44,10 +44,10 @@ func TestMetaPage(t *testing.T) {
 	meta := Pagination{
 		Type: "page",
 		PaginationOffset: PaginationOffset{
-			CurrentPage:    model.NewType(1),
-			MaxPage:        model.NewType(2),
-			TotalRecords:   model.NewType(2),
-			RecordsPerPage: model.NewType(1),
+			CurrentPage:    types.AsPointer(1),
+			MaxPage:        types.AsPointer(2),
+			TotalRecords:   types.AsPointer(2),
+			RecordsPerPage: types.AsPointer(1),
 		},
 	}
 

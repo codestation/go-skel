@@ -9,6 +9,7 @@ import (
 
 	"megpoid.dev/go/go-skel/pkg/model"
 	"megpoid.dev/go/go-skel/pkg/paginator"
+	"megpoid.dev/go/go-skel/pkg/types"
 )
 
 type ListResponse[T model.Modelable] struct {
@@ -37,10 +38,10 @@ func NewListResponse[T model.Modelable](results []T, c *paginator.Cursor) *ListR
 			Pagination: Pagination{
 				Type: string(c.Type()),
 				PaginationOffset: PaginationOffset{
-					TotalRecords:   model.NewType(off.Total),
-					CurrentPage:    model.NewType(off.Page),
-					MaxPage:        model.NewType(int(math.Ceil(float64(off.Total) / float64(off.ItemsPerPage)))),
-					RecordsPerPage: model.NewType(off.ItemsPerPage),
+					TotalRecords:   types.AsPointer(off.Total),
+					CurrentPage:    types.AsPointer(off.Page),
+					MaxPage:        types.AsPointer(int(math.Ceil(float64(off.Total) / float64(off.ItemsPerPage)))),
+					RecordsPerPage: types.AsPointer(off.ItemsPerPage),
 				},
 			},
 		}

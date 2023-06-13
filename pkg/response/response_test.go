@@ -11,6 +11,7 @@ import (
 	"megpoid.dev/go/go-skel/pkg/model"
 	"megpoid.dev/go/go-skel/pkg/paginator"
 	"megpoid.dev/go/go-skel/pkg/paginator/cursor"
+	"megpoid.dev/go/go-skel/pkg/types"
 )
 
 type Profile struct {
@@ -29,8 +30,8 @@ func TestNewListResponseCursor(t *testing.T) {
 
 	cur := &paginator.Cursor{}
 	cur.SetCursor(&cursor.Cursor{
-		After:  model.NewType("after"),
-		Before: model.NewType("before"),
+		After:  types.AsPointer("after"),
+		Before: types.AsPointer("before"),
 	})
 
 	response := NewListResponse(results, cur)

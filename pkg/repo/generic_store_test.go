@@ -16,6 +16,7 @@ import (
 	"megpoid.dev/go/go-skel/pkg/clause"
 	"megpoid.dev/go/go-skel/pkg/model"
 	"megpoid.dev/go/go-skel/pkg/paginator"
+	"megpoid.dev/go/go-skel/pkg/types"
 )
 
 type testProfile struct {
@@ -60,7 +61,7 @@ func (s *userStore) Attach(ctx context.Context, results []*testUser, relation st
 	switch relation {
 	case "profile":
 		err = AttachRelation(ctx, results,
-			func(m *testUser) *int64 { return model.NewType(m.ProfileID) },
+			func(m *testUser) *int64 { return types.AsPointer(m.ProfileID) },
 			func(m *testUser, r *testProfile) { m.AttachProfile(r) },
 			s.profile.ListByIds)
 	}

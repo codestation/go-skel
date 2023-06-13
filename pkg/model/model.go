@@ -90,7 +90,3 @@ func NewModel(opts ...Option) Model {
 
 	return e
 }
-
-func NewType[T any](v T) *T {
-	return &v
-}
