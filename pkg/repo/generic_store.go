@@ -27,10 +27,10 @@ var (
 type AttachFunc[T model.Modelable] func(ctx context.Context, results []T, include string) error
 
 type GenericStoreImpl[T model.Modelable] struct {
-	db             sql.Executor
-	builder        goqu.DialectWrapper
+	Conn           sql.Executor
+	Builder        goqu.DialectWrapper
+	Table          string
 	prefix         string
-	table          string
 	selectFields   []any
 	defaultFilters exp.ExpressionList
 	sortKeys       []string
@@ -85,15 +85,15 @@ func WithTablePrefix[T model.Modelable](prefix string) StoreOption[T] {
 }
 
 func NewStore[T model.Modelable](conn sql.Executor, opts ...StoreOption[T]) *GenericStoreImpl[T] {
-	st := &GenericStoreImpl[T]{db: conn}
-	st.builder = sql.NewQueryBuilder()
+	st := &GenericStoreImpl[T]{Conn: conn}
+	st.Builder = sql.NewQueryBuilder()
 	var defaults []StoreOption[T]
 	defaults = append(defaults, WithSelectFields[T]("*"))
 	for _, opt := range append(defaults, opts...) {
 		opt(st)
 	}
 
-	st.table = st.prefix + model.GetTableName[T](*new(T))
+	st.Table = st.prefix + model.GetTableName[T](*new(T))
 	return st
 }
 
@@ -124,7 +124,7 @@ func (s *GenericStoreImpl[T]) Get(ctx context.Context, id int64) (T, error) {
 }
 
 func (s *GenericStoreImpl[T]) GetBy(ctx context.Context, expr Expr) (T, error) {
-	queryBuilder := s.builder.From(s.table).Select(s.selectFields...).Where(goqu.Ex(expr))
+	queryBuilder := s.Builder.From(s.Table).Select(s.selectFields...).Where(goqu.Ex(expr))
 	if s.defaultFilters != nil && !s.defaultFilters.IsEmpty() {
 		queryBuilder = queryBuilder.Where(s.defaultFilters)
 	}
@@ -135,7 +135,7 @@ func (s *GenericStoreImpl[T]) GetBy(ctx context.Context, expr Expr) (T, error) {
 	}
 
 	result := s.new()
-	err = s.db.Get(ctx, result, query, args...)
+	err = s.Conn.Get(ctx, result, query, args...)
 
 	switch {
 	case errors.Is(err, sql.ErrNoRows):
@@ -152,7 +152,7 @@ func (s *GenericStoreImpl[T]) List(ctx context.Context, opts ...clause.FilterOpt
 }
 
 func (s *GenericStoreImpl[T]) ListBy(ctx context.Context, expr Expr, opts ...clause.FilterOption) (*response.ListResponse[T], error) {
-	query := s.builder.From(s.table).Select(s.selectFields...).Where(goqu.Ex(expr))
+	query := s.Builder.From(s.Table).Select(s.selectFields...).Where(goqu.Ex(expr))
 	if s.defaultFilters != nil {
 		query = query.Where(s.defaultFilters)
 	}
@@ -166,7 +166,7 @@ func (s *GenericStoreImpl[T]) ListBy(ctx context.Context, expr Expr, opts ...cla
 	cl.ApplyOptions(opts...)
 
 	results := make([]T, 0)
-	cur, err := cl.ApplyFilters(ctx, s.db, query, &results)
+	cur, err := cl.ApplyFilters(ctx, s.Conn, query, &results)
 
 	switch {
 	case errors.Is(err, sql.ErrNoRows):
@@ -225,7 +225,7 @@ func (s *GenericStoreImpl[T]) ListByEach(ctx context.Context, expr Expr, fn func
 }
 
 func (s *GenericStoreImpl[T]) Save(ctx context.Context, req T) error {
-	queryBuilder := s.builder.Insert(s.table).Rows(req).Returning("id")
+	queryBuilder := s.Builder.Insert(s.Table).Rows(req).Returning("id")
 
 	query, args, err := queryBuilder.Prepared(true).ToSQL()
 	if err != nil {
@@ -233,7 +233,7 @@ func (s *GenericStoreImpl[T]) Save(ctx context.Context, req T) error {
 	}
 
 	var id int64
-	err = s.db.Get(ctx, &id, query, args...)
+	err = s.Conn.Get(ctx, &id, query, args...)
 
 	if err != nil {
 		if sql.IsUniqueError(err) {
@@ -248,14 +248,14 @@ func (s *GenericStoreImpl[T]) Save(ctx context.Context, req T) error {
 }
 
 func (s *GenericStoreImpl[T]) Update(ctx context.Context, req T) error {
-	query := s.builder.Update(s.table).Set(req).Where(goqu.Ex{"id": req.GetID()})
+	query := s.Builder.Update(s.Table).Set(req).Where(goqu.Ex{"id": req.GetID()})
 
 	sql, args, err := query.Prepared(true).ToSQL()
 	if err != nil {
 		return NewRepoError(ErrBackend, err)
 	}
 
-	result, err := s.db.Exec(ctx, sql, args...)
+	result, err := s.Conn.Exec(ctx, sql, args...)
 
 	if err != nil {
 		return NewRepoError(ErrBackend, err)
@@ -274,14 +274,14 @@ func (s *GenericStoreImpl[T]) Update(ctx context.Context, req T) error {
 }
 
 func (s *GenericStoreImpl[T]) UpdateMap(ctx context.Context, id int64, req map[string]any) error {
-	query := s.builder.Update(s.table).Set(req).Where(goqu.Ex{"id": id})
+	query := s.Builder.Update(s.Table).Set(req).Where(goqu.Ex{"id": id})
 
 	sql, args, err := query.Prepared(true).ToSQL()
 	if err != nil {
 		return NewRepoError(ErrBackend, err)
 	}
 
-	result, err := s.db.Exec(ctx, sql, args...)
+	result, err := s.Conn.Exec(ctx, sql, args...)
 
 	if err != nil {
 		return NewRepoError(ErrBackend, err)
@@ -302,7 +302,7 @@ func (s *GenericStoreImpl[T]) UpdateMap(ctx context.Context, id int64, req map[s
 func (s *GenericStoreImpl[T]) Upsert(ctx context.Context, req T, target string) (bool, error) {
 	conflict := exp.NewDoUpdateConflictExpression(target, req)
 	inserted := goqu.Case().When(goqu.L("xmax::text::int").Gt(0), "updated").Else("inserted").As("upsert_status")
-	queryBuilder := s.builder.Insert(s.table).Rows(req).Returning("id", inserted).OnConflict(conflict)
+	queryBuilder := s.Builder.Insert(s.Table).Rows(req).Returning("id", inserted).OnConflict(conflict)
 
 	query, args, err := queryBuilder.Prepared(true).ToSQL()
 	if err != nil {
@@ -314,7 +314,7 @@ func (s *GenericStoreImpl[T]) Upsert(ctx context.Context, req T, target string) 
 		UpsertStatus string `db:"upsert_status"`
 	}{}
 
-	err = s.db.Get(ctx, &result, query, args...)
+	err = s.Conn.Get(ctx, &result, query, args...)
 
 	if err != nil {
 		if sql.IsUniqueError(err) {
@@ -339,14 +339,14 @@ func (s *GenericStoreImpl[T]) Delete(ctx context.Context, id int64) error {
 }
 
 func (s *GenericStoreImpl[T]) DeleteBy(ctx context.Context, expr Expr) (int64, error) {
-	query := s.builder.Delete(s.table).Where(goqu.Ex(expr))
+	query := s.Builder.Delete(s.Table).Where(goqu.Ex(expr))
 
 	sql, args, err := query.Prepared(true).ToSQL()
 	if err != nil {
 		return 0, NewRepoError(ErrBackend, err)
 	}
 
-	result, err := s.db.Exec(ctx, sql, args...)
+	result, err := s.Conn.Exec(ctx, sql, args...)
 	if err != nil {
 		return 0, NewRepoError(ErrBackend, err)
 	}

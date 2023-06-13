@@ -88,7 +88,7 @@ func (s *storeSuite) TearDownTest() {
 
 func (s *storeSuite) TestNewStore() {
 	st := NewStore[*testUser](s.conn.Store)
-	s.Equal("test_users", st.table)
+	s.Equal("test_users", st.Table)
 	s.Equal([]any{"*"}, st.selectFields)
 }
 
@@ -426,5 +426,5 @@ func (s *storeSuite) TestEmptyResult() {
 
 func (s *storeSuite) TestPrefix() {
 	st := NewStore[*testUser](s.conn.Store, WithTablePrefix[*testUser]("app_"))
-	s.Equal("app_test_users", st.table)
+	s.Equal("app_test_users", st.Table)
 }
