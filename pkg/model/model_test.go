@@ -30,11 +30,11 @@ func NewLocalCompany(opts ...Option) *LocalCompany {
 
 func TestNewModel(t *testing.T) {
 	now := time.Now()
-	model := NewLocalCompany(WithTime(now))
-	model.SetID(1)
-	assert.Equal(t, model.CreatedAt, now)
-	assert.Equal(t, model.UpdatedAt, now)
-	assert.Equal(t, ID(1), model.GetID())
+	m := NewLocalCompany(WithTime(now))
+	m.SetID(1)
+	assert.Equal(t, m.CreatedAt, now)
+	assert.Equal(t, m.UpdatedAt, now)
+	assert.Equal(t, int64(1), m.GetID())
 }
 
 func TestTableName(t *testing.T) {
@@ -50,4 +50,13 @@ func TestModelName(t *testing.T) {
 	assert.Equal(t, "LocalCompany", name)
 	name = GetModelName(LocalCompany{})
 	assert.Equal(t, "LocalCompany", name)
+}
+
+func TestNewType(t *testing.T) {
+	intVal := 1
+	value := NewType(intVal)
+	var intPointer *int
+	assert.IsType(t, intPointer, value)
+	assert.Equal(t, 1, *value)
+	assert.NotEqual(t, &intVal, intPointer)
 }

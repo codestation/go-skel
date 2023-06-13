@@ -11,8 +11,8 @@ import (
 
 	"github.com/doug-martin/goqu/v9"
 	"github.com/doug-martin/goqu/v9/exp"
-	"megpoid.dev/go/go-skel/app/model"
 	"megpoid.dev/go/go-skel/pkg/clause"
+	"megpoid.dev/go/go-skel/pkg/model"
 	"megpoid.dev/go/go-skel/pkg/paginator"
 	"megpoid.dev/go/go-skel/pkg/repo/filter"
 	"megpoid.dev/go/go-skel/pkg/response"
@@ -110,7 +110,7 @@ func (s *GenericStoreImpl[T]) AttachFunc(fn AttachFunc[T]) {
 	s.attachFunc = fn
 }
 
-func (s *GenericStoreImpl[T]) Get(ctx context.Context, id model.ID) (T, error) {
+func (s *GenericStoreImpl[T]) Get(ctx context.Context, id int64) (T, error) {
 	result, err := s.GetBy(ctx, Expr{"id": id})
 	if err != nil {
 		return s.zero(), err
@@ -186,7 +186,7 @@ func (s *GenericStoreImpl[T]) ListBy(ctx context.Context, expr Expr, opts ...cla
 	return response.NewListResponse[T](results, cur), nil
 }
 
-func (s *GenericStoreImpl[T]) ListByIds(ctx context.Context, ids []model.ID) (*response.ListResponse[T], error) {
+func (s *GenericStoreImpl[T]) ListByIds(ctx context.Context, ids []int64) (*response.ListResponse[T], error) {
 	return s.ListBy(ctx, Expr{"id": ids})
 }
 
@@ -232,7 +232,7 @@ func (s *GenericStoreImpl[T]) Save(ctx context.Context, req T) error {
 		return NewRepoError(ErrBackend, err)
 	}
 
-	var id model.ID
+	var id int64
 	err = s.db.Get(ctx, &id, query, args...)
 
 	if err != nil {
@@ -273,7 +273,7 @@ func (s *GenericStoreImpl[T]) Update(ctx context.Context, req T) error {
 	return nil
 }
 
-func (s *GenericStoreImpl[T]) UpdateMap(ctx context.Context, id model.ID, req map[string]any) error {
+func (s *GenericStoreImpl[T]) UpdateMap(ctx context.Context, id int64, req map[string]any) error {
 	query := s.builder.Update(s.table).Set(req).Where(goqu.Ex{"id": id})
 
 	sql, args, err := query.Prepared(true).ToSQL()
@@ -310,8 +310,8 @@ func (s *GenericStoreImpl[T]) Upsert(ctx context.Context, req T, target string) 
 	}
 
 	result := struct {
-		ID           model.ID `db:"id"`
-		UpsertStatus string   `db:"upsert_status"`
+		ID           int64  `db:"id"`
+		UpsertStatus string `db:"upsert_status"`
 	}{}
 
 	err = s.db.Get(ctx, &result, query, args...)
@@ -328,7 +328,7 @@ func (s *GenericStoreImpl[T]) Upsert(ctx context.Context, req T, target string) 
 	return result.UpsertStatus == "inserted", nil
 }
 
-func (s *GenericStoreImpl[T]) Delete(ctx context.Context, id model.ID) error {
+func (s *GenericStoreImpl[T]) Delete(ctx context.Context, id int64) error {
 	if n, err := s.DeleteBy(ctx, Expr{"id": id}); err != nil {
 		return err
 	} else if n != 1 {

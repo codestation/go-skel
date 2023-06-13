@@ -27,15 +27,15 @@ func (_m *MockProfile) EXPECT() *MockProfile_Expecter {
 }
 
 // GetProfile provides a mock function with given fields: ctx, id
-func (_m *MockProfile) GetProfile(ctx context.Context, id model.ID) (*model.Profile, error) {
+func (_m *MockProfile) GetProfile(ctx context.Context, id int64) (*model.Profile, error) {
 	ret := _m.Called(ctx, id)
 
 	var r0 *model.Profile
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, model.ID) (*model.Profile, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, int64) (*model.Profile, error)); ok {
 		return rf(ctx, id)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, model.ID) *model.Profile); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, int64) *model.Profile); ok {
 		r0 = rf(ctx, id)
 	} else {
 		if ret.Get(0) != nil {
@@ -43,7 +43,7 @@ func (_m *MockProfile) GetProfile(ctx context.Context, id model.ID) (*model.Prof
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, model.ID) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, int64) error); ok {
 		r1 = rf(ctx, id)
 	} else {
 		r1 = ret.Error(1)
@@ -59,14 +59,14 @@ type MockProfile_GetProfile_Call struct {
 
 // GetProfile is a helper method to define mock.On call
 //   - ctx context.Context
-//   - id model.ID
+//   - id int64
 func (_e *MockProfile_Expecter) GetProfile(ctx interface{}, id interface{}) *MockProfile_GetProfile_Call {
 	return &MockProfile_GetProfile_Call{Call: _e.mock.On("GetProfile", ctx, id)}
 }
 
-func (_c *MockProfile_GetProfile_Call) Run(run func(ctx context.Context, id model.ID)) *MockProfile_GetProfile_Call {
+func (_c *MockProfile_GetProfile_Call) Run(run func(ctx context.Context, id int64)) *MockProfile_GetProfile_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.ID))
+		run(args[0].(context.Context), args[1].(int64))
 	})
 	return _c
 }
@@ -76,7 +76,7 @@ func (_c *MockProfile_GetProfile_Call) Return(_a0 *model.Profile, _a1 error) *Mo
 	return _c
 }
 
-func (_c *MockProfile_GetProfile_Call) RunAndReturn(run func(context.Context, model.ID) (*model.Profile, error)) *MockProfile_GetProfile_Call {
+func (_c *MockProfile_GetProfile_Call) RunAndReturn(run func(context.Context, int64) (*model.Profile, error)) *MockProfile_GetProfile_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -137,11 +137,11 @@ func (_c *MockProfile_ListProfiles_Call) RunAndReturn(run func(context.Context, 
 }
 
 // RemoveProfile provides a mock function with given fields: ctx, id
-func (_m *MockProfile) RemoveProfile(ctx context.Context, id model.ID) error {
+func (_m *MockProfile) RemoveProfile(ctx context.Context, id int64) error {
 	ret := _m.Called(ctx, id)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, model.ID) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, int64) error); ok {
 		r0 = rf(ctx, id)
 	} else {
 		r0 = ret.Error(0)
@@ -157,14 +157,14 @@ type MockProfile_RemoveProfile_Call struct {
 
 // RemoveProfile is a helper method to define mock.On call
 //   - ctx context.Context
-//   - id model.ID
+//   - id int64
 func (_e *MockProfile_Expecter) RemoveProfile(ctx interface{}, id interface{}) *MockProfile_RemoveProfile_Call {
 	return &MockProfile_RemoveProfile_Call{Call: _e.mock.On("RemoveProfile", ctx, id)}
 }
 
-func (_c *MockProfile_RemoveProfile_Call) Run(run func(ctx context.Context, id model.ID)) *MockProfile_RemoveProfile_Call {
+func (_c *MockProfile_RemoveProfile_Call) Run(run func(ctx context.Context, id int64)) *MockProfile_RemoveProfile_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.ID))
+		run(args[0].(context.Context), args[1].(int64))
 	})
 	return _c
 }
@@ -174,7 +174,7 @@ func (_c *MockProfile_RemoveProfile_Call) Return(_a0 error) *MockProfile_RemoveP
 	return _c
 }
 
-func (_c *MockProfile_RemoveProfile_Call) RunAndReturn(run func(context.Context, model.ID) error) *MockProfile_RemoveProfile_Call {
+func (_c *MockProfile_RemoveProfile_Call) RunAndReturn(run func(context.Context, int64) error) *MockProfile_RemoveProfile_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -235,15 +235,15 @@ func (_c *MockProfile_SaveProfile_Call) RunAndReturn(run func(context.Context, *
 }
 
 // UpdateProfile provides a mock function with given fields: ctx, id, req
-func (_m *MockProfile) UpdateProfile(ctx context.Context, id model.ID, req *model.ProfileRequest) (*model.Profile, error) {
+func (_m *MockProfile) UpdateProfile(ctx context.Context, id int64, req *model.ProfileRequest) (*model.Profile, error) {
 	ret := _m.Called(ctx, id, req)
 
 	var r0 *model.Profile
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, model.ID, *model.ProfileRequest) (*model.Profile, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, int64, *model.ProfileRequest) (*model.Profile, error)); ok {
 		return rf(ctx, id, req)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, model.ID, *model.ProfileRequest) *model.Profile); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, int64, *model.ProfileRequest) *model.Profile); ok {
 		r0 = rf(ctx, id, req)
 	} else {
 		if ret.Get(0) != nil {
@@ -251,7 +251,7 @@ func (_m *MockProfile) UpdateProfile(ctx context.Context, id model.ID, req *mode
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, model.ID, *model.ProfileRequest) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, int64, *model.ProfileRequest) error); ok {
 		r1 = rf(ctx, id, req)
 	} else {
 		r1 = ret.Error(1)
@@ -267,15 +267,15 @@ type MockProfile_UpdateProfile_Call struct {
 
 // UpdateProfile is a helper method to define mock.On call
 //   - ctx context.Context
-//   - id model.ID
+//   - id int64
 //   - req *model.ProfileRequest
 func (_e *MockProfile_Expecter) UpdateProfile(ctx interface{}, id interface{}, req interface{}) *MockProfile_UpdateProfile_Call {
 	return &MockProfile_UpdateProfile_Call{Call: _e.mock.On("UpdateProfile", ctx, id, req)}
 }
 
-func (_c *MockProfile_UpdateProfile_Call) Run(run func(ctx context.Context, id model.ID, req *model.ProfileRequest)) *MockProfile_UpdateProfile_Call {
+func (_c *MockProfile_UpdateProfile_Call) Run(run func(ctx context.Context, id int64, req *model.ProfileRequest)) *MockProfile_UpdateProfile_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.ID), args[2].(*model.ProfileRequest))
+		run(args[0].(context.Context), args[1].(int64), args[2].(*model.ProfileRequest))
 	})
 	return _c
 }
@@ -285,7 +285,7 @@ func (_c *MockProfile_UpdateProfile_Call) Return(_a0 *model.Profile, _a1 error) 
 	return _c
 }
 
-func (_c *MockProfile_UpdateProfile_Call) RunAndReturn(run func(context.Context, model.ID, *model.ProfileRequest) (*model.Profile, error)) *MockProfile_UpdateProfile_Call {
+func (_c *MockProfile_UpdateProfile_Call) RunAndReturn(run func(context.Context, int64, *model.ProfileRequest) (*model.Profile, error)) *MockProfile_UpdateProfile_Call {
 	_c.Call.Return(run)
 	return _c
 }

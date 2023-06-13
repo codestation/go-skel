@@ -61,7 +61,7 @@ func (a *ProfileController) SaveProfile(ctx echo.Context) error {
 }
 
 func (a *ProfileController) RemoveProfile(ctx echo.Context, id oapi.ProfileId) error {
-	err := a.profile.RemoveProfile(ctx.Request().Context(), model.ID(id))
+	err := a.profile.RemoveProfile(ctx.Request().Context(), id)
 	if err != nil {
 		return err
 	}
@@ -70,7 +70,7 @@ func (a *ProfileController) RemoveProfile(ctx echo.Context, id oapi.ProfileId) e
 }
 
 func (a *ProfileController) GetProfile(ctx echo.Context, id oapi.ProfileId) error {
-	result, err := a.profile.GetProfile(ctx.Request().Context(), model.ID(id))
+	result, err := a.profile.GetProfile(ctx.Request().Context(), id)
 	if err != nil {
 		return err
 	}
@@ -87,7 +87,7 @@ func (a *ProfileController) UpdateProfile(ctx echo.Context, id oapi.ProfileId) e
 		return err
 	}
 
-	result, err := a.profile.UpdateProfile(ctx.Request().Context(), model.ID(id), (*model.ProfileRequest)(&request))
+	result, err := a.profile.UpdateProfile(ctx.Request().Context(), id, (*model.ProfileRequest)(&request))
 	if err != nil {
 		return err
 	}

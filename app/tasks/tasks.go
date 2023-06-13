@@ -11,7 +11,6 @@ import (
 	"log"
 
 	"github.com/hibiken/asynq"
-	"megpoid.dev/go/go-skel/app/model"
 	"megpoid.dev/go/go-skel/app/repository"
 	"megpoid.dev/go/go-skel/app/usecase"
 	"megpoid.dev/go/go-skel/pkg/sql"
@@ -27,7 +26,7 @@ type HelloPayload struct {
 }
 
 type ProfilePayload struct {
-	ID model.ID
+	ID int64
 }
 
 func NewSayHelloTask(message string) (*asynq.Task, error) {
@@ -38,7 +37,7 @@ func NewSayHelloTask(message string) (*asynq.Task, error) {
 	return asynq.NewTask(TypeSayHello, payload), nil
 }
 
-func NewProfileCheckTask(id model.ID) (*asynq.Task, error) {
+func NewProfileCheckTask(id int64) (*asynq.Task, error) {
 	payload, err := json.Marshal(ProfilePayload{ID: id})
 	if err != nil {
 		return nil, err

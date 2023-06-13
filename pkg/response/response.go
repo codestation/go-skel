@@ -7,7 +7,7 @@ package response
 import (
 	"math"
 
-	"megpoid.dev/go/go-skel/app/model"
+	"megpoid.dev/go/go-skel/pkg/model"
 	"megpoid.dev/go/go-skel/pkg/paginator"
 )
 

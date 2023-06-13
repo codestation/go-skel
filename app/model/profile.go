@@ -4,16 +4,18 @@
 
 package model
 
+import "megpoid.dev/go/go-skel/pkg/model"
+
 type Profile struct {
-	Model
+	model.Model
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
 	Email     string `json:"email"`
 }
 
-func NewProfile(opts ...Option) *Profile {
+func NewProfile(opts ...model.Option) *Profile {
 	p := &Profile{
-		Model: NewModel(opts...),
+		Model: model.NewModel(opts...),
 	}
 	return p
 }
@@ -24,7 +26,7 @@ type ProfileRequest struct {
 	LastName  string `json:"last_name"`
 }
 
-func (p *ProfileRequest) Profile(opts ...Option) *Profile {
+func (p *ProfileRequest) Profile(opts ...model.Option) *Profile {
 	profile := NewProfile(opts...)
 	profile.FirstName = p.FirstName
 	profile.LastName = p.LastName

@@ -11,9 +11,10 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
-	"megpoid.dev/go/go-skel/app/model"
+	appmodel "megpoid.dev/go/go-skel/app/model"
 	"megpoid.dev/go/go-skel/app/usecase"
 	"megpoid.dev/go/go-skel/oapi"
+	"megpoid.dev/go/go-skel/pkg/model"
 	"megpoid.dev/go/go-skel/pkg/paginator"
 	"megpoid.dev/go/go-skel/pkg/response"
 )
@@ -27,7 +28,7 @@ type profileSuite struct {
 }
 
 func (s *profileSuite) TestGet() {
-	mockProfile := model.Profile{
+	mockProfile := appmodel.Profile{
 		Model:     model.Model{ID: 1},
 		FirstName: "John",
 		LastName:  "Doe",
@@ -35,7 +36,7 @@ func (s *profileSuite) TestGet() {
 	}
 
 	uc := usecase.NewMockProfile(s.T())
-	uc.EXPECT().GetProfile(mock.Anything, model.ID(1)).Return(&mockProfile, nil)
+	uc.EXPECT().GetProfile(mock.Anything, int64(1)).Return(&mockProfile, nil)
 
 	ctrl := NewProfileCtrl(nil, uc)
 
@@ -49,7 +50,7 @@ func (s *profileSuite) TestGet() {
 }
 
 func (s *profileSuite) TestList() {
-	mockProfiles := []*model.Profile{{
+	mockProfiles := []*appmodel.Profile{{
 		Model:     model.Model{ID: 1},
 		FirstName: "John",
 		LastName:  "Doe",

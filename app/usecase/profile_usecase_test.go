@@ -10,9 +10,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"megpoid.dev/go/go-skel/app/model"
+	appmodel "megpoid.dev/go/go-skel/app/model"
 	"megpoid.dev/go/go-skel/app/repository"
 	"megpoid.dev/go/go-skel/app/repository/uow"
+	"megpoid.dev/go/go-skel/pkg/model"
 	"megpoid.dev/go/go-skel/pkg/paginator"
 	"megpoid.dev/go/go-skel/pkg/repo"
 	"megpoid.dev/go/go-skel/pkg/request"
@@ -20,7 +21,7 @@ import (
 )
 
 func TestProfileList(t *testing.T) {
-	profiles := []*model.Profile{
+	profiles := []*appmodel.Profile{
 		{
 			Model: model.Model{ID: 1},
 		},
@@ -36,27 +37,27 @@ func TestProfileList(t *testing.T) {
 	result, err := uc.ListProfiles(context.Background(), &request.QueryParams{})
 	assert.NoError(t, err)
 	assert.Len(t, result.Items, 1)
-	assert.Equal(t, model.ID(1), result.Items[0].ID)
+	assert.Equal(t, int64(1), result.Items[0].ID)
 }
 
 func TestProfileGet(t *testing.T) {
-	mockProfile := model.Profile{
+	mockProfile := appmodel.Profile{
 		Model: model.Model{ID: 1},
 	}
 
 	r := repository.NewMockProfileRepo(t)
-	r.EXPECT().Get(mock.Anything, model.ID(1)).Return(&mockProfile, nil)
+	r.EXPECT().Get(mock.Anything, int64(1)).Return(&mockProfile, nil)
 
 	u := uow.NewMockUnitOfWork(t)
 	uc := NewProfile(u, r)
 
-	profile, err := uc.GetProfile(context.Background(), model.ID(1))
+	profile, err := uc.GetProfile(context.Background(), 1)
 	assert.NoError(t, err)
 	assert.NotNil(t, profile)
 }
 
 func TestProfileSave(t *testing.T) {
-	mockSave := func(ctx context.Context, profile *model.Profile) error {
+	mockSave := func(ctx context.Context, profile *appmodel.Profile) error {
 		profile.ID = 1
 		return nil
 	}
@@ -67,7 +68,7 @@ func TestProfileSave(t *testing.T) {
 	u := uow.NewMockUnitOfWork(t)
 	uc := NewProfile(u, r)
 
-	req := model.ProfileRequest{
+	req := appmodel.ProfileRequest{
 		Email:     "john.doe@example.com",
 		FirstName: "John",
 		LastName:  "Doe",
@@ -77,7 +78,7 @@ func TestProfileSave(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.NotNil(t, newProfile)
-	assert.Equal(t, model.ID(1), newProfile.ID)
+	assert.Equal(t, int64(1), newProfile.ID)
 }
 
 func TestProfileUpdate(t *testing.T) {
@@ -87,29 +88,29 @@ func TestProfileUpdate(t *testing.T) {
 	u := uow.NewMockUnitOfWork(t)
 	uc := NewProfile(u, r)
 
-	updateRequest := &model.ProfileRequest{
+	updateRequest := &appmodel.ProfileRequest{
 		Email: "test@test.com",
 	}
 
-	updated, err := uc.UpdateProfile(context.Background(), model.ID(1), updateRequest)
+	updated, err := uc.UpdateProfile(context.Background(), 1, updateRequest)
 	assert.NoError(t, err)
 	assert.Equal(t, "test@test.com", updated.Email)
 }
 
 func TestProfileDelete(t *testing.T) {
 	r := repository.NewMockProfileRepo(t)
-	r.EXPECT().Delete(mock.Anything, model.ID(1)).Return(nil)
+	r.EXPECT().Delete(mock.Anything, int64(1)).Return(nil)
 
 	u := uow.NewMockUnitOfWork(t)
 	uc := NewProfile(u, r)
 
-	err := uc.RemoveProfile(context.Background(), model.ID(1))
+	err := uc.RemoveProfile(context.Background(), 1)
 	assert.NoError(t, err)
 }
 
 func TestProfileError(t *testing.T) {
 	r := repository.NewMockProfileRepo(t)
-	r.EXPECT().Get(mock.Anything, model.ID(1)).Return(nil, repo.ErrNotFound)
+	r.EXPECT().Get(mock.Anything, int64(1)).Return(nil, repo.ErrNotFound)
 
 	u := uow.NewMockUnitOfWork(t)
 	uc := NewProfile(u, r)

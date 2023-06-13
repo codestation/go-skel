@@ -13,8 +13,8 @@ import (
 	"github.com/doug-martin/goqu/v9"
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/suite"
-	"megpoid.dev/go/go-skel/app/model"
 	"megpoid.dev/go/go-skel/pkg/clause"
+	"megpoid.dev/go/go-skel/pkg/model"
 	"megpoid.dev/go/go-skel/pkg/paginator"
 )
 
@@ -28,7 +28,7 @@ type testUser struct {
 	model.Model
 	Name       string
 	ExternalID uuid.UUID `json:"external_id"`
-	ProfileID  model.ID  `goqu:"skipupdate"`
+	ProfileID  int64     `goqu:"skipupdate"`
 	Profile    *testProfile
 }
 
@@ -37,7 +37,7 @@ func (t *testUser) AttachProfile(p *testProfile) {
 	t.Profile = p
 }
 
-func newUser(name string, profileId model.ID) *testUser {
+func newUser(name string, profileId int64) *testUser {
 	u := &testUser{
 		Model:     model.NewModel(),
 		Name:      name,
@@ -60,7 +60,7 @@ func (s *userStore) Attach(ctx context.Context, results []*testUser, relation st
 	switch relation {
 	case "profile":
 		err = attachRelation(ctx, results,
-			func(m *testUser) *model.ID { return model.NewType(m.ProfileID) },
+			func(m *testUser) *int64 { return model.NewType(m.ProfileID) },
 			func(m *testUser, r *testProfile) { m.AttachProfile(r) },
 			s.profile.ListByIds)
 	}
@@ -95,7 +95,7 @@ func (s *storeSuite) TestNewStore() {
 func (s *storeSuite) TestStoreGet() {
 	st := NewStore[*testUser](s.conn.Store)
 	var tests = []struct {
-		id  model.ID
+		id  int64
 		err error
 	}{
 		{1, nil},
@@ -128,7 +128,7 @@ func (s *storeSuite) TestStoreSave() {
 	st := NewStore[*testUser](s.conn.Store)
 	var tests = []struct {
 		name      string
-		profileId model.ID
+		profileId int64
 		err       error
 	}{
 		{"Some user", 1, nil},
@@ -153,7 +153,7 @@ func (s *storeSuite) TestStoreUpsert() {
 	st := NewStore[*testUser](s.conn.Store)
 	var tests = []struct {
 		name      string
-		profileId model.ID
+		profileId int64
 		created   bool
 		err       error
 	}{
@@ -180,7 +180,7 @@ func (s *storeSuite) TestStoreUpsert() {
 func (s *storeSuite) TestStoreUpdate() {
 	st := NewStore[*testUser](s.conn.Store)
 	var tests = []struct {
-		id  model.ID
+		id  int64
 		err error
 	}{
 		{1, nil},
@@ -205,7 +205,7 @@ func (s *storeSuite) TestStoreUpdate() {
 func (s *storeSuite) TestStoreUpdateMap() {
 	st := NewStore[*testUser](s.conn.Store)
 	var tests = []struct {
-		id  model.ID
+		id  int64
 		err error
 	}{
 		{1, nil},
@@ -232,7 +232,7 @@ func (s *storeSuite) TestStoreUpdateMap() {
 func (s *storeSuite) TestStoreDelete() {
 	st := NewStore[*testUser](s.conn.Store)
 	var tests = []struct {
-		id  model.ID
+		id  int64
 		err error
 	}{
 		{1, nil},
@@ -386,7 +386,7 @@ func (s *storeSuite) TestIncludes() {
 		user := users.Items[0]
 		s.Zero(user.ProfileID)
 		s.NotNil(user.Profile)
-		s.Equal(model.ID(1), user.Profile.ID)
+		s.Equal(int64(1), user.Profile.ID)
 	}
 }
 

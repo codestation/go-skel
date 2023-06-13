@@ -7,24 +7,24 @@ package repo
 import (
 	"context"
 
-	"megpoid.dev/go/go-skel/app/model"
+	"megpoid.dev/go/go-skel/pkg/model"
 	"megpoid.dev/go/go-skel/pkg/response"
 )
 
 func attachRelation[T, U model.Modelable](
 	ctx context.Context,
 	entries []T,
-	getRelationId func(m T) *model.ID,
+	getRelationId func(m T) *int64,
 	setRelation func(m T, r U),
-	listByIds func(ctx context.Context, ids []model.ID) (*response.ListResponse[U], error),
+	listByIds func(ctx context.Context, ids []int64) (*response.ListResponse[U], error),
 ) error {
 	if len(entries) == 0 {
 		return nil
 	}
 	// list to hold the identifiers to query
-	var idList []model.ID
+	var idList []int64
 	// map used to keep the above list with unique items
-	var uniqueMap = map[model.ID]struct{}{}
+	var uniqueMap = map[int64]struct{}{}
 
 	for _, entry := range entries {
 		id := getRelationId(entry)
@@ -46,7 +46,7 @@ func attachRelation[T, U model.Modelable](
 	}
 
 	// keep the results in a map for quicker access
-	var resultMap = map[model.ID]U{}
+	var resultMap = map[int64]U{}
 	for _, result := range results.Items {
 		resultMap[result.GetID()] = result
 	}

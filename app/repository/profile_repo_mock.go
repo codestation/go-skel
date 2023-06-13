@@ -30,11 +30,11 @@ func (_m *MockProfileRepo) EXPECT() *MockProfileRepo_Expecter {
 }
 
 // Delete provides a mock function with given fields: ctx, id
-func (_m *MockProfileRepo) Delete(ctx context.Context, id model.ID) error {
+func (_m *MockProfileRepo) Delete(ctx context.Context, id int64) error {
 	ret := _m.Called(ctx, id)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, model.ID) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, int64) error); ok {
 		r0 = rf(ctx, id)
 	} else {
 		r0 = ret.Error(0)
@@ -50,14 +50,14 @@ type MockProfileRepo_Delete_Call struct {
 
 // Delete is a helper method to define mock.On call
 //   - ctx context.Context
-//   - id model.ID
+//   - id int64
 func (_e *MockProfileRepo_Expecter) Delete(ctx interface{}, id interface{}) *MockProfileRepo_Delete_Call {
 	return &MockProfileRepo_Delete_Call{Call: _e.mock.On("Delete", ctx, id)}
 }
 
-func (_c *MockProfileRepo_Delete_Call) Run(run func(ctx context.Context, id model.ID)) *MockProfileRepo_Delete_Call {
+func (_c *MockProfileRepo_Delete_Call) Run(run func(ctx context.Context, id int64)) *MockProfileRepo_Delete_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.ID))
+		run(args[0].(context.Context), args[1].(int64))
 	})
 	return _c
 }
@@ -67,7 +67,7 @@ func (_c *MockProfileRepo_Delete_Call) Return(_a0 error) *MockProfileRepo_Delete
 	return _c
 }
 
-func (_c *MockProfileRepo_Delete_Call) RunAndReturn(run func(context.Context, model.ID) error) *MockProfileRepo_Delete_Call {
+func (_c *MockProfileRepo_Delete_Call) RunAndReturn(run func(context.Context, int64) error) *MockProfileRepo_Delete_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -126,15 +126,15 @@ func (_c *MockProfileRepo_DeleteBy_Call) RunAndReturn(run func(context.Context, 
 }
 
 // Get provides a mock function with given fields: ctx, id
-func (_m *MockProfileRepo) Get(ctx context.Context, id model.ID) (*model.Profile, error) {
+func (_m *MockProfileRepo) Get(ctx context.Context, id int64) (*model.Profile, error) {
 	ret := _m.Called(ctx, id)
 
 	var r0 *model.Profile
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, model.ID) (*model.Profile, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, int64) (*model.Profile, error)); ok {
 		return rf(ctx, id)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, model.ID) *model.Profile); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, int64) *model.Profile); ok {
 		r0 = rf(ctx, id)
 	} else {
 		if ret.Get(0) != nil {
@@ -142,7 +142,7 @@ func (_m *MockProfileRepo) Get(ctx context.Context, id model.ID) (*model.Profile
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, model.ID) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, int64) error); ok {
 		r1 = rf(ctx, id)
 	} else {
 		r1 = ret.Error(1)
@@ -158,14 +158,14 @@ type MockProfileRepo_Get_Call struct {
 
 // Get is a helper method to define mock.On call
 //   - ctx context.Context
-//   - id model.ID
+//   - id int64
 func (_e *MockProfileRepo_Expecter) Get(ctx interface{}, id interface{}) *MockProfileRepo_Get_Call {
 	return &MockProfileRepo_Get_Call{Call: _e.mock.On("Get", ctx, id)}
 }
 
-func (_c *MockProfileRepo_Get_Call) Run(run func(ctx context.Context, id model.ID)) *MockProfileRepo_Get_Call {
+func (_c *MockProfileRepo_Get_Call) Run(run func(ctx context.Context, id int64)) *MockProfileRepo_Get_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.ID))
+		run(args[0].(context.Context), args[1].(int64))
 	})
 	return _c
 }
@@ -175,7 +175,7 @@ func (_c *MockProfileRepo_Get_Call) Return(_a0 *model.Profile, _a1 error) *MockP
 	return _c
 }
 
-func (_c *MockProfileRepo_Get_Call) RunAndReturn(run func(context.Context, model.ID) (*model.Profile, error)) *MockProfileRepo_Get_Call {
+func (_c *MockProfileRepo_Get_Call) RunAndReturn(run func(context.Context, int64) (*model.Profile, error)) *MockProfileRepo_Get_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -489,15 +489,15 @@ func (_c *MockProfileRepo_ListByEach_Call) RunAndReturn(run func(context.Context
 }
 
 // ListByIds provides a mock function with given fields: ctx, ids
-func (_m *MockProfileRepo) ListByIds(ctx context.Context, ids []model.ID) (*response.ListResponse[*model.Profile], error) {
+func (_m *MockProfileRepo) ListByIds(ctx context.Context, ids []int64) (*response.ListResponse[*model.Profile], error) {
 	ret := _m.Called(ctx, ids)
 
 	var r0 *response.ListResponse[*model.Profile]
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, []model.ID) (*response.ListResponse[*model.Profile], error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, []int64) (*response.ListResponse[*model.Profile], error)); ok {
 		return rf(ctx, ids)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, []model.ID) *response.ListResponse[*model.Profile]); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, []int64) *response.ListResponse[*model.Profile]); ok {
 		r0 = rf(ctx, ids)
 	} else {
 		if ret.Get(0) != nil {
@@ -505,7 +505,7 @@ func (_m *MockProfileRepo) ListByIds(ctx context.Context, ids []model.ID) (*resp
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, []model.ID) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, []int64) error); ok {
 		r1 = rf(ctx, ids)
 	} else {
 		r1 = ret.Error(1)
@@ -521,14 +521,14 @@ type MockProfileRepo_ListByIds_Call struct {
 
 // ListByIds is a helper method to define mock.On call
 //   - ctx context.Context
-//   - ids []model.ID
+//   - ids []int64
 func (_e *MockProfileRepo_Expecter) ListByIds(ctx interface{}, ids interface{}) *MockProfileRepo_ListByIds_Call {
 	return &MockProfileRepo_ListByIds_Call{Call: _e.mock.On("ListByIds", ctx, ids)}
 }
 
-func (_c *MockProfileRepo_ListByIds_Call) Run(run func(ctx context.Context, ids []model.ID)) *MockProfileRepo_ListByIds_Call {
+func (_c *MockProfileRepo_ListByIds_Call) Run(run func(ctx context.Context, ids []int64)) *MockProfileRepo_ListByIds_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].([]model.ID))
+		run(args[0].(context.Context), args[1].([]int64))
 	})
 	return _c
 }
@@ -538,7 +538,7 @@ func (_c *MockProfileRepo_ListByIds_Call) Return(_a0 *response.ListResponse[*mod
 	return _c
 }
 
-func (_c *MockProfileRepo_ListByIds_Call) RunAndReturn(run func(context.Context, []model.ID) (*response.ListResponse[*model.Profile], error)) *MockProfileRepo_ListByIds_Call {
+func (_c *MockProfileRepo_ListByIds_Call) RunAndReturn(run func(context.Context, []int64) (*response.ListResponse[*model.Profile], error)) *MockProfileRepo_ListByIds_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -688,11 +688,11 @@ func (_c *MockProfileRepo_Update_Call) RunAndReturn(run func(context.Context, *m
 }
 
 // UpdateMap provides a mock function with given fields: ctx, id, req
-func (_m *MockProfileRepo) UpdateMap(ctx context.Context, id model.ID, req map[string]interface{}) error {
+func (_m *MockProfileRepo) UpdateMap(ctx context.Context, id int64, req map[string]interface{}) error {
 	ret := _m.Called(ctx, id, req)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, model.ID, map[string]interface{}) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, int64, map[string]interface{}) error); ok {
 		r0 = rf(ctx, id, req)
 	} else {
 		r0 = ret.Error(0)
@@ -708,15 +708,15 @@ type MockProfileRepo_UpdateMap_Call struct {
 
 // UpdateMap is a helper method to define mock.On call
 //   - ctx context.Context
-//   - id model.ID
+//   - id int64
 //   - req map[string]interface{}
 func (_e *MockProfileRepo_Expecter) UpdateMap(ctx interface{}, id interface{}, req interface{}) *MockProfileRepo_UpdateMap_Call {
 	return &MockProfileRepo_UpdateMap_Call{Call: _e.mock.On("UpdateMap", ctx, id, req)}
 }
 
-func (_c *MockProfileRepo_UpdateMap_Call) Run(run func(ctx context.Context, id model.ID, req map[string]interface{})) *MockProfileRepo_UpdateMap_Call {
+func (_c *MockProfileRepo_UpdateMap_Call) Run(run func(ctx context.Context, id int64, req map[string]interface{})) *MockProfileRepo_UpdateMap_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.ID), args[2].(map[string]interface{}))
+		run(args[0].(context.Context), args[1].(int64), args[2].(map[string]interface{}))
 	})
 	return _c
 }
@@ -726,7 +726,7 @@ func (_c *MockProfileRepo_UpdateMap_Call) Return(_a0 error) *MockProfileRepo_Upd
 	return _c
 }
 
-func (_c *MockProfileRepo_UpdateMap_Call) RunAndReturn(run func(context.Context, model.ID, map[string]interface{}) error) *MockProfileRepo_UpdateMap_Call {
+func (_c *MockProfileRepo_UpdateMap_Call) RunAndReturn(run func(context.Context, int64, map[string]interface{}) error) *MockProfileRepo_UpdateMap_Call {
 	_c.Call.Return(run)
 	return _c
 }

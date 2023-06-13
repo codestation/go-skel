@@ -261,6 +261,7 @@ components:
       description: Profile ID
       schema:
         type: integer
+        format: int64
         example: 1
       required: true
     limit:

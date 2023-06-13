@@ -14,11 +14,11 @@ import (
 
 //go:generate go run github.com/vektra/mockery/v2@v2.23.1 --name Profile
 type Profile interface {
-	GetProfile(ctx context.Context, id model.ID) (*model.Profile, error)
+	GetProfile(ctx context.Context, id int64) (*model.Profile, error)
 	ListProfiles(ctx context.Context, query *request.QueryParams) (*response.ListResponse[*model.Profile], error)
 	SaveProfile(ctx context.Context, req *model.ProfileRequest) (*model.Profile, error)
-	UpdateProfile(ctx context.Context, id model.ID, req *model.ProfileRequest) (*model.Profile, error)
-	RemoveProfile(ctx context.Context, id model.ID) error
+	UpdateProfile(ctx context.Context, id int64, req *model.ProfileRequest) (*model.Profile, error)
+	RemoveProfile(ctx context.Context, id int64) error
 }
 
 //go:generate go run github.com/vektra/mockery/v2@v2.23.1 --name Healthcheck

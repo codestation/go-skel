@@ -26,7 +26,7 @@ type ProfileInteractor struct {
 	profileRepo repository.ProfileRepo
 }
 
-func (u *ProfileInteractor) GetProfile(ctx context.Context, id model.ID) (*model.Profile, error) {
+func (u *ProfileInteractor) GetProfile(ctx context.Context, id int64) (*model.Profile, error) {
 	t := u.printer(ctx)
 
 	profile, err := u.profileRepo.Get(ctx, id)
@@ -68,7 +68,7 @@ func (u *ProfileInteractor) SaveProfile(ctx context.Context, req *model.ProfileR
 	return profile, nil
 }
 
-func (u *ProfileInteractor) UpdateProfile(ctx context.Context, id model.ID, req *model.ProfileRequest) (*model.Profile, error) {
+func (u *ProfileInteractor) UpdateProfile(ctx context.Context, id int64, req *model.ProfileRequest) (*model.Profile, error) {
 	t := u.printer(ctx)
 
 	profile := req.Profile()
@@ -81,7 +81,7 @@ func (u *ProfileInteractor) UpdateProfile(ctx context.Context, id model.ID, req 
 	return profile, nil
 }
 
-func (u *ProfileInteractor) RemoveProfile(ctx context.Context, id model.ID) error {
+func (u *ProfileInteractor) RemoveProfile(ctx context.Context, id int64) error {
 	t := u.printer(ctx)
 
 	err := u.profileRepo.Delete(ctx, id)

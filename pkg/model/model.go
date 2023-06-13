@@ -12,20 +12,17 @@ import (
 	"github.com/jinzhu/inflection"
 )
 
-// ID is used as an alias for the model primary key to avoid using some int by mistake.
-type ID uint
-
 // Model is the base that will be used by other model who need a primary key and timestamps.
 type Model struct {
-	ID        ID         `json:"id" goqu:"skipinsert,skipupdate"`
+	ID        int64      `json:"id" goqu:"skipinsert,skipupdate"`
 	CreatedAt time.Time  `json:"created_at" goqu:"skipupdate"`
 	UpdatedAt time.Time  `json:"updated_at"`
 	DeletedAt *time.Time `json:"-"`
 }
 
 type Modelable interface {
-	GetID() ID
-	SetID(id ID)
+	GetID() int64
+	SetID(id int64)
 }
 
 type Tabler interface {
@@ -38,11 +35,11 @@ func (m *Model) SetTimestamps(now time.Time) {
 	m.UpdatedAt = now
 }
 
-func (m *Model) GetID() ID {
+func (m *Model) GetID() int64 {
 	return m.ID
 }
 
-func (m *Model) SetID(id ID) {
+func (m *Model) SetID(id int64) {
 	m.ID = id
 }
 
@@ -72,7 +69,7 @@ func GetTableName[T Modelable](m T) string {
 
 type Option func(m *Model)
 
-func WithID(id ID) Option {
+func WithID(id int64) Option {
 	return func(m *Model) {
 		m.ID = id
 	}
@@ -92,4 +89,8 @@ func NewModel(opts ...Option) Model {
 	}
 
 	return e
+}
+
+func NewType[T any](v T) *T {
+	return &v
 }
