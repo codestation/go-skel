@@ -28,11 +28,16 @@ func TestProfileList(t *testing.T) {
 	}
 
 	mockResponse := response.NewListResponse(profiles, &paginator.Cursor{})
+
 	r := repository.NewMockProfileRepo(t)
 	r.EXPECT().List(mock.Anything, mock.Anything).Return(mockResponse, nil)
 
+	store := uow.NewMockUnitOfWorkStore(t)
+	store.EXPECT().Profiles().Return(r)
+
 	u := uow.NewMockUnitOfWork(t)
-	uc := NewProfile(u, r)
+	u.EXPECT().Store().Return(store)
+	uc := NewProfile(u)
 
 	result, err := uc.ListProfiles(context.Background(), &request.QueryParams{})
 	assert.NoError(t, err)
@@ -48,8 +53,12 @@ func TestProfileGet(t *testing.T) {
 	r := repository.NewMockProfileRepo(t)
 	r.EXPECT().Get(mock.Anything, int64(1)).Return(&mockProfile, nil)
 
+	store := uow.NewMockUnitOfWorkStore(t)
+	store.EXPECT().Profiles().Return(r)
+
 	u := uow.NewMockUnitOfWork(t)
-	uc := NewProfile(u, r)
+	u.EXPECT().Store().Return(store)
+	uc := NewProfile(u)
 
 	profile, err := uc.GetProfile(context.Background(), 1)
 	assert.NoError(t, err)
@@ -65,8 +74,12 @@ func TestProfileSave(t *testing.T) {
 	r := repository.NewMockProfileRepo(t)
 	r.EXPECT().Save(mock.Anything, mock.Anything).RunAndReturn(mockSave)
 
+	store := uow.NewMockUnitOfWorkStore(t)
+	store.EXPECT().Profiles().Return(r)
+
 	u := uow.NewMockUnitOfWork(t)
-	uc := NewProfile(u, r)
+	u.EXPECT().Store().Return(store)
+	uc := NewProfile(u)
 
 	req := appmodel.ProfileRequest{
 		Email:     "john.doe@example.com",
@@ -85,8 +98,12 @@ func TestProfileUpdate(t *testing.T) {
 	r := repository.NewMockProfileRepo(t)
 	r.EXPECT().Update(mock.Anything, mock.Anything).Return(nil)
 
+	store := uow.NewMockUnitOfWorkStore(t)
+	store.EXPECT().Profiles().Return(r)
+
 	u := uow.NewMockUnitOfWork(t)
-	uc := NewProfile(u, r)
+	u.EXPECT().Store().Return(store)
+	uc := NewProfile(u)
 
 	updateRequest := &appmodel.ProfileRequest{
 		Email: "test@test.com",
@@ -101,8 +118,12 @@ func TestProfileDelete(t *testing.T) {
 	r := repository.NewMockProfileRepo(t)
 	r.EXPECT().Delete(mock.Anything, int64(1)).Return(nil)
 
+	store := uow.NewMockUnitOfWorkStore(t)
+	store.EXPECT().Profiles().Return(r)
+
 	u := uow.NewMockUnitOfWork(t)
-	uc := NewProfile(u, r)
+	u.EXPECT().Store().Return(store)
+	uc := NewProfile(u)
 
 	err := uc.RemoveProfile(context.Background(), 1)
 	assert.NoError(t, err)
@@ -112,8 +133,12 @@ func TestProfileError(t *testing.T) {
 	r := repository.NewMockProfileRepo(t)
 	r.EXPECT().Get(mock.Anything, int64(1)).Return(nil, repo.ErrNotFound)
 
+	store := uow.NewMockUnitOfWorkStore(t)
+	store.EXPECT().Profiles().Return(r)
+
 	u := uow.NewMockUnitOfWork(t)
-	uc := NewProfile(u, r)
+	u.EXPECT().Store().Return(store)
+	uc := NewProfile(u)
 
 	_, err := uc.GetProfile(context.Background(), 1)
 	assert.Error(t, err)

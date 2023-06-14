@@ -31,7 +31,7 @@ func (u uowStore) Profiles() repository.ProfileRepo {
 	return u.profiles
 }
 
-type UnitOfWorkBlock func(UnitOfWorkStore) error
+type UnitOfWorkBlock func(UnitOfWork) error
 
 //go:generate go run github.com/vektra/mockery/v2@v2.23.1 --name UnitOfWork
 type UnitOfWork interface {
@@ -40,11 +40,11 @@ type UnitOfWork interface {
 }
 
 type unitOfWork struct {
-	conn  sql.Connector
+	conn  sql.Executor
 	store *uowStore
 }
 
-func New(conn sql.Connector) UnitOfWork {
+func New(conn sql.Executor) UnitOfWork {
 	return &unitOfWork{
 		conn:  conn,
 		store: newUowStore(conn),
@@ -57,8 +57,8 @@ func (u *unitOfWork) Store() UnitOfWorkStore {
 
 func (u *unitOfWork) Do(ctx context.Context, fn UnitOfWorkBlock) error {
 	err := u.conn.BeginFunc(ctx, func(conn sql.Executor) error {
-		uows := newUowStore(conn)
-		if err := fn(uows); err != nil {
+		uowTx := New(conn)
+		if err := fn(uowTx); err != nil {
 			return err
 		}
 

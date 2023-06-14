@@ -49,16 +49,15 @@ func NewApp(cfg *config.Config) (*App, error) {
 
 	s.conn = sql.NewPgxWrapper(pool)
 
-	// Repository initialization
+	// Repository initialization (not attached to the unit of work)
 	healthcheckRepo := repository.NewHealthcheckRepo(s.conn)
-	profileRepo := repository.NewProfileRepo(s.conn)
 
-	// Unit of Work initialization
+	// Unit of Work initialization (all repos are initialized here)
 	unitOfWork := uow.New(s.conn)
 
 	// Usecase initialization
 	healthcheckUsecase := usecase.NewHealthcheck(healthcheckRepo)
-	profileUsecase := usecase.NewProfile(unitOfWork, profileRepo)
+	profileUsecase := usecase.NewProfile(unitOfWork)
 
 	// Controller initialization
 	ctrl := controller.Controller{

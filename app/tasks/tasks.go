@@ -11,7 +11,7 @@ import (
 	"log"
 
 	"github.com/hibiken/asynq"
-	"megpoid.dev/go/go-skel/app/repository"
+	"megpoid.dev/go/go-skel/app/repository/uow"
 	"megpoid.dev/go/go-skel/app/usecase"
 	"megpoid.dev/go/go-skel/pkg/sql"
 )
@@ -56,7 +56,7 @@ func HandleSayHelloTask(ctx context.Context, t *asynq.Task) error {
 }
 
 type ProfileChecker struct {
-	pool sql.Executor
+	pool sql.Connector
 }
 
 func (process *ProfileChecker) ProcessTask(ctx context.Context, t *asynq.Task) error {
@@ -65,8 +65,8 @@ func (process *ProfileChecker) ProcessTask(ctx context.Context, t *asynq.Task) e
 		return fmt.Errorf("json.Unmarshal failed: %v: %w", err, asynq.SkipRetry)
 	}
 
-	repo := repository.NewProfileRepo(process.pool)
-	uc := usecase.NewProfile(nil, repo)
+	unitOfWork := uow.New(process.pool)
+	uc := usecase.NewProfile(unitOfWork)
 
 	profile, err := uc.GetProfile(ctx, p.ID)
 	if err != nil {
@@ -78,6 +78,6 @@ func (process *ProfileChecker) ProcessTask(ctx context.Context, t *asynq.Task) e
 	return nil
 }
 
-func NewProfileProcessor(pool sql.Executor) *ProfileChecker {
+func NewProfileProcessor(pool sql.Connector) *ProfileChecker {
 	return &ProfileChecker{pool: pool}
 }
