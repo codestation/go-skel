@@ -17,17 +17,17 @@ import (
 
 type HealthcheckController struct {
 	common
-	healthcheck usecase.Healthcheck
+	healthcheckUsecase usecase.Healthcheck
 }
 
-func NewHealthcheckCtrl(cfg *config.Config, healthcheck usecase.Healthcheck) HealthcheckController {
+func NewHealthCheck(cfg *config.Config, healthcheck usecase.Healthcheck) HealthcheckController {
 	return HealthcheckController{
-		common:      newCommon(cfg),
-		healthcheck: healthcheck,
+		common:             newCommon(cfg),
+		healthcheckUsecase: healthcheck,
 	}
 }
 
-func (a *HealthcheckController) LiveCheck(ctx echo.Context, params oapi.LiveCheckParams) error {
+func (ctrl *HealthcheckController) LiveCheck(ctx echo.Context, params oapi.LiveCheckParams) error {
 	if params.Verbose != nil && *params.Verbose {
 		var check strings.Builder
 		check.WriteString("live check passed\n")
@@ -36,8 +36,8 @@ func (a *HealthcheckController) LiveCheck(ctx echo.Context, params oapi.LiveChec
 	return ctx.String(http.StatusOK, "ok")
 }
 
-func (a *HealthcheckController) ReadyCheck(ctx echo.Context, params oapi.ReadyCheckParams) error {
-	result := a.healthcheck.Execute(ctx.Request().Context())
+func (ctrl *HealthcheckController) ReadyCheck(ctx echo.Context, params oapi.ReadyCheckParams) error {
+	result := ctrl.healthcheckUsecase.Execute(ctx.Request().Context())
 	if params.Verbose != nil && *params.Verbose {
 		var check strings.Builder
 		if result.Ping != nil {

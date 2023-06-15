@@ -32,7 +32,7 @@ func (s *healthcheckSuite) TearDownTest() {
 }
 
 func (s *healthcheckSuite) TestPing() {
-	store := NewHealthcheckRepo(s.conn.Db)
+	store := NewHealthCheck(s.conn.Db)
 	err := store.Execute(context.Background())
 	s.NoError(err)
 }

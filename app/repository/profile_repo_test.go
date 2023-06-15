@@ -34,7 +34,7 @@ func (s *profileSuite) TearDownTest() {
 }
 
 func (s *profileSuite) TestFilterSingleMatch() {
-	store := NewProfileRepo(s.conn.Store)
+	store := NewProfile(s.conn.Store)
 	result, err := store.List(context.Background(), clause.WithConditions(filter.Condition{
 		Field:     "first_name",
 		Operation: filter.OperationEqual,
@@ -46,7 +46,7 @@ func (s *profileSuite) TestFilterSingleMatch() {
 }
 
 func (s *profileSuite) TestFilterMultipleMatch() {
-	store := NewProfileRepo(s.conn.Store)
+	store := NewProfile(s.conn.Store)
 	result, err := store.List(context.Background(), clause.WithConditions(filter.Condition{
 		Field:     "last_name",
 		Operation: filter.OperationEqual,
@@ -58,7 +58,7 @@ func (s *profileSuite) TestFilterMultipleMatch() {
 }
 
 func (s *profileSuite) TestFilterNoMatch() {
-	store := NewProfileRepo(s.conn.Store)
+	store := NewProfile(s.conn.Store)
 	result, err := store.List(context.Background(), clause.WithConditions(filter.Condition{
 		Field:     "last_name",
 		Operation: filter.OperationEqual,
@@ -70,7 +70,7 @@ func (s *profileSuite) TestFilterNoMatch() {
 }
 
 func (s *profileSuite) TestProfileByEmail() {
-	store := NewProfileRepo(s.conn.Store)
+	store := NewProfile(s.conn.Store)
 	profile, err := store.GetByEmail(context.Background(), "john.doe@example.com")
 	if s.NoError(err) {
 		s.Equal("john.doe@example.com", profile.Email)

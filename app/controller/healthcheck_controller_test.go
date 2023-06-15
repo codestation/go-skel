@@ -27,7 +27,7 @@ type healthcheckSuite struct {
 
 func (s *healthcheckSuite) TestLive() {
 	uc := usecase.NewMockHealthcheck(s.T())
-	ctrl := NewHealthcheckCtrl(nil, uc)
+	ctrl := NewHealthCheck(nil, uc)
 
 	e := echo.New()
 	req := httptest.NewRequest(echo.GET, "/", nil)
@@ -44,7 +44,7 @@ func (s *healthcheckSuite) TestReady() {
 	uc := usecase.NewMockHealthcheck(s.T())
 	uc.EXPECT().Execute(mock.Anything).Return(&model.HealthcheckResult{})
 
-	ctrl := NewHealthcheckCtrl(nil, uc)
+	ctrl := NewHealthCheck(nil, uc)
 
 	e := echo.New()
 	req := httptest.NewRequest(echo.GET, "/", nil)
@@ -63,7 +63,7 @@ func (s *healthcheckSuite) TestReadyFailed() {
 		Ping: errors.New("an error ocurred"),
 	})
 
-	ctrl := NewHealthcheckCtrl(nil, uc)
+	ctrl := NewHealthCheck(nil, uc)
 
 	e := echo.New()
 	req := httptest.NewRequest(echo.GET, "/", nil)

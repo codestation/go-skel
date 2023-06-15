@@ -38,7 +38,7 @@ func (s *profileSuite) TestGet() {
 	uc := usecase.NewMockProfile(s.T())
 	uc.EXPECT().GetProfile(mock.Anything, int64(1)).Return(&mockProfile, nil)
 
-	ctrl := NewProfileCtrl(nil, uc)
+	ctrl := NewProfile(nil, uc)
 
 	e := echo.New()
 	req := httptest.NewRequest(echo.GET, "/", nil)
@@ -62,7 +62,7 @@ func (s *profileSuite) TestList() {
 	uc := usecase.NewMockProfile(s.T())
 	uc.EXPECT().ListProfiles(mock.Anything, mock.Anything).Return(resp, nil)
 
-	ctrl := NewProfileCtrl(nil, uc)
+	ctrl := NewProfile(nil, uc)
 
 	e := echo.New()
 	req := httptest.NewRequest(echo.GET, "/", nil)

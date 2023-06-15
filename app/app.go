@@ -50,7 +50,7 @@ func NewApp(cfg *config.Config) (*App, error) {
 	s.conn = sql.NewPgxWrapper(pool)
 
 	// Repository initialization (not attached to the unit of work)
-	healthcheckRepo := repository.NewHealthcheckRepo(s.conn)
+	healthcheckRepo := repository.NewHealthCheck(s.conn)
 
 	// Unit of Work initialization (all repos are initialized here)
 	unitOfWork := uow.New(s.conn)
@@ -61,8 +61,8 @@ func NewApp(cfg *config.Config) (*App, error) {
 
 	// Controller initialization
 	ctrl := controller.Controller{
-		ProfileController:     controller.NewProfileCtrl(cfg, profileUsecase),
-		HealthcheckController: controller.NewHealthcheckCtrl(cfg, healthcheckUsecase),
+		ProfileController:     controller.NewProfile(cfg, profileUsecase),
+		HealthcheckController: controller.NewHealthCheck(cfg, healthcheckUsecase),
 	}
 
 	// HTTP server initialization

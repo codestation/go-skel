@@ -23,7 +23,7 @@ type uowStore struct {
 
 func newUowStore(conn sql.Executor) *uowStore {
 	return &uowStore{
-		profiles: repository.NewProfileRepo(conn),
+		profiles: repository.NewProfile(conn),
 	}
 }
 

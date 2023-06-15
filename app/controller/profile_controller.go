@@ -17,23 +17,23 @@ import (
 
 type ProfileController struct {
 	common
-	profile usecase.Profile
+	profileUsecase usecase.Profile
 }
 
-func NewProfileCtrl(cfg *config.Config, profile usecase.Profile) ProfileController {
+func NewProfile(cfg *config.Config, profile usecase.Profile) ProfileController {
 	return ProfileController{
-		common:  newCommon(cfg),
-		profile: profile,
+		common:         newCommon(cfg),
+		profileUsecase: profile,
 	}
 }
 
-func (a *ProfileController) ListProfiles(ctx echo.Context, params oapi.ListProfilesParams) error {
+func (ctrl *ProfileController) ListProfiles(ctx echo.Context, params oapi.ListProfilesParams) error {
 	query, err := filter.NewFilterFromParams(filter.Params(params))
 	if err != nil {
 		return err
 	}
 
-	result, err := a.profile.ListProfiles(ctx.Request().Context(), query)
+	result, err := ctrl.profileUsecase.ListProfiles(ctx.Request().Context(), query)
 	if err != nil {
 		return err
 	}
@@ -41,8 +41,8 @@ func (a *ProfileController) ListProfiles(ctx echo.Context, params oapi.ListProfi
 	return ctx.JSON(http.StatusOK, result)
 }
 
-func (a *ProfileController) SaveProfile(ctx echo.Context) error {
-	t := a.printer(ctx)
+func (ctrl *ProfileController) SaveProfile(ctx echo.Context) error {
+	t := ctrl.printer(ctx)
 
 	var request oapi.ProfileRequest
 	if err := ctx.Bind(&request); err != nil {
@@ -52,7 +52,7 @@ func (a *ProfileController) SaveProfile(ctx echo.Context) error {
 		return usecase.NewAppError(t.Sprintf("The request did not pass validation"), err)
 	}
 
-	result, err := a.profile.SaveProfile(ctx.Request().Context(), (*model.ProfileRequest)(&request))
+	result, err := ctrl.profileUsecase.SaveProfile(ctx.Request().Context(), (*model.ProfileRequest)(&request))
 	if err != nil {
 		return err
 	}
@@ -60,8 +60,8 @@ func (a *ProfileController) SaveProfile(ctx echo.Context) error {
 	return ctx.JSON(http.StatusCreated, result)
 }
 
-func (a *ProfileController) RemoveProfile(ctx echo.Context, id oapi.ProfileId) error {
-	err := a.profile.RemoveProfile(ctx.Request().Context(), id)
+func (ctrl *ProfileController) RemoveProfile(ctx echo.Context, id oapi.ProfileId) error {
+	err := ctrl.profileUsecase.RemoveProfile(ctx.Request().Context(), id)
 	if err != nil {
 		return err
 	}
@@ -69,8 +69,8 @@ func (a *ProfileController) RemoveProfile(ctx echo.Context, id oapi.ProfileId) e
 	return ctx.NoContent(http.StatusNoContent)
 }
 
-func (a *ProfileController) GetProfile(ctx echo.Context, id oapi.ProfileId) error {
-	result, err := a.profile.GetProfile(ctx.Request().Context(), id)
+func (ctrl *ProfileController) GetProfile(ctx echo.Context, id oapi.ProfileId) error {
+	result, err := ctrl.profileUsecase.GetProfile(ctx.Request().Context(), id)
 	if err != nil {
 		return err
 	}
@@ -78,7 +78,7 @@ func (a *ProfileController) GetProfile(ctx echo.Context, id oapi.ProfileId) erro
 	return ctx.JSON(http.StatusOK, result)
 }
 
-func (a *ProfileController) UpdateProfile(ctx echo.Context, id oapi.ProfileId) error {
+func (ctrl *ProfileController) UpdateProfile(ctx echo.Context, id oapi.ProfileId) error {
 	var request oapi.ProfileRequest
 	if err := ctx.Bind(&request); err != nil {
 		return err
@@ -87,7 +87,7 @@ func (a *ProfileController) UpdateProfile(ctx echo.Context, id oapi.ProfileId) e
 		return err
 	}
 
-	result, err := a.profile.UpdateProfile(ctx.Request().Context(), id, (*model.ProfileRequest)(&request))
+	result, err := ctrl.profileUsecase.UpdateProfile(ctx.Request().Context(), id, (*model.ProfileRequest)(&request))
 	if err != nil {
 		return err
 	}
