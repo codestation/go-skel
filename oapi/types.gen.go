@@ -13,6 +13,15 @@ const (
 	BearerAuthScopes = "BearerAuth.Scopes"
 )
 
+// AuthRequest defines model for AuthRequest.
+type AuthRequest struct {
+	// Password Password
+	Password string `json:"password"`
+
+	// Username Username
+	Username string `json:"username"`
+}
+
 // Error defines model for Error.
 type Error struct {
 	DetailedError *string `json:"detailed_error,omitempty"`
@@ -77,6 +86,12 @@ type ProfileRequest struct {
 	Email     string `json:"email"`
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
+}
+
+// Token defines model for Token.
+type Token struct {
+	// Token JWT token
+	Token string `json:"token"`
 }
 
 // After defines model for after.
@@ -156,6 +171,9 @@ type ListProfilesParams struct {
 	// Sort Comma-separated list of fields to provide a sort order. Use + or - as a prefix. Not implemented
 	Sort *Sort `form:"sort,omitempty" json:"sort,omitempty"`
 }
+
+// LoginJSONRequestBody defines body for Login for application/json ContentType.
+type LoginJSONRequestBody = AuthRequest
 
 // SaveProfileJSONRequestBody defines body for SaveProfile for application/json ContentType.
 type SaveProfileJSONRequestBody = ProfileRequest

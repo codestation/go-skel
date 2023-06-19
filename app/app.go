@@ -6,6 +6,7 @@ package app
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -23,6 +24,7 @@ import (
 	"megpoid.dev/go/go-skel/config"
 	"megpoid.dev/go/go-skel/oapi"
 	"megpoid.dev/go/go-skel/pkg/i18n"
+	"megpoid.dev/go/go-skel/pkg/jwt"
 	"megpoid.dev/go/go-skel/pkg/sql"
 	"megpoid.dev/go/go-skel/web"
 )
@@ -56,11 +58,13 @@ func NewApp(cfg *config.Config) (*App, error) {
 	unitOfWork := uow.New(s.conn)
 
 	// Usecase initialization
+	authUsecase := usecase.NewAuth(cfg.ServerSettings.JwtSecret)
 	healthcheckUsecase := usecase.NewHealthcheck(healthcheckRepo)
 	profileUsecase := usecase.NewProfile(unitOfWork)
 
 	// Controller initialization
 	ctrl := controller.Controller{
+		AuthController:        controller.NewAuth(cfg, authUsecase),
 		ProfileController:     controller.NewProfile(cfg, profileUsecase),
 		HealthcheckController: controller.NewHealthCheck(cfg, healthcheckUsecase),
 	}
@@ -90,12 +94,20 @@ func NewApp(cfg *config.Config) (*App, error) {
 	// Serve Swagger UI
 	handler := v4emb.NewHandlerWithConfig(swgui.Config{
 		Title:       "Skel API",
-		SwaggerJSON: "/swagger/docs/goapp.yaml",
+		SwaggerJSON: "/swagger/docs/openapi.yaml",
 		BasePath:    "/swagger",
 		SettingsUI: map[string]string{
 			"defaultModelsExpandDepth": "1",
 		},
 	})
+
+	spec, err := oapi.GetSwagger()
+	if err != nil {
+		return nil, fmt.Errorf("error loading spec: %w", err)
+	}
+
+	oapiMiddleware := jwt.OapiValidator(spec, cfg.ServerSettings.JwtSecret)
+	e.Use(oapiMiddleware)
 
 	swagger := echo.WrapHandler(handler)
 	e.GET("/swagger", swagger)

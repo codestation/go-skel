@@ -12,6 +12,10 @@ import (
 	"megpoid.dev/go/go-skel/pkg/response"
 )
 
+type Auth interface {
+	Login(ctx context.Context, username, password string) (string, error)
+}
+
 //go:generate go run github.com/vektra/mockery/v2@v2.23.1 --name Profile
 type Profile interface {
 	GetProfile(ctx context.Context, id int64) (*model.Profile, error)

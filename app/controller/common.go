@@ -24,6 +24,7 @@ func BaseURL() string {
 var _ oapi.ServerInterface = &Controller{}
 
 type Controller struct {
+	AuthController
 	ProfileController
 	HealthcheckController
 }

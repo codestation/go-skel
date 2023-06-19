@@ -16,9 +16,27 @@ GET {{host}}/apis/goapp/v1/health/ready?verbose=true
     });
 %}
 
+### Login
+POST {{host}}/apis/goapp/v1/auth/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "username": "johndoe",
+  "password": "secret"
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+    client.global.set("auth_token", response.body.token);
+%}
+
 ###
 POST {{host}}/apis/goapp/v1/profiles
 Content-Type: application/json
+Authorization: Bearer {{auth_token}}
 
 {
   "first_name": "John",
@@ -36,6 +54,7 @@ Content-Type: application/json
 ###
 PATCH {{host}}/apis/goapp/v1/profiles/{{profile_id}}
 Content-Type: application/json
+Authorization: Bearer {{auth_token}}
 
 {
   "first_name": "John",
@@ -52,6 +71,8 @@ Content-Type: application/json
 
 ###
 GET {{host}}/apis/goapp/v1/profiles?limit=1&page=1
+Accept: application/json
+Authorization: Bearer {{auth_token}}
 
 > {%
     client.test("Request executed successfully", function () {
@@ -61,6 +82,8 @@ GET {{host}}/apis/goapp/v1/profiles?limit=1&page=1
 
 ###
 GET {{host}}/apis/goapp/v1/profiles/{{profile_id}}
+Accept: application/json
+Authorization: Bearer {{auth_token}}
 
 > {%
     client.test("Profile found successfully", function () {
@@ -70,6 +93,8 @@ GET {{host}}/apis/goapp/v1/profiles/{{profile_id}}
 
 ###
 DELETE {{host}}/apis/goapp/v1/profiles/{{profile_id}}
+Accept: application/json
+Authorization: Bearer {{auth_token}}
 
 > {%
     client.test("Profile deleted successfully", function () {

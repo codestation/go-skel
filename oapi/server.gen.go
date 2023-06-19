@@ -13,6 +13,9 @@ import (
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+
+	// (POST /auth/login)
+	Login(ctx echo.Context) error
 	// Check if app is started
 	// (GET /health/live)
 	LiveCheck(ctx echo.Context, params LiveCheckParams) error
@@ -39,6 +42,15 @@ type ServerInterface interface {
 // ServerInterfaceWrapper converts echo contexts to parameters.
 type ServerInterfaceWrapper struct {
 	Handler ServerInterface
+}
+
+// Login converts echo context to params.
+func (w *ServerInterfaceWrapper) Login(ctx echo.Context) error {
+	var err error
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.Login(ctx)
+	return err
 }
 
 // LiveCheck converts echo context to params.
@@ -246,6 +258,7 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 		Handler: si,
 	}
 
+	router.POST(baseURL+"/auth/login", wrapper.Login)
 	router.GET(baseURL+"/health/live", wrapper.LiveCheck)
 	router.GET(baseURL+"/health/ready", wrapper.ReadyCheck)
 	router.GET(baseURL+"/profiles", wrapper.ListProfiles)

@@ -46,6 +46,25 @@ paths:
           $ref: "#/components/responses/UnexpectedError"
       tags:
         - status
+  "/auth/login":
+    post:
+      security: []
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuthRequest"
+      responses:
+        '200':
+          description: Login success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Token"
+      tags:
+        - auth
   "/profiles":
     get:
       parameters:
@@ -144,6 +163,20 @@ paths:
         - Profile
 components:
   schemas:
+    AuthRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          description: Username
+          example: john
+        password:
+          type: string
+          format: password
+          description: Password
+      required:
+        - username
+        - password
     ProfileList:
       type: object
       properties:
@@ -167,6 +200,14 @@ components:
         - first_name
         - last_name
         - email
+    Token:
+      type: object
+      properties:
+        token:
+          type: string
+          description: JWT token
+      required:
+        - token
     Model:
       type: object
       properties:
