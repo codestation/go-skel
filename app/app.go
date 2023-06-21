@@ -78,8 +78,8 @@ func NewApp(cfg *config.Config) (*App, error) {
 		AllowMethods: []string{http.MethodGet, http.MethodHead, http.MethodPut, http.MethodPatch, http.MethodPost, http.MethodDelete},
 	}))
 	e.Use(middleware.GzipWithConfig(middleware.GzipConfig{
-		Skipper: func(c echo.Context) bool {
-			return strings.HasPrefix(c.Request().URL.Path, "/swagger")
+		Skipper: func(ctx echo.Context) bool {
+			return strings.HasPrefix(ctx.Path(), controller.BaseURL()+"/swagger")
 		},
 	}))
 	e.Use(middleware.Recover())
@@ -94,8 +94,8 @@ func NewApp(cfg *config.Config) (*App, error) {
 	// Serve Swagger UI
 	handler := v4emb.NewHandlerWithConfig(swgui.Config{
 		Title:       "Skel API",
-		SwaggerJSON: "/swagger/docs/openapi.yaml",
-		BasePath:    "/swagger",
+		SwaggerJSON: controller.BaseURL() + "/swagger/docs/openapi.yaml",
+		BasePath:    controller.BaseURL() + "/swagger",
 		SettingsUI: map[string]string{
 			"defaultModelsExpandDepth": "1",
 		},
@@ -106,16 +106,26 @@ func NewApp(cfg *config.Config) (*App, error) {
 		return nil, fmt.Errorf("error loading spec: %w", err)
 	}
 
-	oapiMiddleware := jwt.OapiValidator(spec, cfg.ServerSettings.JwtSecret)
+	skipperFunc := jwt.WithSkipperFunc(func(ctx echo.Context) bool {
+		path := ctx.Path()
+		if strings.HasPrefix(path, controller.BaseURL()+"/swagger") {
+			return true
+		}
+
+		return false
+	})
+
+	oapiMiddleware := jwt.OapiValidator(spec, cfg.ServerSettings.JwtSecret, skipperFunc)
 	e.Use(oapiMiddleware)
 
+	group := e.Group(controller.BaseURL())
 	swagger := echo.WrapHandler(handler)
-	e.GET("/swagger", swagger)
-	e.GET("/swagger/*", swagger)
+	group.GET("/swagger", swagger)
+	group.GET("/swagger/*", swagger)
 
 	// Embed openapi docs
 	assetHandler := http.FileServer(http.FS(oapi.Assets()))
-	e.GET("/swagger/docs/*", echo.WrapHandler(http.StripPrefix("/swagger/docs/", assetHandler)))
+	group.GET("/swagger/docs/*", echo.WrapHandler(http.StripPrefix(controller.BaseURL()+"/swagger/docs/", assetHandler)))
 
 	web.New(e)
 

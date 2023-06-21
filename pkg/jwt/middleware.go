@@ -16,6 +16,7 @@ import (
 	"github.com/getkin/kin-openapi/openapi3filter"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 const ClaimsContextKey = "jwt_claims"
@@ -23,12 +24,26 @@ const ClaimsContextKey = "jwt_claims"
 var ErrNoAuthHeader = errors.New("authorization header is missing")
 var ErrInvalidAuthHeader = errors.New("authorization header is malformed")
 
-func OapiValidator(spec *openapi3.T, secret []byte) echo.MiddlewareFunc {
-	return oapimw.OapiRequestValidatorWithOptions(spec, &oapimw.Options{
+type ValidatorOption func(opt *oapimw.Options)
+
+func WithSkipperFunc(skipFn middleware.Skipper) ValidatorOption {
+	return func(o *oapimw.Options) {
+		o.Skipper = skipFn
+	}
+}
+
+func OapiValidator(spec *openapi3.T, secret []byte, opts ...ValidatorOption) echo.MiddlewareFunc {
+	options := &oapimw.Options{
 		Options: openapi3filter.Options{
 			AuthenticationFunc: newAuthenticator(secret),
 		},
-	})
+	}
+
+	for _, opt := range opts {
+		opt(options)
+	}
+
+	return oapimw.OapiRequestValidatorWithOptions(spec, options)
 }
 
 func newAuthenticator(secret []byte) openapi3filter.AuthenticationFunc {
