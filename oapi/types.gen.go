@@ -77,8 +77,8 @@ type Profile struct {
 
 // ProfileList defines model for ProfileList.
 type ProfileList struct {
-	Items      *Profile    `json:"items,omitempty"`
-	Pagination *Pagination `json:"pagination,omitempty"`
+	Items      []Profile  `json:"items"`
+	Pagination Pagination `json:"pagination"`
 }
 
 // ProfileRequest defines model for ProfileRequest.

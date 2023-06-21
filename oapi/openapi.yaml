@@ -181,9 +181,14 @@ components:
       type: object
       properties:
         items:
-          $ref: "#/components/schemas/Profile"
+          type: array
+          items:
+            $ref: "#/components/schemas/Profile"
         pagination:
           $ref: "#/components/schemas/Pagination"
+      required:
+        - items
+        - pagination
     ProfileRequest:
       type: object
       properties:
