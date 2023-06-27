@@ -11,6 +11,7 @@ import (
 	"megpoid.dev/go/go-skel/app/model"
 	"megpoid.dev/go/go-skel/app/repository"
 	"megpoid.dev/go/go-skel/app/repository/uow"
+	"megpoid.dev/go/go-skel/pkg/apperror"
 	"megpoid.dev/go/go-skel/pkg/clause"
 	"megpoid.dev/go/go-skel/pkg/repo"
 	"megpoid.dev/go/go-skel/pkg/request"
@@ -32,9 +33,9 @@ func (u *ProfileInteractor) GetProfile(ctx context.Context, id int64) (*model.Pr
 	profile, err := u.profileRepo.Get(ctx, id)
 	if err != nil {
 		if errors.Is(err, repo.ErrNotFound) {
-			return nil, NewAppError(t.Sprintf("Profile not found"), err)
+			return nil, apperror.NewAppError(t.Sprintf("Profile not found"), err)
 		} else {
-			return nil, NewAppError(t.Sprintf("Failed to get profileRepo"), err)
+			return nil, apperror.NewAppError(t.Sprintf("Failed to get profile"), err)
 		}
 	}
 
@@ -46,7 +47,7 @@ func (u *ProfileInteractor) ListProfiles(ctx context.Context, query *request.Que
 
 	result, err := u.profileRepo.List(ctx, clause.WithFilter(query))
 	if err != nil {
-		return nil, NewAppError(t.Sprintf("Failed to list profiles"), err)
+		return nil, apperror.NewAppError(t.Sprintf("Failed to list profiles"), err)
 	}
 
 	return result, nil
@@ -59,10 +60,10 @@ func (u *ProfileInteractor) SaveProfile(ctx context.Context, req *model.ProfileR
 	err := u.profileRepo.Save(ctx, profile)
 	if err != nil {
 		if errors.Is(err, repo.ErrDuplicated) {
-			return nil, NewAppError(t.Sprintf("Email is already registered with another profileRepo"), err)
+			return nil, apperror.NewAppError(t.Sprintf("Email is already registered with another profile"), err)
 		}
 
-		return nil, NewAppError(t.Sprintf("Failed to save profileRepo"), err)
+		return nil, apperror.NewAppError(t.Sprintf("Failed to save profile"), err)
 	}
 
 	return profile, nil
@@ -75,7 +76,7 @@ func (u *ProfileInteractor) UpdateProfile(ctx context.Context, id int64, req *mo
 	profile.ID = id
 	err := u.profileRepo.Update(ctx, profile)
 	if err != nil {
-		return nil, NewAppError(t.Sprintf("Failed to update profileRepo"), err)
+		return nil, apperror.NewAppError(t.Sprintf("Failed to update profile"), err)
 	}
 
 	return profile, nil
@@ -85,7 +86,7 @@ func (u *ProfileInteractor) RemoveProfile(ctx context.Context, id int64) error {
 	t := u.printer(ctx)
 
 	if err := u.profileRepo.Delete(ctx, id); err != nil {
-		return NewAppError(t.Sprintf("Failed to remove profileRepo"), err)
+		return apperror.NewAppError(t.Sprintf("Failed to remove profile"), err)
 	}
 
 	return nil

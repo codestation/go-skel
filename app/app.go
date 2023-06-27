@@ -12,7 +12,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/swaggest/swgui"
@@ -23,9 +22,11 @@ import (
 	"megpoid.dev/go/go-skel/app/usecase"
 	"megpoid.dev/go/go-skel/config"
 	"megpoid.dev/go/go-skel/oapi"
+	"megpoid.dev/go/go-skel/pkg/apperror"
 	"megpoid.dev/go/go-skel/pkg/i18n"
 	"megpoid.dev/go/go-skel/pkg/jwt"
 	"megpoid.dev/go/go-skel/pkg/sql"
+	"megpoid.dev/go/go-skel/pkg/validator"
 	"megpoid.dev/go/go-skel/web"
 )
 
@@ -87,8 +88,8 @@ func NewApp(cfg *config.Config) (*App, error) {
 	e.Use(middleware.Logger())
 	e.Use(middleware.BodyLimit(cfg.ServerSettings.BodyLimit))
 	e.Use(middleware.RequestID())
-	e.Validator = &CustomValidator{validator: validator.New()}
-	e.HTTPErrorHandler = ErrorHandler(e)
+	e.Validator = validator.NewCustomValidator()
+	e.HTTPErrorHandler = apperror.ErrorHandler(e)
 	s.EchoServer = e
 
 	// Serve Swagger UI

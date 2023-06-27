@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"megpoid.dev/go/go-skel/pkg/apperror"
 )
 
 // used to validate that the implementation matches the interface
@@ -36,7 +37,7 @@ func (uc *AuthInteractor) Login(ctx context.Context, username, password string) 
 
 	//TODO: really verify username/password
 	if len(username) == 0 || len(password) == 0 {
-		return "", NewAppError(t.Sprintf("Invalid username or password"), nil)
+		return "", apperror.NewAuthError(t.Sprintf("Invalid username or password"), nil)
 	}
 
 	claims := JwtCustomClaims{
@@ -50,7 +51,7 @@ func (uc *AuthInteractor) Login(ctx context.Context, username, password string) 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	s, err := token.SignedString(uc.jwtSecret)
 	if err != nil {
-		return "", NewAppError(t.Sprintf("Failed to sign token"), err)
+		return "", apperror.NewAppError(t.Sprintf("Failed to sign token"), err)
 	}
 
 	return s, nil

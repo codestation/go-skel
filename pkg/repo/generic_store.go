@@ -110,6 +110,7 @@ func (s *GenericStoreImpl[T]) AttachFunc(fn AttachFunc[T]) {
 	s.attachFunc = fn
 }
 
+// Get returns a record from the database. If no record is found then a ErrNotFound is returned
 func (s *GenericStoreImpl[T]) Get(ctx context.Context, id int64) (T, error) {
 	result, err := s.GetBy(ctx, Expr{"id": id})
 	if err != nil {

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT-license
 // that can be found in the LICENSE file.
 
-package app
+package apperror
 
 import (
 	"errors"
@@ -10,7 +10,6 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"golang.org/x/text/message"
-	"megpoid.dev/go/go-skel/app/usecase"
 	"megpoid.dev/go/go-skel/pkg/i18n"
 )
 
@@ -20,11 +19,11 @@ func ErrorHandler(e *echo.Echo) echo.HTTPErrorHandler {
 			return
 		}
 
-		var appErr *usecase.Error
+		var appErr *Error
 		printer := message.NewPrinter(i18n.GetLanguageTags(c))
 
 		if !errors.As(err, &appErr) {
-			appErr = usecase.NewAppError(printer.Sprintf("An error occurred"), err)
+			appErr = NewAppError(printer.Sprintf("An error occurred"), err)
 			appErr.Where = "ErrorHandler"
 		}
 

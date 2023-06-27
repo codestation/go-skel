@@ -13,6 +13,7 @@ import (
 	"megpoid.dev/go/go-skel/app/usecase"
 	"megpoid.dev/go/go-skel/config"
 	"megpoid.dev/go/go-skel/oapi"
+	"megpoid.dev/go/go-skel/pkg/apperror"
 )
 
 type ProfileController struct {
@@ -46,10 +47,10 @@ func (ctrl *ProfileController) SaveProfile(ctx echo.Context) error {
 
 	var request oapi.ProfileRequest
 	if err := ctx.Bind(&request); err != nil {
-		return usecase.NewAppError(t.Sprintf("Failed to read request"), err)
+		return apperror.NewAppError(t.Sprintf("Failed to read request"), err)
 	}
 	if err := ctx.Validate(&request); err != nil {
-		return usecase.NewAppError(t.Sprintf("The request did not pass validation"), err)
+		return apperror.NewAppError(t.Sprintf("The request did not pass validation"), err)
 	}
 
 	result, err := ctrl.profileUsecase.SaveProfile(ctx.Request().Context(), (*model.ProfileRequest)(&request))

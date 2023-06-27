@@ -16,10 +16,10 @@ const (
 // AuthRequest defines model for AuthRequest.
 type AuthRequest struct {
 	// Password Password
-	Password string `json:"password"`
+	Password string `json:"password" validate:"required"`
 
 	// Username Username
-	Username string `json:"username"`
+	Username string `json:"username" validate:"required"`
 }
 
 // Error defines model for Error.

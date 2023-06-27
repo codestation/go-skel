@@ -2,13 +2,12 @@
 // Use of this source code is governed by a MIT-license
 // that can be found in the LICENSE file.
 
-package usecase
+package apperror
 
 import (
 	"errors"
 	"net/http"
 	"runtime"
-	"strings"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
@@ -32,25 +31,26 @@ func (e *Error) Error() string {
 	return e.Where + ": " + e.Message + ", " + e.DetailedError
 }
 
-func NewAppError(message string, err error) *Error {
+func createAppError(message string, err error, skip int) *Error {
 	appErr := &Error{
 		Message: message,
 	}
 
 	pc := make([]uintptr, 1)
-	n := runtime.Callers(2, pc)
+	n := runtime.Callers(skip, pc)
 
 	if n > 0 {
 		frames := runtime.CallersFrames(pc[:n])
 		frame, _ := frames.Next()
-		funcParts := strings.Split(frame.Function, ".")
-		appErr.Where = funcParts[len(funcParts)-1]
+		appErr.Where = frame.Function
 	}
 
 	if err != nil {
 		var httpErr *echo.HTTPError
 		var validateErr validator.ValidationErrors
 		var bindingErr *echo.BindingError
+		var authErr *authError
+		var validationErr *validationError
 
 		appErr.DetailedError = err.Error()
 		switch {
@@ -69,6 +69,12 @@ func NewAppError(message string, err error) *Error {
 				})
 			}
 			appErr.StatusCode = http.StatusBadRequest
+		case errors.As(err, &authErr):
+			appErr.StatusCode = http.StatusUnauthorized
+			appErr.DetailedError = authErr.Error()
+		case errors.As(err, &validationErr):
+			appErr.StatusCode = http.StatusBadRequest
+			appErr.DetailedError = validationErr.Error()
 		default:
 			appErr.StatusCode = http.StatusInternalServerError
 		}
@@ -77,4 +83,38 @@ func NewAppError(message string, err error) *Error {
 	}
 
 	return appErr
+}
+
+func NewAppError(message string, err error) *Error {
+	return createAppError(message, err, 3)
+}
+
+type authError struct {
+	err error
+}
+
+func (e *authError) Error() string {
+	if e.err != nil {
+		return e.err.Error()
+	}
+	return ""
+}
+
+type validationError struct {
+	err error
+}
+
+func (e *validationError) Error() string {
+	if e.err != nil {
+		return e.err.Error()
+	}
+	return ""
+}
+
+func NewAuthError(message string, err error) *Error {
+	return createAppError(message, &authError{err: err}, 4)
+}
+
+func NewValidationError(message string, err error) *Error {
+	return createAppError(message, &validationError{err: err}, 4)
 }

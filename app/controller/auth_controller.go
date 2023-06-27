@@ -11,6 +11,7 @@ import (
 	"megpoid.dev/go/go-skel/app/usecase"
 	"megpoid.dev/go/go-skel/config"
 	"megpoid.dev/go/go-skel/oapi"
+	"megpoid.dev/go/go-skel/pkg/apperror"
 )
 
 type AuthController struct {
@@ -28,13 +29,13 @@ func NewAuth(cfg *config.Config, Auth usecase.Auth) AuthController {
 func (ctrl *AuthController) Login(ctx echo.Context) error {
 	t := ctrl.printer(ctx)
 
-	request := &oapi.AuthRequest{}
+	request := oapi.AuthRequest{}
 
-	if err := ctx.Bind(request); err != nil {
-		return usecase.NewAppError(t.Sprintf("Invalid login"), err)
+	if err := ctx.Bind(&request); err != nil {
+		return apperror.NewValidationError(t.Sprintf("Invalid login request"), err)
 	}
-	if err := ctx.Validate(request); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	if err := ctx.Validate(&request); err != nil {
+		return err
 	}
 
 	result, err := ctrl.auth.Login(ctx.Request().Context(), request.Username, request.Password)

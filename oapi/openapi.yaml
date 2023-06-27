@@ -170,10 +170,14 @@ components:
           type: string
           description: Username
           example: john
+          x-oapi-codegen-extra-tags:
+            validate: 'required'
         password:
           type: string
           format: password
           description: Password
+          x-oapi-codegen-extra-tags:
+            validate: 'required'
       required:
         - username
         - password
