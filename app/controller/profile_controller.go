@@ -50,7 +50,7 @@ func (ctrl *ProfileController) SaveProfile(ctx echo.Context) error {
 		return apperror.NewAppError(t.Sprintf("Failed to read request"), err)
 	}
 	if err := ctx.Validate(&request); err != nil {
-		return apperror.NewAppError(t.Sprintf("The request did not pass validation"), err)
+		return apperror.NewValidationError(t.Sprintf("The request did not pass validation"), err)
 	}
 
 	result, err := ctrl.profileUsecase.SaveProfile(ctx.Request().Context(), (*model.ProfileRequest)(&request))
