@@ -218,17 +218,16 @@ components:
       properties:
         id:
           type: integer
+          format: int64
+          x-go-name: ID
         created_at:
           type: string
         updated_at:
-          type: string
-        external_id:
           type: string
       required:
         - id
         - created_at
         - updated_at
-        - external_id
     Profile:
       allOf:
         - $ref: "#/components/schemas/Model"

@@ -32,10 +32,9 @@ type Error struct {
 
 // Model defines model for Model.
 type Model struct {
-	CreatedAt  string `json:"created_at"`
-	ExternalId string `json:"external_id"`
-	Id         int    `json:"id"`
-	UpdatedAt  string `json:"updated_at"`
+	CreatedAt string `json:"created_at"`
+	ID        int64  `json:"id"`
+	UpdatedAt string `json:"updated_at"`
 }
 
 // Pagination defines model for Pagination.
@@ -66,13 +65,12 @@ type PaginationType struct {
 
 // Profile defines model for Profile.
 type Profile struct {
-	CreatedAt  string `json:"created_at"`
-	Email      string `json:"email"`
-	ExternalId string `json:"external_id"`
-	FirstName  string `json:"first_name"`
-	Id         int    `json:"id"`
-	LastName   string `json:"last_name"`
-	UpdatedAt  string `json:"updated_at"`
+	CreatedAt string `json:"created_at"`
+	Email     string `json:"email"`
+	FirstName string `json:"first_name"`
+	ID        int64  `json:"id"`
+	LastName  string `json:"last_name"`
+	UpdatedAt string `json:"updated_at"`
 }
 
 // ProfileList defines model for ProfileList.
