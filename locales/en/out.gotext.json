@@ -2,9 +2,9 @@
     "language": "en",
     "messages": [
         {
-            "id": "An error occurred",
-            "message": "An error occurred",
-            "translation": "An error occurred",
+            "id": "Invalid login request",
+            "message": "Invalid login request",
+            "translation": "Invalid login request",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
@@ -19,6 +19,20 @@
             "id": "The request did not pass validation",
             "message": "The request did not pass validation",
             "translation": "The request did not pass validation",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Invalid username or password",
+            "message": "Invalid username or password",
+            "translation": "Invalid username or password",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Failed to sign token",
+            "message": "Failed to sign token",
+            "translation": "Failed to sign token",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
@@ -68,6 +82,13 @@
             "id": "Failed to remove profile",
             "message": "Failed to remove profile",
             "translation": "Failed to remove profile",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "An error occurred",
+            "message": "An error occurred",
+            "translation": "An error occurred",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         }

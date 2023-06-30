@@ -2,9 +2,9 @@
     "language": "es",
     "messages": [
         {
-            "id": "An error occurred",
-            "message": "An error occurred",
-            "translation": "Ha ocurrido un error"
+            "id": "Invalid login request",
+            "message": "Invalid login request",
+            "translation": "Petición de inicio de sesión invalida"
         },
         {
             "id": "Failed to read request",
@@ -15,6 +15,16 @@
             "id": "The request did not pass validation",
             "message": "The request did not pass validation",
             "translation": "La petición no pasó la validación"
+        },
+        {
+            "id": "Invalid username or password",
+            "message": "Invalid username or password",
+            "translation": "Usuario o contraseña invalida"
+        },
+        {
+            "id": "Failed to sign token",
+            "message": "Failed to sign token",
+            "translation": "Error al firmar token"
         },
         {
             "id": "Profile not found",
@@ -50,6 +60,11 @@
             "id": "Failed to remove profile",
             "message": "Failed to remove profile",
             "translation": "Error al eliminar el perfil"
+        },
+        {
+            "id": "An error occurred",
+            "message": "An error occurred",
+            "translation": "Ha ocurrido un error"
         }
     ]
 }

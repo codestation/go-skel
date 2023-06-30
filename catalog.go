@@ -39,42 +39,49 @@ func init() {
 }
 
 var messageKeyToIndex = map[string]int{
-	"An error occurred": 0,
-	"Email is already registered with another profile": 6,
-	"Failed to get profile":                            4,
-	"Failed to list profiles":                          5,
+	"An error occurred": 12,
+	"Email is already registered with another profile": 8,
+	"Failed to get profile":                            6,
+	"Failed to list profiles":                          7,
 	"Failed to read request":                           1,
-	"Failed to remove profile":                         9,
-	"Failed to save profile":                           7,
-	"Failed to update profile":                         8,
-	"Profile not found":                                3,
+	"Failed to remove profile":                         11,
+	"Failed to save profile":                           9,
+	"Failed to sign token":                             4,
+	"Failed to update profile":                         10,
+	"Invalid login request":                            0,
+	"Invalid username or password":                     3,
+	"Profile not found":                                5,
 	"The request did not pass validation":              2,
 }
 
-var enIndex = []uint32{ // 11 elements
-	0x00000000, 0x00000012, 0x00000029, 0x0000004d,
-	0x0000005f, 0x00000075, 0x0000008d, 0x000000be,
-	0x000000d5, 0x000000ee, 0x00000107,
-} // Size: 68 bytes
+var enIndex = []uint32{ // 14 elements
+	0x00000000, 0x00000016, 0x0000002d, 0x00000051,
+	0x0000006e, 0x00000083, 0x00000095, 0x000000ab,
+	0x000000c3, 0x000000f4, 0x0000010b, 0x00000124,
+	0x0000013d, 0x0000014f,
+} // Size: 80 bytes
 
-const enData string = "" + // Size: 263 bytes
-	"\x02An error occurred\x02Failed to read request\x02The request did not p" +
-	"ass validation\x02Profile not found\x02Failed to get profile\x02Failed t" +
-	"o list profiles\x02Email is already registered with another profile\x02F" +
-	"ailed to save profile\x02Failed to update profile\x02Failed to remove pr" +
-	"ofile"
+const enData string = "" + // Size: 335 bytes
+	"\x02Invalid login request\x02Failed to read request\x02The request did n" +
+	"ot pass validation\x02Invalid username or password\x02Failed to sign tok" +
+	"en\x02Profile not found\x02Failed to get profile\x02Failed to list profi" +
+	"les\x02Email is already registered with another profile\x02Failed to sav" +
+	"e profile\x02Failed to update profile\x02Failed to remove profile\x02An " +
+	"error occurred"
 
-var esIndex = []uint32{ // 11 elements
-	0x00000000, 0x00000015, 0x00000030, 0x00000055,
-	0x0000006a, 0x00000082, 0x0000009b, 0x000000cc,
-	0x000000e7, 0x00000105, 0x00000121,
-} // Size: 68 bytes
+var esIndex = []uint32{ // 14 elements
+	0x00000000, 0x00000028, 0x00000043, 0x00000068,
+	0x00000087, 0x0000009d, 0x000000b2, 0x000000ca,
+	0x000000e3, 0x00000114, 0x0000012f, 0x0000014d,
+	0x00000169, 0x0000017e,
+} // Size: 80 bytes
 
-const esData string = "" + // Size: 289 bytes
-	"\x02Ha ocurrido un error\x02Error al leer la petición\x02La petición no " +
-	"pasó la validación\x02Perfil no encontrado\x02Error al obtener perfil" +
-	"\x02Error al listar perfiles\x02El correo está siendo utilizado por otro" +
-	" perfil\x02Error al guardar el perfil\x02Error al actualizar el perfil" +
-	"\x02Error al eliminar el perfil"
+const esData string = "" + // Size: 382 bytes
+	"\x02Petición de inicio de sesión invalida\x02Error al leer la petición" +
+	"\x02La petición no pasó la validación\x02Usuario o contraseña invalida" +
+	"\x02Error al firmar token\x02Perfil no encontrado\x02Error al obtener pe" +
+	"rfil\x02Error al listar perfiles\x02El correo está siendo utilizado por " +
+	"otro perfil\x02Error al guardar el perfil\x02Error al actualizar el perf" +
+	"il\x02Error al eliminar el perfil\x02Ha ocurrido un error"
 
-	// Total table size 688 bytes (0KiB); checksum: 99144895
+	// Total table size 877 bytes (0KiB); checksum: DB66DE91
