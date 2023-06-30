@@ -18,6 +18,7 @@ type GenericStore[T model.Modelable] interface {
 	Find(ctx context.Context, dest T, id int64) error
 	Get(ctx context.Context, id int64) (T, error)
 	GetBy(ctx context.Context, expr Expr) (T, error)
+	Exists(ctx context.Context, expr Expr) (bool, error)
 	List(ctx context.Context, opts ...clause.FilterOption) (*response.ListResponse[T], error)
 	ListBy(ctx context.Context, expr Expr, opts ...clause.FilterOption) (*response.ListResponse[T], error)
 	ListByIds(ctx context.Context, ids []int64) (*response.ListResponse[T], error)

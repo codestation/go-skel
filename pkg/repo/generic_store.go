@@ -165,6 +165,19 @@ func (s *GenericStoreImpl[T]) GetBy(ctx context.Context, expr Expr) (T, error) {
 	}
 }
 
+func (s *GenericStoreImpl[T]) Exists(ctx context.Context, expr Expr) (bool, error) {
+	_, err := s.GetBy(ctx, expr)
+	if err != nil {
+		if errors.Is(err, ErrNotFound) {
+			return false, nil
+		}
+
+		return false, err
+	}
+
+	return true, nil
+}
+
 func (s *GenericStoreImpl[T]) List(ctx context.Context, opts ...clause.FilterOption) (*response.ListResponse[T], error) {
 	return s.ListBy(ctx, Expr{}, opts...)
 }

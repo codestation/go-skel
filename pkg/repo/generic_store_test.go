@@ -329,6 +329,26 @@ func (s *storeSuite) TestStoreGetByExpr() {
 	}
 }
 
+func (s *storeSuite) TestStoreExists() {
+	st := NewStore[*testUser](s.conn.Store)
+	var tests = []struct {
+		name   string
+		exists bool
+	}{
+		{"John Doe 1", true},
+		{"John Doe 6", false},
+	}
+
+	for _, test := range tests {
+		s.Run("Exists", func() {
+			exists, err := st.Exists(context.Background(), Expr{"name": test.name})
+			if s.NoError(err) {
+				s.Equal(test.exists, exists)
+			}
+		})
+	}
+}
+
 func (s *storeSuite) TestStoreDeleteExternal() {
 	st := NewStore[*testUser](s.conn.Store)
 	var tests = []struct {

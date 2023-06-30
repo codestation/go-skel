@@ -125,6 +125,59 @@ func (_c *MockProfileRepo_DeleteBy_Call) RunAndReturn(run func(context.Context, 
 	return _c
 }
 
+// Exists provides a mock function with given fields: ctx, expr
+func (_m *MockProfileRepo) Exists(ctx context.Context, expr repo.Expr) (bool, error) {
+	ret := _m.Called(ctx, expr)
+
+	var r0 bool
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, repo.Expr) (bool, error)); ok {
+		return rf(ctx, expr)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, repo.Expr) bool); ok {
+		r0 = rf(ctx, expr)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, repo.Expr) error); ok {
+		r1 = rf(ctx, expr)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockProfileRepo_Exists_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Exists'
+type MockProfileRepo_Exists_Call struct {
+	*mock.Call
+}
+
+// Exists is a helper method to define mock.On call
+//   - ctx context.Context
+//   - expr repo.Expr
+func (_e *MockProfileRepo_Expecter) Exists(ctx interface{}, expr interface{}) *MockProfileRepo_Exists_Call {
+	return &MockProfileRepo_Exists_Call{Call: _e.mock.On("Exists", ctx, expr)}
+}
+
+func (_c *MockProfileRepo_Exists_Call) Run(run func(ctx context.Context, expr repo.Expr)) *MockProfileRepo_Exists_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(repo.Expr))
+	})
+	return _c
+}
+
+func (_c *MockProfileRepo_Exists_Call) Return(_a0 bool, _a1 error) *MockProfileRepo_Exists_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockProfileRepo_Exists_Call) RunAndReturn(run func(context.Context, repo.Expr) (bool, error)) *MockProfileRepo_Exists_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Find provides a mock function with given fields: ctx, dest, id
 func (_m *MockProfileRepo) Find(ctx context.Context, dest *model.Profile, id int64) error {
 	ret := _m.Called(ctx, dest, id)
