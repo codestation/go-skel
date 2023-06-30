@@ -109,11 +109,7 @@ func NewApp(cfg *config.Config) (*App, error) {
 
 	skipperFunc := jwt.WithSkipperFunc(func(ctx echo.Context) bool {
 		path := ctx.Path()
-		if strings.HasPrefix(path, controller.BaseURL()+"/swagger") {
-			return true
-		}
-
-		return false
+		return strings.HasPrefix(path, controller.BaseURL()+"/swagger")
 	})
 
 	oapiMiddleware := jwt.OapiValidator(spec, cfg.ServerSettings.JwtSecret, skipperFunc)
