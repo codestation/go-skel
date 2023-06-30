@@ -125,6 +125,50 @@ func (_c *MockProfileRepo_DeleteBy_Call) RunAndReturn(run func(context.Context, 
 	return _c
 }
 
+// Find provides a mock function with given fields: ctx, dest, id
+func (_m *MockProfileRepo) Find(ctx context.Context, dest *model.Profile, id int64) error {
+	ret := _m.Called(ctx, dest, id)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, *model.Profile, int64) error); ok {
+		r0 = rf(ctx, dest, id)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// MockProfileRepo_Find_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Find'
+type MockProfileRepo_Find_Call struct {
+	*mock.Call
+}
+
+// Find is a helper method to define mock.On call
+//   - ctx context.Context
+//   - dest *model.Profile
+//   - id int64
+func (_e *MockProfileRepo_Expecter) Find(ctx interface{}, dest interface{}, id interface{}) *MockProfileRepo_Find_Call {
+	return &MockProfileRepo_Find_Call{Call: _e.mock.On("Find", ctx, dest, id)}
+}
+
+func (_c *MockProfileRepo_Find_Call) Run(run func(ctx context.Context, dest *model.Profile, id int64)) *MockProfileRepo_Find_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(*model.Profile), args[2].(int64))
+	})
+	return _c
+}
+
+func (_c *MockProfileRepo_Find_Call) Return(_a0 error) *MockProfileRepo_Find_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockProfileRepo_Find_Call) RunAndReturn(run func(context.Context, *model.Profile, int64) error) *MockProfileRepo_Find_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Get provides a mock function with given fields: ctx, id
 func (_m *MockProfileRepo) Get(ctx context.Context, id int64) (*model.Profile, error) {
 	ret := _m.Called(ctx, id)

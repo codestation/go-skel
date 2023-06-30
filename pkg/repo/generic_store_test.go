@@ -93,6 +93,31 @@ func (s *storeSuite) TestNewStore() {
 	s.Equal([]any{"*"}, st.selectFields)
 }
 
+func (s *storeSuite) TestStoreFind() {
+	st := NewStore[*testUser](s.conn.Store)
+	var tests = []struct {
+		id  int64
+		err error
+	}{
+		{1, nil},
+		{0, ErrNotFound},
+	}
+
+	for _, test := range tests {
+		s.Run("Find", func() {
+			var user testUser
+			err := st.Find(context.Background(), &user, test.id)
+			if test.err != nil {
+				s.ErrorIs(err, test.err)
+			} else {
+				s.NoError(err)
+				s.NotZero(user.ID)
+				s.NotZero(user.CreatedAt)
+			}
+		})
+	}
+}
+
 func (s *storeSuite) TestStoreGet() {
 	st := NewStore[*testUser](s.conn.Store)
 	var tests = []struct {

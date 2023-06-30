@@ -110,6 +110,30 @@ func (s *GenericStoreImpl[T]) AttachFunc(fn AttachFunc[T]) {
 	s.attachFunc = fn
 }
 
+// Find returns a record from the database. If no record is found then a ErrNotFound is returned
+func (s *GenericStoreImpl[T]) Find(ctx context.Context, dest T, id int64) error {
+	queryBuilder := s.Builder.From(s.Table).Select(s.selectFields...).Where(goqu.Ex{"id": id})
+	if s.defaultFilters != nil && !s.defaultFilters.IsEmpty() {
+		queryBuilder = queryBuilder.Where(s.defaultFilters)
+	}
+
+	query, args, err := queryBuilder.Prepared(true).ToSQL()
+	if err != nil {
+		return NewRepoError(ErrBackend, err)
+	}
+
+	err = s.Conn.Get(ctx, dest, query, args...)
+
+	switch {
+	case errors.Is(err, sql.ErrNoRows):
+		return NewRepoError(ErrNotFound, nil)
+	case err != nil:
+		return NewRepoError(ErrBackend, err)
+	default:
+		return nil
+	}
+}
+
 // Get returns a record from the database. If no record is found then a ErrNotFound is returned
 func (s *GenericStoreImpl[T]) Get(ctx context.Context, id int64) (T, error) {
 	result, err := s.GetBy(ctx, Expr{"id": id})

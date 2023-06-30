@@ -15,6 +15,7 @@ import (
 type Expr map[string]any
 
 type GenericStore[T model.Modelable] interface {
+	Find(ctx context.Context, dest T, id int64) error
 	Get(ctx context.Context, id int64) (T, error)
 	GetBy(ctx context.Context, expr Expr) (T, error)
 	List(ctx context.Context, opts ...clause.FilterOption) (*response.ListResponse[T], error)
