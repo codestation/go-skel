@@ -72,7 +72,7 @@ func TestProfileSave(t *testing.T) {
 	}
 
 	r := repository.NewMockProfileRepo(t)
-	r.EXPECT().Save(mock.Anything, mock.Anything).RunAndReturn(mockSave)
+	r.EXPECT().Insert(mock.Anything, mock.Anything).RunAndReturn(mockSave)
 
 	store := uow.NewMockUnitOfWorkStore(t)
 	store.EXPECT().Profiles().Return(r)

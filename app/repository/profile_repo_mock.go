@@ -334,6 +334,49 @@ func (_c *MockProfileRepo_GetByEmail_Call) RunAndReturn(run func(context.Context
 	return _c
 }
 
+// Insert provides a mock function with given fields: ctx, req
+func (_m *MockProfileRepo) Insert(ctx context.Context, req *model.Profile) error {
+	ret := _m.Called(ctx, req)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, *model.Profile) error); ok {
+		r0 = rf(ctx, req)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// MockProfileRepo_Insert_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Insert'
+type MockProfileRepo_Insert_Call struct {
+	*mock.Call
+}
+
+// Insert is a helper method to define mock.On call
+//   - ctx context.Context
+//   - req *model.Profile
+func (_e *MockProfileRepo_Expecter) Insert(ctx interface{}, req interface{}) *MockProfileRepo_Insert_Call {
+	return &MockProfileRepo_Insert_Call{Call: _e.mock.On("Insert", ctx, req)}
+}
+
+func (_c *MockProfileRepo_Insert_Call) Run(run func(ctx context.Context, req *model.Profile)) *MockProfileRepo_Insert_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(*model.Profile))
+	})
+	return _c
+}
+
+func (_c *MockProfileRepo_Insert_Call) Return(_a0 error) *MockProfileRepo_Insert_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockProfileRepo_Insert_Call) RunAndReturn(run func(context.Context, *model.Profile) error) *MockProfileRepo_Insert_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // List provides a mock function with given fields: ctx, opts
 func (_m *MockProfileRepo) List(ctx context.Context, opts ...clause.FilterOption) (*response.ListResponse[*model.Profile], error) {
 	_va := make([]interface{}, len(opts))
@@ -641,49 +684,6 @@ func (_c *MockProfileRepo_ListEach_Call) Return(_a0 error) *MockProfileRepo_List
 }
 
 func (_c *MockProfileRepo_ListEach_Call) RunAndReturn(run func(context.Context, func(*model.Profile) error, ...clause.FilterOption) error) *MockProfileRepo_ListEach_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// Save provides a mock function with given fields: ctx, req
-func (_m *MockProfileRepo) Save(ctx context.Context, req *model.Profile) error {
-	ret := _m.Called(ctx, req)
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, *model.Profile) error); ok {
-		r0 = rf(ctx, req)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
-
-// MockProfileRepo_Save_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Save'
-type MockProfileRepo_Save_Call struct {
-	*mock.Call
-}
-
-// Save is a helper method to define mock.On call
-//   - ctx context.Context
-//   - req *model.Profile
-func (_e *MockProfileRepo_Expecter) Save(ctx interface{}, req interface{}) *MockProfileRepo_Save_Call {
-	return &MockProfileRepo_Save_Call{Call: _e.mock.On("Save", ctx, req)}
-}
-
-func (_c *MockProfileRepo_Save_Call) Run(run func(ctx context.Context, req *model.Profile)) *MockProfileRepo_Save_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*model.Profile))
-	})
-	return _c
-}
-
-func (_c *MockProfileRepo_Save_Call) Return(_a0 error) *MockProfileRepo_Save_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *MockProfileRepo_Save_Call) RunAndReturn(run func(context.Context, *model.Profile) error) *MockProfileRepo_Save_Call {
 	_c.Call.Return(run)
 	return _c
 }

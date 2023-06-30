@@ -23,7 +23,7 @@ type GenericStore[T model.Modelable] interface {
 	ListByIds(ctx context.Context, ids []int64) (*response.ListResponse[T], error)
 	ListEach(ctx context.Context, fn func(item T) error, opts ...clause.FilterOption) error
 	ListByEach(ctx context.Context, expr Expr, fn func(item T) error, opts ...clause.FilterOption) error
-	Save(ctx context.Context, req T) error
+	Insert(ctx context.Context, req T) error
 	// Upsert inserts a new record in the database, if the target column has a conflict then updates the fields instead
 	Upsert(ctx context.Context, req T, target string) (bool, error)
 	// Update updates a record on the repository

@@ -162,9 +162,9 @@ func (s *storeSuite) TestStoreSave() {
 	}
 
 	for _, test := range tests {
-		s.Run("Save", func() {
+		s.Run("Insert", func() {
 			user := newUser(test.name, test.profileId)
-			err := st.Save(context.Background(), user)
+			err := st.Insert(context.Background(), user)
 			if test.err != nil {
 				s.ErrorIs(err, test.err)
 			} else {
@@ -189,7 +189,7 @@ func (s *storeSuite) TestStoreUpsert() {
 	}
 
 	for _, test := range tests {
-		s.Run("Save", func() {
+		s.Run("Insert", func() {
 			user := newUser(test.name, test.profileId)
 			created, err := st.Upsert(context.Background(), user, "name")
 			if test.err != nil {
@@ -373,7 +373,7 @@ func (s *storeSuite) TestBackendError() {
 	s.ErrorIs(err, ErrBackend)
 	_, err = st.List(ctx)
 	s.ErrorIs(err, ErrBackend)
-	err = st.Save(ctx, newUser("John Doe", 1))
+	err = st.Insert(ctx, newUser("John Doe", 1))
 	s.ErrorIs(err, ErrBackend)
 	err = st.Update(ctx, newUser("John Doe", 1))
 	s.ErrorIs(err, ErrBackend)

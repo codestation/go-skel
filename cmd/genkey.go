@@ -62,7 +62,7 @@ var genkeyCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(genkeyCmd)
 
-	genkeyCmd.Flags().StringP("output", "o", "", "Save generated key to file")
+	genkeyCmd.Flags().StringP("output", "o", "", "Insert generated key to file")
 	genkeyCmd.Flags().BoolP("quiet", "q", false, "Do not print extra messages")
 	genkeyCmd.Flags().IntP("length", "l", ApplicationKeySize, "Use an specific key length")
 

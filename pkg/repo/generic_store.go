@@ -249,7 +249,7 @@ func (s *GenericStoreImpl[T]) ListByEach(ctx context.Context, expr Expr, fn func
 	}
 }
 
-func (s *GenericStoreImpl[T]) Save(ctx context.Context, req T) error {
+func (s *GenericStoreImpl[T]) Insert(ctx context.Context, req T) error {
 	queryBuilder := s.Builder.Insert(s.Table).Rows(req).Returning("id")
 
 	query, args, err := queryBuilder.Prepared(true).ToSQL()

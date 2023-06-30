@@ -57,7 +57,7 @@ func (u *ProfileInteractor) SaveProfile(ctx context.Context, req *model.ProfileR
 	t := u.printer(ctx)
 
 	profile := req.Profile()
-	err := u.profileRepo.Save(ctx, profile)
+	err := u.profileRepo.Insert(ctx, profile)
 	if err != nil {
 		if errors.Is(err, repo.ErrDuplicated) {
 			return nil, apperror.NewAppError(t.Sprintf("Email is already registered with another profile"), err)
