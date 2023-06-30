@@ -280,12 +280,11 @@ func (s *storeSuite) TestStoreDelete() {
 func (s *storeSuite) TestStoreGetExternal() {
 	st := NewStore[*testUser](s.conn.Store)
 	var tests = []struct {
-		id     uuid.UUID
-		err    error
-		exists bool
+		id  uuid.UUID
+		err error
 	}{
-		{uuid.Must(uuid.FromString("00000000-0000-0000-0000-000000000001")), nil, true},
-		{uuid.Must(uuid.NewV7()), nil, false},
+		{uuid.Must(uuid.FromString("00000000-0000-0000-0000-000000000001")), nil},
+		{uuid.Must(uuid.NewV7()), ErrNotFound},
 	}
 
 	for _, test := range tests {
@@ -294,13 +293,10 @@ func (s *storeSuite) TestStoreGetExternal() {
 			if test.err != nil {
 				s.ErrorIs(err, test.err)
 			} else {
-				s.NoError(err)
-				if test.exists {
+				if s.NoError(err) {
 					s.NotNil(user)
 					s.NotZero(user.ID)
 					s.NotZero(user.CreatedAt)
-				} else {
-					s.Nil(user)
 				}
 			}
 		})
@@ -310,12 +306,11 @@ func (s *storeSuite) TestStoreGetExternal() {
 func (s *storeSuite) TestStoreGetByExpr() {
 	st := NewStore[*testUser](s.conn.Store)
 	var tests = []struct {
-		name   string
-		err    error
-		exists bool
+		name string
+		err  error
 	}{
-		{"John Doe 1", nil, true},
-		{"John Doe 6", nil, false},
+		{"John Doe 1", nil},
+		{"John Doe 6", ErrNotFound},
 	}
 
 	for _, test := range tests {
@@ -324,13 +319,10 @@ func (s *storeSuite) TestStoreGetByExpr() {
 			if test.err != nil {
 				s.ErrorIs(err, test.err)
 			} else {
-				s.NoError(err)
-				if test.exists {
+				if s.NoError(err) {
 					s.NotNil(user)
 					s.NotZero(user.ID)
 					s.NotZero(user.CreatedAt)
-				} else {
-					s.Nil(user)
 				}
 			}
 		})

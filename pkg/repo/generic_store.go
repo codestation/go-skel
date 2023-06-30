@@ -136,18 +136,11 @@ func (s *GenericStoreImpl[T]) Find(ctx context.Context, dest T, id int64) error 
 
 // Get returns a record from the database. If no record is found then a ErrNotFound is returned
 func (s *GenericStoreImpl[T]) Get(ctx context.Context, id int64) (T, error) {
-	result, err := s.GetBy(ctx, Expr{"id": id})
-	if err != nil {
-		return s.zero(), err
-	}
-
-	if reflect.ValueOf(result).IsNil() {
-		return s.zero(), NewRepoError(ErrNotFound, nil)
-	}
-
-	return result, nil
+	return s.GetBy(ctx, Expr{"id": id})
 }
 
+// GetBy returns the first record from the database matching the expression.
+// If no record is found then a ErrNotFound is returned
 func (s *GenericStoreImpl[T]) GetBy(ctx context.Context, expr Expr) (T, error) {
 	queryBuilder := s.Builder.From(s.Table).Select(s.selectFields...).Where(goqu.Ex(expr))
 	if s.defaultFilters != nil && !s.defaultFilters.IsEmpty() {
@@ -164,7 +157,7 @@ func (s *GenericStoreImpl[T]) GetBy(ctx context.Context, expr Expr) (T, error) {
 
 	switch {
 	case errors.Is(err, sql.ErrNoRows):
-		return s.zero(), nil
+		return s.zero(), NewRepoError(ErrNotFound, nil)
 	case err != nil:
 		return s.zero(), NewRepoError(ErrBackend, err)
 	default:
