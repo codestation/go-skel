@@ -7,23 +7,40 @@ package repo
 import (
 	"context"
 
+	"github.com/doug-martin/goqu/v9"
 	"megpoid.dev/go/go-skel/pkg/clause"
 	"megpoid.dev/go/go-skel/pkg/model"
 	"megpoid.dev/go/go-skel/pkg/response"
 )
 
-type Expr map[string]any
+type (
+	Ex         = goqu.Ex
+	ExOr       = goqu.ExOr
+	Expression = goqu.Expression
+	Op         = goqu.Op
+)
+
+var (
+	// I represent a schema, table, column or any combination separated by "."
+	I = goqu.I
+	// C represents a column
+	C = goqu.C
+	// And represent multiple AND operations toghether
+	And = goqu.And
+	// Or represent multiple OR operations toghether
+	Or = goqu.Or
+)
 
 type GenericStore[T model.Modelable] interface {
 	Find(ctx context.Context, dest T, id int64) error
 	Get(ctx context.Context, id int64) (T, error)
-	GetBy(ctx context.Context, expr Expr) (T, error)
-	Exists(ctx context.Context, expr Expr) (bool, error)
+	GetBy(ctx context.Context, expr Expression) (T, error)
+	Exists(ctx context.Context, expr Expression) (bool, error)
 	List(ctx context.Context, opts ...clause.FilterOption) (*response.ListResponse[T], error)
-	ListBy(ctx context.Context, expr Expr, opts ...clause.FilterOption) (*response.ListResponse[T], error)
+	ListBy(ctx context.Context, expr Expression, opts ...clause.FilterOption) (*response.ListResponse[T], error)
 	ListByIds(ctx context.Context, ids []int64) (*response.ListResponse[T], error)
 	ListEach(ctx context.Context, fn func(item T) error, opts ...clause.FilterOption) error
-	ListByEach(ctx context.Context, expr Expr, fn func(item T) error, opts ...clause.FilterOption) error
+	ListByEach(ctx context.Context, expr Expression, fn func(item T) error, opts ...clause.FilterOption) error
 	Insert(ctx context.Context, req T) error
 	// Upsert inserts a new record in the database, if the target column has a conflict then updates the fields instead
 	Upsert(ctx context.Context, req T, target string) (bool, error)
@@ -34,5 +51,5 @@ type GenericStore[T model.Modelable] interface {
 	// Delete removes a record from the repository, returns ErrNotFound if the ID doesn't exist
 	Delete(ctx context.Context, id int64) error
 	// DeleteBy removes the records matched by the expression, returns the deleted count on success
-	DeleteBy(ctx context.Context, expr Expr) (int64, error)
+	DeleteBy(ctx context.Context, expr Ex) (int64, error)
 }

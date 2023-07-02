@@ -36,5 +36,5 @@ func NewProfile(conn sql.Executor) *ProfileRepoImpl {
 }
 
 func (s *ProfileRepoImpl) GetByEmail(ctx context.Context, email string) (*model.Profile, error) {
-	return s.GetBy(ctx, repo.Expr{"email": email})
+	return s.GetBy(ctx, repo.Ex{"email": email})
 }

@@ -7,11 +7,11 @@ import (
 
 	clause "megpoid.dev/go/go-skel/pkg/clause"
 
+	exp "github.com/doug-martin/goqu/v9/exp"
+
 	mock "github.com/stretchr/testify/mock"
 
 	model "megpoid.dev/go/go-skel/app/model"
-
-	repo "megpoid.dev/go/go-skel/pkg/repo"
 
 	response "megpoid.dev/go/go-skel/pkg/response"
 )
@@ -73,21 +73,21 @@ func (_c *MockProfileRepo_Delete_Call) RunAndReturn(run func(context.Context, in
 }
 
 // DeleteBy provides a mock function with given fields: ctx, expr
-func (_m *MockProfileRepo) DeleteBy(ctx context.Context, expr repo.Expr) (int64, error) {
+func (_m *MockProfileRepo) DeleteBy(ctx context.Context, expr exp.Ex) (int64, error) {
 	ret := _m.Called(ctx, expr)
 
 	var r0 int64
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, repo.Expr) (int64, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, exp.Ex) (int64, error)); ok {
 		return rf(ctx, expr)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, repo.Expr) int64); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, exp.Ex) int64); ok {
 		r0 = rf(ctx, expr)
 	} else {
 		r0 = ret.Get(0).(int64)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, repo.Expr) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, exp.Ex) error); ok {
 		r1 = rf(ctx, expr)
 	} else {
 		r1 = ret.Error(1)
@@ -103,14 +103,14 @@ type MockProfileRepo_DeleteBy_Call struct {
 
 // DeleteBy is a helper method to define mock.On call
 //   - ctx context.Context
-//   - expr repo.Expr
+//   - expr exp.Ex
 func (_e *MockProfileRepo_Expecter) DeleteBy(ctx interface{}, expr interface{}) *MockProfileRepo_DeleteBy_Call {
 	return &MockProfileRepo_DeleteBy_Call{Call: _e.mock.On("DeleteBy", ctx, expr)}
 }
 
-func (_c *MockProfileRepo_DeleteBy_Call) Run(run func(ctx context.Context, expr repo.Expr)) *MockProfileRepo_DeleteBy_Call {
+func (_c *MockProfileRepo_DeleteBy_Call) Run(run func(ctx context.Context, expr exp.Ex)) *MockProfileRepo_DeleteBy_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(repo.Expr))
+		run(args[0].(context.Context), args[1].(exp.Ex))
 	})
 	return _c
 }
@@ -120,27 +120,27 @@ func (_c *MockProfileRepo_DeleteBy_Call) Return(_a0 int64, _a1 error) *MockProfi
 	return _c
 }
 
-func (_c *MockProfileRepo_DeleteBy_Call) RunAndReturn(run func(context.Context, repo.Expr) (int64, error)) *MockProfileRepo_DeleteBy_Call {
+func (_c *MockProfileRepo_DeleteBy_Call) RunAndReturn(run func(context.Context, exp.Ex) (int64, error)) *MockProfileRepo_DeleteBy_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // Exists provides a mock function with given fields: ctx, expr
-func (_m *MockProfileRepo) Exists(ctx context.Context, expr repo.Expr) (bool, error) {
+func (_m *MockProfileRepo) Exists(ctx context.Context, expr exp.Expression) (bool, error) {
 	ret := _m.Called(ctx, expr)
 
 	var r0 bool
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, repo.Expr) (bool, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, exp.Expression) (bool, error)); ok {
 		return rf(ctx, expr)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, repo.Expr) bool); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, exp.Expression) bool); ok {
 		r0 = rf(ctx, expr)
 	} else {
 		r0 = ret.Get(0).(bool)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, repo.Expr) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, exp.Expression) error); ok {
 		r1 = rf(ctx, expr)
 	} else {
 		r1 = ret.Error(1)
@@ -156,14 +156,14 @@ type MockProfileRepo_Exists_Call struct {
 
 // Exists is a helper method to define mock.On call
 //   - ctx context.Context
-//   - expr repo.Expr
+//   - expr exp.Expression
 func (_e *MockProfileRepo_Expecter) Exists(ctx interface{}, expr interface{}) *MockProfileRepo_Exists_Call {
 	return &MockProfileRepo_Exists_Call{Call: _e.mock.On("Exists", ctx, expr)}
 }
 
-func (_c *MockProfileRepo_Exists_Call) Run(run func(ctx context.Context, expr repo.Expr)) *MockProfileRepo_Exists_Call {
+func (_c *MockProfileRepo_Exists_Call) Run(run func(ctx context.Context, expr exp.Expression)) *MockProfileRepo_Exists_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(repo.Expr))
+		run(args[0].(context.Context), args[1].(exp.Expression))
 	})
 	return _c
 }
@@ -173,7 +173,7 @@ func (_c *MockProfileRepo_Exists_Call) Return(_a0 bool, _a1 error) *MockProfileR
 	return _c
 }
 
-func (_c *MockProfileRepo_Exists_Call) RunAndReturn(run func(context.Context, repo.Expr) (bool, error)) *MockProfileRepo_Exists_Call {
+func (_c *MockProfileRepo_Exists_Call) RunAndReturn(run func(context.Context, exp.Expression) (bool, error)) *MockProfileRepo_Exists_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -278,15 +278,15 @@ func (_c *MockProfileRepo_Get_Call) RunAndReturn(run func(context.Context, int64
 }
 
 // GetBy provides a mock function with given fields: ctx, expr
-func (_m *MockProfileRepo) GetBy(ctx context.Context, expr repo.Expr) (*model.Profile, error) {
+func (_m *MockProfileRepo) GetBy(ctx context.Context, expr exp.Expression) (*model.Profile, error) {
 	ret := _m.Called(ctx, expr)
 
 	var r0 *model.Profile
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, repo.Expr) (*model.Profile, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, exp.Expression) (*model.Profile, error)); ok {
 		return rf(ctx, expr)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, repo.Expr) *model.Profile); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, exp.Expression) *model.Profile); ok {
 		r0 = rf(ctx, expr)
 	} else {
 		if ret.Get(0) != nil {
@@ -294,7 +294,7 @@ func (_m *MockProfileRepo) GetBy(ctx context.Context, expr repo.Expr) (*model.Pr
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, repo.Expr) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, exp.Expression) error); ok {
 		r1 = rf(ctx, expr)
 	} else {
 		r1 = ret.Error(1)
@@ -310,14 +310,14 @@ type MockProfileRepo_GetBy_Call struct {
 
 // GetBy is a helper method to define mock.On call
 //   - ctx context.Context
-//   - expr repo.Expr
+//   - expr exp.Expression
 func (_e *MockProfileRepo_Expecter) GetBy(ctx interface{}, expr interface{}) *MockProfileRepo_GetBy_Call {
 	return &MockProfileRepo_GetBy_Call{Call: _e.mock.On("GetBy", ctx, expr)}
 }
 
-func (_c *MockProfileRepo_GetBy_Call) Run(run func(ctx context.Context, expr repo.Expr)) *MockProfileRepo_GetBy_Call {
+func (_c *MockProfileRepo_GetBy_Call) Run(run func(ctx context.Context, expr exp.Expression)) *MockProfileRepo_GetBy_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(repo.Expr))
+		run(args[0].(context.Context), args[1].(exp.Expression))
 	})
 	return _c
 }
@@ -327,7 +327,7 @@ func (_c *MockProfileRepo_GetBy_Call) Return(_a0 *model.Profile, _a1 error) *Moc
 	return _c
 }
 
-func (_c *MockProfileRepo_GetBy_Call) RunAndReturn(run func(context.Context, repo.Expr) (*model.Profile, error)) *MockProfileRepo_GetBy_Call {
+func (_c *MockProfileRepo_GetBy_Call) RunAndReturn(run func(context.Context, exp.Expression) (*model.Profile, error)) *MockProfileRepo_GetBy_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -500,7 +500,7 @@ func (_c *MockProfileRepo_List_Call) RunAndReturn(run func(context.Context, ...c
 }
 
 // ListBy provides a mock function with given fields: ctx, expr, opts
-func (_m *MockProfileRepo) ListBy(ctx context.Context, expr repo.Expr, opts ...clause.FilterOption) (*response.ListResponse[*model.Profile], error) {
+func (_m *MockProfileRepo) ListBy(ctx context.Context, expr exp.Expression, opts ...clause.FilterOption) (*response.ListResponse[*model.Profile], error) {
 	_va := make([]interface{}, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]
@@ -512,10 +512,10 @@ func (_m *MockProfileRepo) ListBy(ctx context.Context, expr repo.Expr, opts ...c
 
 	var r0 *response.ListResponse[*model.Profile]
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, repo.Expr, ...clause.FilterOption) (*response.ListResponse[*model.Profile], error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, exp.Expression, ...clause.FilterOption) (*response.ListResponse[*model.Profile], error)); ok {
 		return rf(ctx, expr, opts...)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, repo.Expr, ...clause.FilterOption) *response.ListResponse[*model.Profile]); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, exp.Expression, ...clause.FilterOption) *response.ListResponse[*model.Profile]); ok {
 		r0 = rf(ctx, expr, opts...)
 	} else {
 		if ret.Get(0) != nil {
@@ -523,7 +523,7 @@ func (_m *MockProfileRepo) ListBy(ctx context.Context, expr repo.Expr, opts ...c
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, repo.Expr, ...clause.FilterOption) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, exp.Expression, ...clause.FilterOption) error); ok {
 		r1 = rf(ctx, expr, opts...)
 	} else {
 		r1 = ret.Error(1)
@@ -539,14 +539,14 @@ type MockProfileRepo_ListBy_Call struct {
 
 // ListBy is a helper method to define mock.On call
 //   - ctx context.Context
-//   - expr repo.Expr
+//   - expr exp.Expression
 //   - opts ...clause.FilterOption
 func (_e *MockProfileRepo_Expecter) ListBy(ctx interface{}, expr interface{}, opts ...interface{}) *MockProfileRepo_ListBy_Call {
 	return &MockProfileRepo_ListBy_Call{Call: _e.mock.On("ListBy",
 		append([]interface{}{ctx, expr}, opts...)...)}
 }
 
-func (_c *MockProfileRepo_ListBy_Call) Run(run func(ctx context.Context, expr repo.Expr, opts ...clause.FilterOption)) *MockProfileRepo_ListBy_Call {
+func (_c *MockProfileRepo_ListBy_Call) Run(run func(ctx context.Context, expr exp.Expression, opts ...clause.FilterOption)) *MockProfileRepo_ListBy_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		variadicArgs := make([]clause.FilterOption, len(args)-2)
 		for i, a := range args[2:] {
@@ -554,7 +554,7 @@ func (_c *MockProfileRepo_ListBy_Call) Run(run func(ctx context.Context, expr re
 				variadicArgs[i] = a.(clause.FilterOption)
 			}
 		}
-		run(args[0].(context.Context), args[1].(repo.Expr), variadicArgs...)
+		run(args[0].(context.Context), args[1].(exp.Expression), variadicArgs...)
 	})
 	return _c
 }
@@ -564,13 +564,13 @@ func (_c *MockProfileRepo_ListBy_Call) Return(_a0 *response.ListResponse[*model.
 	return _c
 }
 
-func (_c *MockProfileRepo_ListBy_Call) RunAndReturn(run func(context.Context, repo.Expr, ...clause.FilterOption) (*response.ListResponse[*model.Profile], error)) *MockProfileRepo_ListBy_Call {
+func (_c *MockProfileRepo_ListBy_Call) RunAndReturn(run func(context.Context, exp.Expression, ...clause.FilterOption) (*response.ListResponse[*model.Profile], error)) *MockProfileRepo_ListBy_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // ListByEach provides a mock function with given fields: ctx, expr, fn, opts
-func (_m *MockProfileRepo) ListByEach(ctx context.Context, expr repo.Expr, fn func(*model.Profile) error, opts ...clause.FilterOption) error {
+func (_m *MockProfileRepo) ListByEach(ctx context.Context, expr exp.Expression, fn func(*model.Profile) error, opts ...clause.FilterOption) error {
 	_va := make([]interface{}, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]
@@ -581,7 +581,7 @@ func (_m *MockProfileRepo) ListByEach(ctx context.Context, expr repo.Expr, fn fu
 	ret := _m.Called(_ca...)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, repo.Expr, func(*model.Profile) error, ...clause.FilterOption) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, exp.Expression, func(*model.Profile) error, ...clause.FilterOption) error); ok {
 		r0 = rf(ctx, expr, fn, opts...)
 	} else {
 		r0 = ret.Error(0)
@@ -597,7 +597,7 @@ type MockProfileRepo_ListByEach_Call struct {
 
 // ListByEach is a helper method to define mock.On call
 //   - ctx context.Context
-//   - expr repo.Expr
+//   - expr exp.Expression
 //   - fn func(*model.Profile) error
 //   - opts ...clause.FilterOption
 func (_e *MockProfileRepo_Expecter) ListByEach(ctx interface{}, expr interface{}, fn interface{}, opts ...interface{}) *MockProfileRepo_ListByEach_Call {
@@ -605,7 +605,7 @@ func (_e *MockProfileRepo_Expecter) ListByEach(ctx interface{}, expr interface{}
 		append([]interface{}{ctx, expr, fn}, opts...)...)}
 }
 
-func (_c *MockProfileRepo_ListByEach_Call) Run(run func(ctx context.Context, expr repo.Expr, fn func(*model.Profile) error, opts ...clause.FilterOption)) *MockProfileRepo_ListByEach_Call {
+func (_c *MockProfileRepo_ListByEach_Call) Run(run func(ctx context.Context, expr exp.Expression, fn func(*model.Profile) error, opts ...clause.FilterOption)) *MockProfileRepo_ListByEach_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		variadicArgs := make([]clause.FilterOption, len(args)-3)
 		for i, a := range args[3:] {
@@ -613,7 +613,7 @@ func (_c *MockProfileRepo_ListByEach_Call) Run(run func(ctx context.Context, exp
 				variadicArgs[i] = a.(clause.FilterOption)
 			}
 		}
-		run(args[0].(context.Context), args[1].(repo.Expr), args[2].(func(*model.Profile) error), variadicArgs...)
+		run(args[0].(context.Context), args[1].(exp.Expression), args[2].(func(*model.Profile) error), variadicArgs...)
 	})
 	return _c
 }
@@ -623,7 +623,7 @@ func (_c *MockProfileRepo_ListByEach_Call) Return(_a0 error) *MockProfileRepo_Li
 	return _c
 }
 
-func (_c *MockProfileRepo_ListByEach_Call) RunAndReturn(run func(context.Context, repo.Expr, func(*model.Profile) error, ...clause.FilterOption) error) *MockProfileRepo_ListByEach_Call {
+func (_c *MockProfileRepo_ListByEach_Call) RunAndReturn(run func(context.Context, exp.Expression, func(*model.Profile) error, ...clause.FilterOption) error) *MockProfileRepo_ListByEach_Call {
 	_c.Call.Return(run)
 	return _c
 }

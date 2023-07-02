@@ -240,7 +240,7 @@ func (s *storeSuite) TestStoreUpdateMap() {
 
 	for _, test := range tests {
 		s.Run("UpdateMap", func() {
-			user := Expr{
+			user := Ex{
 				"name":       "John Doe",
 				"profile_id": 1,
 				"updated_at": time.Now(),
@@ -289,7 +289,7 @@ func (s *storeSuite) TestStoreGetExternal() {
 
 	for _, test := range tests {
 		s.Run("GetExternal", func() {
-			user, err := st.GetBy(context.Background(), Expr{"external_id": test.id})
+			user, err := st.GetBy(context.Background(), Ex{"external_id": test.id})
 			if test.err != nil {
 				s.ErrorIs(err, test.err)
 			} else {
@@ -315,7 +315,7 @@ func (s *storeSuite) TestStoreGetByExpr() {
 
 	for _, test := range tests {
 		s.Run("GetBy", func() {
-			user, err := st.GetBy(context.Background(), Expr{"name": test.name})
+			user, err := st.GetBy(context.Background(), Ex{"name": test.name})
 			if test.err != nil {
 				s.ErrorIs(err, test.err)
 			} else {
@@ -341,11 +341,24 @@ func (s *storeSuite) TestStoreExists() {
 
 	for _, test := range tests {
 		s.Run("Exists", func() {
-			exists, err := st.Exists(context.Background(), Expr{"name": test.name})
+			exists, err := st.Exists(context.Background(), Ex{"name": test.name})
 			if s.NoError(err) {
 				s.Equal(test.exists, exists)
 			}
 		})
+	}
+}
+
+func (s *storeSuite) TestStoreExpression() {
+	st := NewStore[*testUser](s.conn.Store)
+	exists, err := st.Exists(context.Background(), And(
+		I("name").Eq("John Doe 1"),
+		Or(
+			C("name").IsNotNull(),
+		),
+	))
+	if s.NoError(err) {
+		s.True(exists)
 	}
 }
 
@@ -362,7 +375,7 @@ func (s *storeSuite) TestStoreDeleteExternal() {
 
 	for _, test := range tests {
 		s.Run("DeleteExternal", func() {
-			n, err := st.DeleteBy(context.Background(), Expr{"external_id": test.id})
+			n, err := st.DeleteBy(context.Background(), Ex{"external_id": test.id})
 			if test.err != nil {
 				s.ErrorIs(err, test.err)
 			} else {
@@ -391,9 +404,9 @@ func (s *storeSuite) TestBackendError() {
 	s.ErrorIs(err, ErrBackend)
 	err = st.Delete(ctx, 1)
 	s.ErrorIs(err, ErrBackend)
-	_, err = st.GetBy(ctx, Expr{"external_id": uuid.Must(uuid.FromString("00000000-0000-0000-0000-000000000001"))})
+	_, err = st.GetBy(ctx, Ex{"external_id": uuid.Must(uuid.FromString("00000000-0000-0000-0000-000000000001"))})
 	s.ErrorIs(err, ErrBackend)
-	_, err = st.DeleteBy(ctx, Expr{"external_id": uuid.Must(uuid.FromString("00000000-0000-0000-0000-000000000001"))})
+	_, err = st.DeleteBy(ctx, Ex{"external_id": uuid.Must(uuid.FromString("00000000-0000-0000-0000-000000000001"))})
 	s.ErrorIs(err, ErrBackend)
 
 	db.Result = &fakeSqlResult{Error: errors.New("not implemented")}
@@ -401,7 +414,7 @@ func (s *storeSuite) TestBackendError() {
 	s.ErrorIs(err, ErrBackend)
 	err = st.Delete(ctx, 1)
 	s.ErrorIs(err, ErrBackend)
-	_, err = st.DeleteBy(ctx, Expr{"external_id": uuid.Must(uuid.FromString("00000000-0000-0000-0000-000000000001"))})
+	_, err = st.DeleteBy(ctx, Ex{"external_id": uuid.Must(uuid.FromString("00000000-0000-0000-0000-000000000001"))})
 	s.ErrorIs(err, ErrBackend)
 }
 
@@ -457,7 +470,7 @@ func (s *storeSuite) TestWithFilters() {
 func (s *storeSuite) TestEmptyResult() {
 	st := userStore{GenericStoreImpl: NewStore[*testUser](s.conn.Store)}
 
-	response, err := st.ListBy(context.Background(), Expr{"name": "Not Found"})
+	response, err := st.ListBy(context.Background(), Ex{"name": "Not Found"})
 	s.NoError(err)
 	s.Equal(0, len(response.Items))
 }

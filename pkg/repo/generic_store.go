@@ -136,13 +136,13 @@ func (s *GenericStoreImpl[T]) Find(ctx context.Context, dest T, id int64) error 
 
 // Get returns a record from the database. If no record is found then a ErrNotFound is returned
 func (s *GenericStoreImpl[T]) Get(ctx context.Context, id int64) (T, error) {
-	return s.GetBy(ctx, Expr{"id": id})
+	return s.GetBy(ctx, Ex{"id": id})
 }
 
 // GetBy returns the first record from the database matching the expression.
 // If no record is found then a ErrNotFound is returned
-func (s *GenericStoreImpl[T]) GetBy(ctx context.Context, expr Expr) (T, error) {
-	queryBuilder := s.Builder.From(s.Table).Select(s.selectFields...).Where(goqu.Ex(expr))
+func (s *GenericStoreImpl[T]) GetBy(ctx context.Context, expr Expression) (T, error) {
+	queryBuilder := s.Builder.From(s.Table).Select(s.selectFields...).Where(expr)
 	if s.defaultFilters != nil && !s.defaultFilters.IsEmpty() {
 		queryBuilder = queryBuilder.Where(s.defaultFilters)
 	}
@@ -165,7 +165,7 @@ func (s *GenericStoreImpl[T]) GetBy(ctx context.Context, expr Expr) (T, error) {
 	}
 }
 
-func (s *GenericStoreImpl[T]) Exists(ctx context.Context, expr Expr) (bool, error) {
+func (s *GenericStoreImpl[T]) Exists(ctx context.Context, expr Expression) (bool, error) {
 	_, err := s.GetBy(ctx, expr)
 	if err != nil {
 		if errors.Is(err, ErrNotFound) {
@@ -179,11 +179,11 @@ func (s *GenericStoreImpl[T]) Exists(ctx context.Context, expr Expr) (bool, erro
 }
 
 func (s *GenericStoreImpl[T]) List(ctx context.Context, opts ...clause.FilterOption) (*response.ListResponse[T], error) {
-	return s.ListBy(ctx, Expr{}, opts...)
+	return s.ListBy(ctx, Ex{}, opts...)
 }
 
-func (s *GenericStoreImpl[T]) ListBy(ctx context.Context, expr Expr, opts ...clause.FilterOption) (*response.ListResponse[T], error) {
-	query := s.Builder.From(s.Table).Select(s.selectFields...).Where(goqu.Ex(expr))
+func (s *GenericStoreImpl[T]) ListBy(ctx context.Context, expr Expression, opts ...clause.FilterOption) (*response.ListResponse[T], error) {
+	query := s.Builder.From(s.Table).Select(s.selectFields...).Where(expr)
 	if s.defaultFilters != nil {
 		query = query.Where(s.defaultFilters)
 	}
@@ -218,14 +218,14 @@ func (s *GenericStoreImpl[T]) ListBy(ctx context.Context, expr Expr, opts ...cla
 }
 
 func (s *GenericStoreImpl[T]) ListByIds(ctx context.Context, ids []int64) (*response.ListResponse[T], error) {
-	return s.ListBy(ctx, Expr{"id": ids})
+	return s.ListBy(ctx, Ex{"id": ids})
 }
 
 func (s *GenericStoreImpl[T]) ListEach(ctx context.Context, fn func(item T) error, opts ...clause.FilterOption) error {
-	return s.ListByEach(ctx, Expr{}, fn, opts...)
+	return s.ListByEach(ctx, Ex{}, fn, opts...)
 }
 
-func (s *GenericStoreImpl[T]) ListByEach(ctx context.Context, expr Expr, fn func(item T) error, opts ...clause.FilterOption) error {
+func (s *GenericStoreImpl[T]) ListByEach(ctx context.Context, expr Expression, fn func(item T) error, opts ...clause.FilterOption) error {
 	filters := make([]clause.FilterOption, 0, len(opts))
 	copy(filters, opts)
 
@@ -360,7 +360,7 @@ func (s *GenericStoreImpl[T]) Upsert(ctx context.Context, req T, target string) 
 }
 
 func (s *GenericStoreImpl[T]) Delete(ctx context.Context, id int64) error {
-	if n, err := s.DeleteBy(ctx, Expr{"id": id}); err != nil {
+	if n, err := s.DeleteBy(ctx, Ex{"id": id}); err != nil {
 		return err
 	} else if n != 1 {
 		return NewRepoError(ErrNotFound, nil)
@@ -369,8 +369,8 @@ func (s *GenericStoreImpl[T]) Delete(ctx context.Context, id int64) error {
 	}
 }
 
-func (s *GenericStoreImpl[T]) DeleteBy(ctx context.Context, expr Expr) (int64, error) {
-	query := s.Builder.Delete(s.Table).Where(goqu.Ex(expr))
+func (s *GenericStoreImpl[T]) DeleteBy(ctx context.Context, expr Ex) (int64, error) {
+	query := s.Builder.Delete(s.Table).Where(expr)
 
 	sql, args, err := query.Prepared(true).ToSQL()
 	if err != nil {
