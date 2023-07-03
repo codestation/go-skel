@@ -110,8 +110,9 @@ func (s *GenericStoreImpl[T]) AttachFunc(fn AttachFunc[T]) {
 	s.attachFunc = fn
 }
 
-func (s *GenericStoreImpl[T]) First(ctx context.Context, expr Expression) (T, error) {
-	queryBuilder := s.Builder.From(s.Table).Select(s.selectFields...).Where(expr).Limit(1)
+func (s *GenericStoreImpl[T]) First(ctx context.Context, expr ...Expression) (T, error) {
+	queryBuilder := s.Builder.From(s.Table).Select(s.selectFields...).Where(expr...).
+		Order(goqu.C("id").Asc()).Limit(1)
 	if s.defaultFilters != nil && !s.defaultFilters.IsEmpty() {
 		queryBuilder = queryBuilder.Where(s.defaultFilters)
 	}

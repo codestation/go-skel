@@ -120,6 +120,13 @@ func (s *storeSuite) TestStoreFind() {
 
 func (s *storeSuite) TestStoreFirst() {
 	st := NewStore[*testUser](s.conn.Store)
+	user, err := st.First(context.Background())
+	s.NoError(err)
+	s.NotNil(user)
+}
+
+func (s *storeSuite) TestStoreFirstWithFilters() {
+	st := NewStore[*testUser](s.conn.Store)
 	var tests = []struct {
 		name string
 		err  error
