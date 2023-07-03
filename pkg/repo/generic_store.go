@@ -110,6 +110,30 @@ func (s *GenericStoreImpl[T]) AttachFunc(fn AttachFunc[T]) {
 	s.attachFunc = fn
 }
 
+func (s *GenericStoreImpl[T]) First(ctx context.Context, expr Expression) (T, error) {
+	queryBuilder := s.Builder.From(s.Table).Select(s.selectFields...).Where(expr).Limit(1)
+	if s.defaultFilters != nil && !s.defaultFilters.IsEmpty() {
+		queryBuilder = queryBuilder.Where(s.defaultFilters)
+	}
+
+	query, args, err := queryBuilder.Prepared(true).ToSQL()
+	if err != nil {
+		return s.zero(), NewRepoError(ErrBackend, err)
+	}
+
+	result := s.new()
+	err = s.Conn.Get(ctx, result, query, args...)
+
+	switch {
+	case errors.Is(err, sql.ErrNoRows):
+		return s.zero(), NewRepoError(ErrNotFound, nil)
+	case err != nil:
+		return s.zero(), NewRepoError(ErrBackend, err)
+	default:
+		return result, nil
+	}
+}
+
 // Find returns a record from the database. If no record is found then a ErrNotFound is returned
 func (s *GenericStoreImpl[T]) Find(ctx context.Context, dest T, id int64) error {
 	queryBuilder := s.Builder.From(s.Table).Select(s.selectFields...).Where(goqu.Ex{"id": id})

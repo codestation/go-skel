@@ -118,6 +118,30 @@ func (s *storeSuite) TestStoreFind() {
 	}
 }
 
+func (s *storeSuite) TestStoreFirst() {
+	st := NewStore[*testUser](s.conn.Store)
+	var tests = []struct {
+		name string
+		err  error
+	}{
+		{"John Doe 1", nil},
+		{"John Doe 6", ErrNotFound},
+	}
+
+	for _, test := range tests {
+		s.Run("First", func() {
+			user, err := st.First(context.Background(), Ex{"name": test.name})
+			if test.err != nil {
+				s.ErrorIs(err, test.err)
+			} else {
+				s.NoError(err)
+				s.NotZero(user.ID)
+				s.Equal(test.name, user.Name)
+			}
+		})
+	}
+}
+
 func (s *storeSuite) TestStoreGet() {
 	st := NewStore[*testUser](s.conn.Store)
 	var tests = []struct {
