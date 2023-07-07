@@ -81,6 +81,17 @@ Authorization: Bearer {{auth_token}}
 %}
 
 ###
+GET {{host}}/apis/goapp/v1/profiles?first_name__eq=John
+Accept: application/json
+Authorization: Bearer {{auth_token}}
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+###
 GET {{host}}/apis/goapp/v1/profiles/{{profile_id}}
 Accept: application/json
 Authorization: Bearer {{auth_token}}

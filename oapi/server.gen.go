@@ -48,7 +48,7 @@ type ServerInterfaceWrapper struct {
 func (w *ServerInterfaceWrapper) Login(ctx echo.Context) error {
 	var err error
 
-	// Invoke the callback with all the unmarshalled arguments
+	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.Login(ctx)
 	return err
 }
@@ -59,6 +59,7 @@ func (w *ServerInterfaceWrapper) LiveCheck(ctx echo.Context) error {
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params LiveCheckParams
+
 	// ------------- Optional query parameter "verbose" -------------
 
 	err = runtime.BindQueryParameter("form", true, false, "verbose", ctx.QueryParams(), &params.Verbose)
@@ -66,7 +67,7 @@ func (w *ServerInterfaceWrapper) LiveCheck(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter verbose: %s", err))
 	}
 
-	// Invoke the callback with all the unmarshalled arguments
+	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.LiveCheck(ctx, params)
 	return err
 }
@@ -77,6 +78,7 @@ func (w *ServerInterfaceWrapper) ReadyCheck(ctx echo.Context) error {
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params ReadyCheckParams
+
 	// ------------- Optional query parameter "verbose" -------------
 
 	err = runtime.BindQueryParameter("form", true, false, "verbose", ctx.QueryParams(), &params.Verbose)
@@ -84,7 +86,7 @@ func (w *ServerInterfaceWrapper) ReadyCheck(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter verbose: %s", err))
 	}
 
-	// Invoke the callback with all the unmarshalled arguments
+	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.ReadyCheck(ctx, params)
 	return err
 }
@@ -97,6 +99,19 @@ func (w *ServerInterfaceWrapper) ListProfiles(ctx echo.Context) error {
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params ListProfilesParams
+
+	paramsMap := map[string]bool{
+		"before":   true,
+		"after":    true,
+		"page":     true,
+		"q":        true,
+		"limit":    true,
+		"includes": true,
+		"filters":  true,
+		"fields":   true,
+		"sort":     true,
+	}
+
 	// ------------- Optional query parameter "before" -------------
 
 	err = runtime.BindQueryParameter("form", true, false, "before", ctx.QueryParams(), &params.Before)
@@ -141,9 +156,11 @@ func (w *ServerInterfaceWrapper) ListProfiles(ctx echo.Context) error {
 
 	// ------------- Optional query parameter "filters" -------------
 
-	err = runtime.BindQueryParameter("form", true, false, "filters", ctx.QueryParams(), &params.Filters)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter filters: %s", err))
+	params.Filters = &Filters{}
+	for key, values := range ctx.QueryParams() {
+		if !paramsMap[key] {
+			(*params.Filters)[key] = values[0]
+		}
 	}
 
 	// ------------- Optional query parameter "fields" -------------
@@ -160,7 +177,7 @@ func (w *ServerInterfaceWrapper) ListProfiles(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter sort: %s", err))
 	}
 
-	// Invoke the callback with all the unmarshalled arguments
+	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.ListProfiles(ctx, params)
 	return err
 }
@@ -171,7 +188,7 @@ func (w *ServerInterfaceWrapper) SaveProfile(ctx echo.Context) error {
 
 	ctx.Set(BearerAuthScopes, []string{})
 
-	// Invoke the callback with all the unmarshalled arguments
+	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.SaveProfile(ctx)
 	return err
 }
@@ -189,7 +206,7 @@ func (w *ServerInterfaceWrapper) RemoveProfile(ctx echo.Context) error {
 
 	ctx.Set(BearerAuthScopes, []string{})
 
-	// Invoke the callback with all the unmarshalled arguments
+	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.RemoveProfile(ctx, id)
 	return err
 }
@@ -207,7 +224,7 @@ func (w *ServerInterfaceWrapper) GetProfile(ctx echo.Context) error {
 
 	ctx.Set(BearerAuthScopes, []string{})
 
-	// Invoke the callback with all the unmarshalled arguments
+	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.GetProfile(ctx, id)
 	return err
 }
@@ -225,7 +242,7 @@ func (w *ServerInterfaceWrapper) UpdateProfile(ctx echo.Context) error {
 
 	ctx.Set(BearerAuthScopes, []string{})
 
-	// Invoke the callback with all the unmarshalled arguments
+	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.UpdateProfile(ctx, id)
 	return err
 }
