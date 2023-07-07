@@ -15,25 +15,37 @@ const (
 
 // AuthRequest defines model for AuthRequest.
 type AuthRequest struct {
-	// Password Password
+	// Password The password of the user.
 	Password string `json:"password" validate:"required"`
 
-	// Username Username
+	// Username The username of the user.
 	Username string `json:"username" validate:"required"`
 }
 
 // Error defines model for Error.
 type Error struct {
+	// DetailedError The detailed error description.
 	DetailedError *string `json:"detailed_error,omitempty"`
-	Location      *string `json:"location,omitempty"`
-	Message       string  `json:"message"`
-	StatusCode    string  `json:"status_code"`
+
+	// Location The location of the error.
+	Location *string `json:"location,omitempty"`
+
+	// Message The error message.
+	Message string `json:"message"`
+
+	// StatusCode The status code of the error.
+	StatusCode string `json:"status_code"`
 }
 
 // Model defines model for Model.
 type Model struct {
+	// CreatedAt The creation timestamp of the model.
 	CreatedAt string `json:"created_at"`
-	ID        int64  `json:"id"`
+
+	// Id The unique identifier of the model.
+	ID int64 `json:"id"`
+
+	// UpdatedAt The last update timestamp of the model.
 	UpdatedAt string `json:"updated_at"`
 }
 
@@ -44,18 +56,28 @@ type Pagination struct {
 
 // PaginationCursor defines model for PaginationCursor.
 type PaginationCursor struct {
+	// NextCursor The cursor for the next page of results.
 	NextCursor string `json:"next_cursor"`
+
+	// PrevCursor The cursor for the previous page of results.
 	PrevCursor string `json:"prev_cursor"`
 	Type       string `json:"type"`
 }
 
 // PaginationPage defines model for PaginationPage.
 type PaginationPage struct {
-	CurrentPage    int    `json:"current_page"`
-	MaxPage        int    `json:"max_page"`
-	RecordsPerPage int    `json:"records_per_page"`
-	TotalRecords   int    `json:"total_records"`
-	Type           string `json:"type"`
+	// CurrentPage The current page number.
+	CurrentPage int `json:"current_page"`
+
+	// MaxPage The maximum page number.
+	MaxPage int `json:"max_page"`
+
+	// RecordsPerPage The number of records per page.
+	RecordsPerPage int `json:"records_per_page"`
+
+	// TotalRecords The total number of records.
+	TotalRecords int    `json:"total_records"`
+	Type         string `json:"type"`
 }
 
 // PaginationType defines model for PaginationType.
@@ -65,11 +87,22 @@ type PaginationType struct {
 
 // Profile defines model for Profile.
 type Profile struct {
+	// CreatedAt The creation timestamp of the model.
 	CreatedAt string `json:"created_at"`
-	Email     string `json:"email"`
+
+	// Email The email address of the profile owner.
+	Email string `json:"email"`
+
+	// FirstName The first name of the profile owner.
 	FirstName string `json:"first_name"`
-	ID        int64  `json:"id"`
-	LastName  string `json:"last_name"`
+
+	// Id The unique identifier of the model.
+	ID int64 `json:"id"`
+
+	// LastName The last name of the profile owner.
+	LastName string `json:"last_name"`
+
+	// UpdatedAt The last update timestamp of the model.
 	UpdatedAt string `json:"updated_at"`
 }
 
@@ -81,14 +114,19 @@ type ProfileList struct {
 
 // ProfileRequest defines model for ProfileRequest.
 type ProfileRequest struct {
-	Email     string `json:"email"`
+	// Email The email address of the profile owner.
+	Email string `json:"email"`
+
+	// FirstName The first name of the profile owner.
 	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
+
+	// LastName The last name of the profile owner.
+	LastName string `json:"last_name"`
 }
 
 // Token defines model for Token.
 type Token struct {
-	// Token JWT token
+	// Token The JWT token for authentication.
 	Token string `json:"token"`
 }
 
@@ -130,43 +168,43 @@ type UnexpectedError = Error
 
 // LiveCheckParams defines parameters for LiveCheck.
 type LiveCheckParams struct {
-	// Verbose Give a verbose response
+	// Verbose Flag to enable verbose response.
 	Verbose *Verbose `form:"verbose,omitempty" json:"verbose,omitempty"`
 }
 
 // ReadyCheckParams defines parameters for ReadyCheck.
 type ReadyCheckParams struct {
-	// Verbose Give a verbose response
+	// Verbose Flag to enable verbose response.
 	Verbose *Verbose `form:"verbose,omitempty" json:"verbose,omitempty"`
 }
 
 // ListProfilesParams defines parameters for ListProfiles.
 type ListProfilesParams struct {
-	// Before Cursor for the previous page
+	// Before The cursor for retrieving the previous page.
 	Before *Before `form:"before,omitempty" json:"before,omitempty"`
 
-	// After Cursor for the next page
+	// After The cursor for retrieving the next page.
 	After *After `form:"after,omitempty" json:"after,omitempty"`
 
-	// Page Page number
+	// Page The page number to retrieve.
 	Page *Page `form:"page,omitempty" json:"page,omitempty"`
 
-	// Q Default query parameter
+	// Q The default query parameter.
 	Q *Query `form:"q,omitempty" json:"q,omitempty"`
 
-	// Limit Max items to return
+	// Limit The maximum number of items to return.
 	Limit *Limit `form:"limit,omitempty" json:"limit,omitempty"`
 
-	// Includes Additional relationships
+	// Includes Additional relationships to include.
 	Includes *Includes `form:"includes,omitempty" json:"includes,omitempty"`
 
-	// Filters Additional filters
+	// Filters Additional filters for querying.
 	Filters *Filters `form:"filters,omitempty" json:"filters,omitempty"`
 
-	// Fields Comma-separated list of fields to only return in the response. Not implemented
+	// Fields Comma-separated list of fields to return in the response. Not implemented yet.
 	Fields *Fields `form:"fields,omitempty" json:"fields,omitempty"`
 
-	// Sort Comma-separated list of fields to provide a sort order. Use + or - as a prefix. Not implemented
+	// Sort Comma-separated list of fields to specify the sort order. Use + or - as a prefix. Not implemented yet.
 	Sort *Sort `form:"sort,omitempty" json:"sort,omitempty"`
 }
 

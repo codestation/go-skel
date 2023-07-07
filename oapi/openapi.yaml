@@ -2,7 +2,7 @@
 openapi: 3.0.2
 info:
   title: Skel API
-  description: Skel API
+  description: Skel API - Documentation for the Skel API
   version: 1.0.0
 servers:
   - # noinspection HttpUrlsUsage
@@ -18,34 +18,34 @@ security:
 paths:
   "/health/live":
     get:
-      summary: Check if app is started
-      description: Check if app is started
+      summary: Check if the app is started
+      description: Check if the app is started and running successfully.
       operationId: liveCheck
       security: []
       parameters:
         - $ref: "#/components/parameters/verbose"
       responses:
         '200':
-          description: Successful operation
+          description: The app is running
         default:
           $ref: "#/components/responses/UnexpectedError"
       tags:
-        - status
+        - Status
   "/health/ready":
     get:
-      summary: Check if app is ready to accept connections
-      description: Check if app is ready to accept connections
+      summary: Check if the app is ready to accept connections
+      description: Check if the app has completed initialization and is ready to accept connections.
       operationId: readyCheck
       security: []
       parameters:
         - $ref: "#/components/parameters/verbose"
       responses:
         '200':
-          description: Successful operation
+          description: The app is ready
         default:
           $ref: "#/components/responses/UnexpectedError"
       tags:
-        - status
+        - Status
   "/auth/login":
     post:
       security: []
@@ -58,30 +58,30 @@ paths:
               $ref: "#/components/schemas/AuthRequest"
       responses:
         '200':
-          description: Login success
+          description: Successful login
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Token"
       tags:
-        - auth
+        - Authentication
   "/profiles":
     get:
       parameters:
-        # cursor pagination
+        # Cursor pagination
         - $ref: "#/components/parameters/before"
         - $ref: "#/components/parameters/after"
-        # offset pagination
+        # Offset pagination
         - $ref: "#/components/parameters/page"
-        # filtering params
+        # Filtering parameters
         - $ref: "#/components/parameters/query"
         - $ref: "#/components/parameters/limit"
         - $ref: "#/components/parameters/includes"
         - $ref: "#/components/parameters/filters"
-        # not implemented yet
+        # Not implemented yet
         - $ref: "#/components/parameters/fields"
         - $ref: "#/components/parameters/sort"
-      summary: Obtain a list of profiles
+      summary: Retrieve a list of profiles
       operationId: listProfiles
       responses:
         '200':
@@ -95,7 +95,7 @@ paths:
       tags:
         - Profile
     post:
-      summary: cretes a new profile
+      summary: Create a new profile
       operationId: saveProfile
       requestBody:
         required: true
@@ -105,7 +105,7 @@ paths:
               $ref: "#/components/schemas/ProfileRequest"
       responses:
         '201':
-          description: Created profile
+          description: Profile created successfully
           content:
             application/json:
               schema:
@@ -118,7 +118,7 @@ paths:
     parameters:
       - $ref: "#/components/parameters/profileId"
     get:
-      summary: Gets a profile by ID
+      summary: Get a profile by ID
       operationId: getProfile
       responses:
         '200':
@@ -132,7 +132,7 @@ paths:
       tags:
         - Profile
     patch:
-      summary: Updates a profile by ID
+      summary: Update a profile by ID
       operationId: updateProfile
       requestBody:
         required: true
@@ -152,11 +152,11 @@ paths:
       tags:
         - Profile
     delete:
-      summary: Deletes a profile by ID
+      summary: Delete a profile by ID
       operationId: removeProfile
       responses:
         '204':
-          description: Profile deleted
+          description: Profile deleted successfully
         default:
           $ref: "#/components/responses/UnexpectedError"
       tags:
@@ -168,14 +168,15 @@ components:
       properties:
         username:
           type: string
-          description: Username
+          description: The username of the user.
           example: john
           x-oapi-codegen-extra-tags:
             validate: 'required'
         password:
           type: string
           format: password
-          description: Password
+          description: The password of the user.
+          example: password123
           x-oapi-codegen-extra-tags:
             validate: 'required'
       required:
@@ -198,12 +199,15 @@ components:
       properties:
         first_name:
           type: string
+          description: The first name of the profile owner.
           example: John
         last_name:
           type: string
+          description: The last name of the profile owner.
           example: Doe
         email:
           type: string
+          description: The email address of the profile owner.
           example: john.doe@example.com
       required:
         - first_name
@@ -214,7 +218,7 @@ components:
       properties:
         token:
           type: string
-          description: JWT token
+          description: The JWT token for authentication.
       required:
         - token
     Model:
@@ -223,11 +227,15 @@ components:
         id:
           type: integer
           format: int64
+          description: The unique identifier of the model.
+          example: 1
           x-go-name: ID
         created_at:
           type: string
+          description: The creation timestamp of the model.
         updated_at:
           type: string
+          description: The last update timestamp of the model.
       required:
         - id
         - created_at
@@ -260,8 +268,10 @@ components:
           properties:
             next_cursor:
               type: string
+              description: The cursor for the next page of results.
             prev_cursor:
               type: string
+              description: The cursor for the previous page of results.
           required:
             - next_cursor
             - prev_cursor
@@ -272,12 +282,16 @@ components:
           properties:
             current_page:
               type: integer
+              description: The current page number.
             max_page:
               type: integer
+              description: The maximum page number.
             total_records:
               type: integer
+              description: The total number of records.
             records_per_page:
               type: integer
+              description: The number of records per page.
           required:
             - current_page
             - max_page
@@ -288,12 +302,16 @@ components:
       properties:
         message:
           type: string
+          description: The error message.
         location:
           type: string
+          description: The location of the error.
         detailed_error:
           type: string
+          description: The detailed error description.
         status_code:
           type: string
+          description: The status code of the error.
       required:
         - message
         - status_code
@@ -301,13 +319,14 @@ components:
     verbose:
       name: verbose
       in: query
-      description: Give a verbose response
+      description: Flag to enable verbose response.
       schema:
         type: boolean
+        example: true
     profileId:
       name: id
       in: path
-      description: Profile ID
+      description: The ID of the profile.
       schema:
         type: integer
         format: int64
@@ -316,33 +335,33 @@ components:
     limit:
       name: limit
       in: query
-      description: Max items to return
+      description: The maximum number of items to return.
       schema:
         type: integer
         example: 10
     after:
       name: after
       in: query
-      description: Cursor for the next page
+      description: The cursor for retrieving the next page.
       schema:
         type: string
     before:
       name: before
       in: query
-      description: Cursor for the previous page
+      description: The cursor for retrieving the previous page.
       schema:
         type: string
     page:
       name: page
       in: query
-      description: Page number
+      description: The page number to retrieve.
       schema:
         type: integer
         example: 1
     includes:
       name: includes
       in: query
-      description: Additional relationships
+      description: Additional relationships to include.
       schema:
         type: array
         items:
@@ -351,35 +370,35 @@ components:
     query:
       name: q
       in: query
-      description: Default query parameter
+      description: The default query parameter.
       schema:
         type: string
         example: john@example.com
     fields:
       name: fields
       in: query
-      description: Comma-separated list of fields to only return in the response. Not implemented
+      description: Comma-separated list of fields to return in the response. Not implemented yet.
       schema:
         type: string
         example: id,name
     sort:
       name: sort
       in: query
-      description: Comma-separated list of fields to provide a sort order. Use + or - as a prefix. Not implemented
+      description: Comma-separated list of fields to specify the sort order. Use + or - as a prefix. Not implemented yet.
       schema:
         type: string
         example: +name,-id
     filters:
       name: filters
       in: query
-      description: Additional filters
+      description: Additional filters for querying.
       schema:
         type: object
         additionalProperties:
           type: string
   responses:
     UnexpectedError:
-      description: Unexpected error
+      description: An unexpected error occurred.
       content:
         application/json:
           schema:

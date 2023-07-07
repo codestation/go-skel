@@ -16,25 +16,25 @@ type ServerInterface interface {
 
 	// (POST /auth/login)
 	Login(ctx echo.Context) error
-	// Check if app is started
+	// Check if the app is started
 	// (GET /health/live)
 	LiveCheck(ctx echo.Context, params LiveCheckParams) error
-	// Check if app is ready to accept connections
+	// Check if the app is ready to accept connections
 	// (GET /health/ready)
 	ReadyCheck(ctx echo.Context, params ReadyCheckParams) error
-	// Obtain a list of profiles
+	// Retrieve a list of profiles
 	// (GET /profiles)
 	ListProfiles(ctx echo.Context, params ListProfilesParams) error
-	// cretes a new profile
+	// Create a new profile
 	// (POST /profiles)
 	SaveProfile(ctx echo.Context) error
-	// Deletes a profile by ID
+	// Delete a profile by ID
 	// (DELETE /profiles/{id})
 	RemoveProfile(ctx echo.Context, id ProfileId) error
-	// Gets a profile by ID
+	// Get a profile by ID
 	// (GET /profiles/{id})
 	GetProfile(ctx echo.Context, id ProfileId) error
-	// Updates a profile by ID
+	// Update a profile by ID
 	// (PATCH /profiles/{id})
 	UpdateProfile(ctx echo.Context, id ProfileId) error
 }
