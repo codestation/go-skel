@@ -24,7 +24,7 @@ func AttachRelation[T, U model.Modelable](
 	// list to hold the identifiers to query
 	var idList []int64
 	// map used to keep the above list with unique items
-	var uniqueMap = map[int64]struct{}{}
+	uniqueMap := map[int64]struct{}{}
 
 	for _, entry := range entries {
 		id := getRelationId(entry)
@@ -46,7 +46,7 @@ func AttachRelation[T, U model.Modelable](
 	}
 
 	// keep the results in a map for quicker access
-	var resultMap = map[int64]U{}
+	resultMap := map[int64]U{}
 	for _, result := range results.Items {
 		resultMap[result.GetID()] = result
 	}

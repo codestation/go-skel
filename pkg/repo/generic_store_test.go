@@ -64,6 +64,8 @@ func (s *userStore) Attach(ctx context.Context, results []*testUser, relation st
 			func(m *testUser) *int64 { return types.AsPointer(m.ProfileID) },
 			func(m *testUser, r *testProfile) { m.AttachProfile(r) },
 			s.profile.ListByIds)
+	default:
+		return ErrBackend
 	}
 	return err
 }
@@ -95,7 +97,7 @@ func (s *storeSuite) TestNewStore() {
 
 func (s *storeSuite) TestStoreFind() {
 	st := NewStore[*testUser](s.conn.Store)
-	var tests = []struct {
+	tests := []struct {
 		id  int64
 		err error
 	}{
@@ -127,7 +129,7 @@ func (s *storeSuite) TestStoreFirst() {
 
 func (s *storeSuite) TestStoreFirstWithFilters() {
 	st := NewStore[*testUser](s.conn.Store)
-	var tests = []struct {
+	tests := []struct {
 		name string
 		err  error
 	}{
@@ -151,7 +153,7 @@ func (s *storeSuite) TestStoreFirstWithFilters() {
 
 func (s *storeSuite) TestStoreGet() {
 	st := NewStore[*testUser](s.conn.Store)
-	var tests = []struct {
+	tests := []struct {
 		id  int64
 		err error
 	}{
@@ -183,7 +185,7 @@ func (s *storeSuite) TestStoreList() {
 
 func (s *storeSuite) TestStoreSave() {
 	st := NewStore[*testUser](s.conn.Store)
-	var tests = []struct {
+	tests := []struct {
 		name      string
 		profileId int64
 		err       error
@@ -208,7 +210,7 @@ func (s *storeSuite) TestStoreSave() {
 
 func (s *storeSuite) TestStoreUpsert() {
 	st := NewStore[*testUser](s.conn.Store)
-	var tests = []struct {
+	tests := []struct {
 		name      string
 		profileId int64
 		created   bool
@@ -236,7 +238,7 @@ func (s *storeSuite) TestStoreUpsert() {
 
 func (s *storeSuite) TestStoreUpdate() {
 	st := NewStore[*testUser](s.conn.Store)
-	var tests = []struct {
+	tests := []struct {
 		id  int64
 		err error
 	}{
@@ -261,7 +263,7 @@ func (s *storeSuite) TestStoreUpdate() {
 
 func (s *storeSuite) TestStoreUpdateMap() {
 	st := NewStore[*testUser](s.conn.Store)
-	var tests = []struct {
+	tests := []struct {
 		id  int64
 		err error
 	}{
@@ -288,7 +290,7 @@ func (s *storeSuite) TestStoreUpdateMap() {
 
 func (s *storeSuite) TestStoreDelete() {
 	st := NewStore[*testUser](s.conn.Store)
-	var tests = []struct {
+	tests := []struct {
 		id  int64
 		err error
 	}{
@@ -310,7 +312,7 @@ func (s *storeSuite) TestStoreDelete() {
 
 func (s *storeSuite) TestStoreGetExternal() {
 	st := NewStore[*testUser](s.conn.Store)
-	var tests = []struct {
+	tests := []struct {
 		id  uuid.UUID
 		err error
 	}{
@@ -323,12 +325,10 @@ func (s *storeSuite) TestStoreGetExternal() {
 			user, err := st.GetBy(context.Background(), Ex{"external_id": test.id})
 			if test.err != nil {
 				s.ErrorIs(err, test.err)
-			} else {
-				if s.NoError(err) {
-					s.NotNil(user)
-					s.NotZero(user.ID)
-					s.NotZero(user.CreatedAt)
-				}
+			} else if s.NoError(err) {
+				s.NotNil(user)
+				s.NotZero(user.ID)
+				s.NotZero(user.CreatedAt)
 			}
 		})
 	}
@@ -336,7 +336,7 @@ func (s *storeSuite) TestStoreGetExternal() {
 
 func (s *storeSuite) TestStoreGetByExpr() {
 	st := NewStore[*testUser](s.conn.Store)
-	var tests = []struct {
+	tests := []struct {
 		name string
 		err  error
 	}{
@@ -349,12 +349,10 @@ func (s *storeSuite) TestStoreGetByExpr() {
 			user, err := st.GetBy(context.Background(), Ex{"name": test.name})
 			if test.err != nil {
 				s.ErrorIs(err, test.err)
-			} else {
-				if s.NoError(err) {
-					s.NotNil(user)
-					s.NotZero(user.ID)
-					s.NotZero(user.CreatedAt)
-				}
+			} else if s.NoError(err) {
+				s.NotNil(user)
+				s.NotZero(user.ID)
+				s.NotZero(user.CreatedAt)
 			}
 		})
 	}
@@ -362,7 +360,7 @@ func (s *storeSuite) TestStoreGetByExpr() {
 
 func (s *storeSuite) TestStoreExists() {
 	st := NewStore[*testUser](s.conn.Store)
-	var tests = []struct {
+	tests := []struct {
 		name   string
 		exists bool
 	}{
@@ -395,7 +393,7 @@ func (s *storeSuite) TestStoreExpression() {
 
 func (s *storeSuite) TestStoreDeleteExternal() {
 	st := NewStore[*testUser](s.conn.Store)
-	var tests = []struct {
+	tests := []struct {
 		id    uuid.UUID
 		err   error
 		count int64
@@ -440,7 +438,7 @@ func (s *storeSuite) TestBackendError() {
 	_, err = st.DeleteBy(ctx, Ex{"external_id": uuid.Must(uuid.FromString("00000000-0000-0000-0000-000000000001"))})
 	s.ErrorIs(err, ErrBackend)
 
-	db.Result = &fakeSqlResult{Error: errors.New("not implemented")}
+	db.Result = &fakeSQLResult{Error: errors.New("not implemented")}
 	err = st.Update(ctx, newUser("John Doe", 1))
 	s.ErrorIs(err, ErrBackend)
 	err = st.Delete(ctx, 1)

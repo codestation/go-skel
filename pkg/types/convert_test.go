@@ -11,7 +11,7 @@ import (
 )
 
 func TestAsPointerInt(t *testing.T) {
-	var x = 1
+	x := 1
 	y := AsPointer(x)
 	if assert.NotNil(t, y) {
 		assert.Equal(t, 1, *y)
@@ -19,7 +19,7 @@ func TestAsPointerInt(t *testing.T) {
 }
 
 func TestAsPointerString(t *testing.T) {
-	var x = "test"
+	x := "test"
 	y := AsPointer(x)
 	if assert.NotNil(t, y) {
 		assert.Equal(t, "test", *y)
@@ -27,7 +27,7 @@ func TestAsPointerString(t *testing.T) {
 }
 
 func TestAsPointerMap(t *testing.T) {
-	var x = map[int]string{1: "test"}
+	x := map[int]string{1: "test"}
 	y := AsPointer(x)
 	if assert.NotNil(t, y) {
 		assert.Equal(t, map[int]string{1: "test"}, *y)

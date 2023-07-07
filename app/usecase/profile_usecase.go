@@ -34,9 +34,9 @@ func (u *ProfileInteractor) GetProfile(ctx context.Context, id int64) (*model.Pr
 	if err != nil {
 		if errors.Is(err, repo.ErrNotFound) {
 			return nil, apperror.NewAppError(t.Sprintf("Profile not found"), err)
-		} else {
-			return nil, apperror.NewAppError(t.Sprintf("Failed to get profile"), err)
 		}
+
+		return nil, apperror.NewAppError(t.Sprintf("Failed to get profile"), err)
 	}
 
 	return profile, nil

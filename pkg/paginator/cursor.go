@@ -48,4 +48,4 @@ func (c *Cursor) Offset() *Page {
 	return c.offset
 }
 
-//type Cursor = cursor.Cursor
+// type Cursor = cursor.Cursor

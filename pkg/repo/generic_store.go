@@ -312,7 +312,6 @@ func (s *GenericStoreImpl[T]) Update(ctx context.Context, req T) error {
 	}
 
 	result, err := s.Conn.Exec(ctx, sql, args...)
-
 	if err != nil {
 		return NewRepoError(ErrBackend, err)
 	}
@@ -338,7 +337,6 @@ func (s *GenericStoreImpl[T]) UpdateMap(ctx context.Context, id int64, req map[s
 	}
 
 	result, err := s.Conn.Exec(ctx, sql, args...)
-
 	if err != nil {
 		return NewRepoError(ErrBackend, err)
 	}

@@ -16,8 +16,10 @@ import (
 	"github.com/spf13/viper"
 )
 
-var matchFirstCap = regexp.MustCompile(`(.)([A-Z][a-z]+)`)
-var matchAllCap = regexp.MustCompile(`([a-z\d])([A-Z])`)
+var (
+	matchFirstCap = regexp.MustCompile(`(.)([A-Z][a-z]+)`)
+	matchAllCap   = regexp.MustCompile(`([a-z\d])([A-Z])`)
+)
 
 var templateContent = `-- +migrate Up
 
@@ -52,7 +54,7 @@ var migrationCmd = &cobra.Command{
 		}
 
 		filename := path.Join(baseDir, timestamp+"_"+name+".sql")
-		err := os.WriteFile(filename, []byte(templateContent), 0644)
+		err := os.WriteFile(filename, []byte(templateContent), 0o644)
 		if err != nil {
 			return fmt.Errorf("failed to create migration file: %w", err)
 		}

@@ -27,8 +27,7 @@ func ErrorHandler(e *echo.Echo) echo.HTTPErrorHandler {
 			appErr.Where = "ErrorHandler"
 		}
 
-		if e.Debug {
-		} else {
+		if !e.Debug {
 			appErr.DetailedError = ""
 			appErr.Where = ""
 		}

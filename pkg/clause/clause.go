@@ -116,7 +116,7 @@ func (c *Clause) Includes(fn func(include string) error) error {
 	return nil
 }
 
-func (c *Clause) ApplyFilters(ctx context.Context, db paginator.SqlSelector, sd *goqu.SelectDataset, dest any) (*paginator.Cursor, error) {
+func (c *Clause) ApplyFilters(ctx context.Context, db paginator.SQLSelector, sd *goqu.SelectDataset, dest any) (*paginator.Cursor, error) {
 	var (
 		err   error
 		cur   *paginator.Cursor

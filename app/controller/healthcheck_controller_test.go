@@ -60,7 +60,7 @@ func (s *healthcheckSuite) TestReady() {
 func (s *healthcheckSuite) TestReadyFailed() {
 	uc := usecase.NewMockHealthcheck(s.T())
 	uc.EXPECT().Execute(mock.Anything).Return(&model.HealthcheckResult{
-		Ping: errors.New("an error ocurred"),
+		Ping: errors.New("an error occurred"),
 	})
 
 	ctrl := NewHealthCheck(nil, uc)

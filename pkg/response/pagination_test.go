@@ -36,8 +36,8 @@ func TestMetaCursor(t *testing.T) {
 		"prev_cursor": nil,
 	}
 
-	expectedJson, _ := json.Marshal(expected)
-	assert.JSONEq(t, string(expectedJson), string(data))
+	expectedJSON, _ := json.Marshal(expected)
+	assert.JSONEq(t, string(expectedJSON), string(data))
 }
 
 func TestMetaPage(t *testing.T) {
@@ -64,6 +64,6 @@ func TestMetaPage(t *testing.T) {
 		"total":            2,
 	}
 
-	expectedJson, _ := json.Marshal(expected)
-	assert.JSONEq(t, string(expectedJson), string(data))
+	expectedJSON, _ := json.Marshal(expected)
+	assert.JSONEq(t, string(expectedJSON), string(data))
 }

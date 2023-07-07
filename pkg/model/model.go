@@ -50,11 +50,12 @@ func (m *Model) Apply(opts ...Option) {
 }
 
 func GetModelName[T any](m T) string {
-	if t := reflect.TypeOf(m); t.Kind() == reflect.Ptr {
+	var t reflect.Type
+	if t = reflect.TypeOf(m); t.Kind() == reflect.Ptr {
 		return t.Elem().Name()
-	} else {
-		return t.Name()
 	}
+
+	return t.Name()
 }
 
 func GetTableName[T Modelable](m T) string {

@@ -92,7 +92,7 @@ func (c *Connection) seedDatabase(t *testing.T, conn sql.Executor) {
 
 type fakeDatabase struct {
 	Error  error
-	Result *fakeSqlResult
+	Result *fakeSQLResult
 }
 
 func (d fakeDatabase) BeginFunc(ctx context.Context, f func(conn sql.Executor) error) error {
@@ -120,16 +120,16 @@ func (d fakeDatabase) Select(ctx context.Context, dest any, query string, args .
 
 var _ sql.Executor = &fakeDatabase{}
 
-type fakeSqlResult struct {
+type fakeSQLResult struct {
 	Error error
 }
 
-func (f fakeSqlResult) LastInsertId() (int64, error) {
+func (f fakeSQLResult) LastInsertId() (int64, error) {
 	return 0, f.Error
 }
 
-func (f fakeSqlResult) RowsAffected() (int64, error) {
+func (f fakeSQLResult) RowsAffected() (int64, error) {
 	return 0, f.Error
 }
 
-var _ sql.Result = &fakeSqlResult{}
+var _ sql.Result = &fakeSQLResult{}

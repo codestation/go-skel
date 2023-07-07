@@ -29,7 +29,8 @@ func HexStringToByteArray() mapstructure.DecodeHookFuncType {
 	return func(
 		f reflect.Type,
 		t reflect.Type,
-		data any) (any, error) {
+		data any,
+	) (any, error) {
 		if f.Kind() != reflect.String || t != typeOfBytes {
 			return data, nil
 		}

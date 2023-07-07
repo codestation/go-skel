@@ -45,7 +45,7 @@ func NewProfileCheckTask(id int64) (*asynq.Task, error) {
 	return asynq.NewTask(TypeProfileCheck, payload), nil
 }
 
-func HandleSayHelloTask(ctx context.Context, t *asynq.Task) error {
+func HandleSayHelloTask(_ context.Context, t *asynq.Task) error {
 	var p HelloPayload
 	if err := json.Unmarshal(t.Payload(), &p); err != nil {
 		return fmt.Errorf("json.Unmarshal failed: %v: %w", err, asynq.SkipRetry)

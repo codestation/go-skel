@@ -51,10 +51,11 @@ func (ctrl *HealthcheckController) ReadyCheck(ctx echo.Context, params oapi.Read
 			check.WriteString("ready check failed\n")
 		}
 		return ctx.String(http.StatusOK, check.String())
-	} else {
-		if !result.AllOk() {
-			return echo.NewHTTPError(http.StatusInternalServerError, "error")
-		}
-		return ctx.String(http.StatusOK, "ok")
 	}
+
+	if !result.AllOk() {
+		return echo.NewHTTPError(http.StatusInternalServerError, "error")
+	}
+
+	return ctx.String(http.StatusOK, "ok")
 }

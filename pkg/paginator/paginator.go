@@ -18,7 +18,7 @@ import (
 	"megpoid.dev/go/go-skel/pkg/paginator/cursor"
 )
 
-type SqlSelector interface {
+type SQLSelector interface {
 	Select(ctx context.Context, dest any, query string, args ...any) error
 	Get(ctx context.Context, dst any, query string, args ...any) error
 }
@@ -83,7 +83,7 @@ func (p *Paginator) SetPage(page int) {
 	p.page = &Page{Page: page}
 }
 
-func (p *Paginator) Paginate(ctx context.Context, db SqlSelector, ds *goqu.SelectDataset, dest any) (*Cursor, error) {
+func (p *Paginator) Paginate(ctx context.Context, db SQLSelector, ds *goqu.SelectDataset, dest any) (*Cursor, error) {
 	query, err := p.paginateDataset(ds, dest)
 	if err != nil {
 		return nil, fmt.Errorf("failed to include pagination to query: %w", err)
@@ -95,9 +95,9 @@ func (p *Paginator) Paginate(ctx context.Context, db SqlSelector, ds *goqu.Selec
 		}
 	} else {
 		queryCount := p.paginateCount(ds, dest)
-		sql, args, err := queryCount.Prepared(true).ToSQL()
-		if err != nil {
-			return nil, fmt.Errorf("failed to generate count SQL query: %w", err)
+		sql, args, queryErr := queryCount.Prepared(true).ToSQL()
+		if queryErr != nil {
+			return nil, fmt.Errorf("failed to generate count SQL query: %w", queryErr)
 		}
 
 		var count int
@@ -298,7 +298,7 @@ func (p *Paginator) buildWhereExpression(fields []any) exp.ExpressionList {
 			next = goqu.I(rule.SQLRepr).Eq(fields[i])
 		}
 	}
-	// for exmaple:
+	// for examaple:
 	// a > 1 OR a = 1 AND b > 2 OR a = 1 AND b = 2 AND c > 3
 	return goqu.Or(queries...)
 }

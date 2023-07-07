@@ -48,7 +48,7 @@ func TestFilter_Apply(t *testing.T) {
 		}...),
 	}
 
-	expectedSQL := strings.Replace(`
+	expectedSQL := strings.ReplaceAll(`
 SELECT * FROM "profiles" WHERE (
 ("value1" = '1') AND 
 ("value2" != 2) AND 
@@ -64,7 +64,7 @@ SELECT * FROM "profiles" WHERE (
 ("value12" = '2022-06-28T15:54:10.001Z') AND 
 ("value13" IS TRUE) AND 
 ("value14" IS NULL))
-`, "\n", "", -1)
+`, "\n", "")
 
 	f := New(opts...)
 	query := goqu.Dialect("postgres").From("profiles")

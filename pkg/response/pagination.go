@@ -44,13 +44,13 @@ func (m *Pagination) MarshalJSON() ([]byte, error) {
 			Type:             m.Type,
 			PaginationOffset: m.PaginationOffset,
 		})
-	} else {
-		return json.Marshal(&struct {
-			Type string `json:"type"`
-			PaginationCursor
-		}{
-			Type:             m.Type,
-			PaginationCursor: m.PaginationCursor,
-		})
 	}
+
+	return json.Marshal(&struct {
+		Type string `json:"type"`
+		PaginationCursor
+	}{
+		Type:             m.Type,
+		PaginationCursor: m.PaginationCursor,
+	})
 }

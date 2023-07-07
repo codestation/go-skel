@@ -43,7 +43,7 @@ func (e *Encoder) marshalJSON(model any) ([]byte, error) {
 	fields := make([]any, len(e.fields))
 	for i, field := range e.fields {
 		f := rv.FieldByName(field.Key)
-		if f == (reflect.Value{}) {
+		if !f.IsValid() {
 			return nil, ErrInvalidModel
 		}
 		if e.isNilable(f) && f.IsZero() {

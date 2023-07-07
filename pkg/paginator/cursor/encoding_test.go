@@ -247,7 +247,7 @@ func (s *encodingSuite) TestMultipleFieldsToStruct() {
 
 	s.Equal(123, model.ID)
 	s.Equal("Hello", model.Name)
-	s.Equal(t.Second(), (*model.CreatedAt).Second())
+	s.Equal(t.Second(), model.CreatedAt.Second())
 }
 
 func (s *encoderSuite) TestMultipleFieldsToStructWithZeroValue() {

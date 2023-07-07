@@ -167,7 +167,7 @@ func TestPaginatorPaginateError(t *testing.T) {
 	paginator := New()
 
 	query := goqu.Dialect("postgres").From("users")
-	paginatorErr := errors.New("an error ocurred")
+	paginatorErr := errors.New("an error occurred")
 	db := sqlSelector{Error: paginatorErr}
 
 	results := make([]*User, 0)

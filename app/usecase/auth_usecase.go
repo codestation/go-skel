@@ -35,7 +35,7 @@ func NewAuth(jwtSecret []byte) *AuthInteractor {
 func (uc *AuthInteractor) Login(ctx context.Context, username, password string) (string, error) {
 	t := uc.printer(ctx)
 
-	//TODO: really verify username/password
+	// TODO: really verify username/password
 	if len(username) == 0 || len(password) == 0 {
 		return "", apperror.NewAuthError(t.Sprintf("Invalid username or password"), nil)
 	}

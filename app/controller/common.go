@@ -14,8 +14,10 @@ import (
 	"megpoid.dev/go/go-skel/pkg/i18n"
 )
 
-const appName = "goapp"
-const apiVersion = "v1"
+const (
+	appName    = "goapp"
+	apiVersion = "v1"
+)
 
 func BaseURL() string {
 	return "/apis/" + appName + "/" + apiVersion

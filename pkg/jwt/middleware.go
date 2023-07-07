@@ -21,8 +21,10 @@ import (
 
 const ClaimsContextKey = "jwt_claims"
 
-var ErrNoAuthHeader = errors.New("authorization header is missing")
-var ErrInvalidAuthHeader = errors.New("authorization header is malformed")
+var (
+	ErrNoAuthHeader      = errors.New("authorization header is missing")
+	ErrInvalidAuthHeader = errors.New("authorization header is malformed")
+)
 
 type ValidatorOption func(opt *oapimw.Options)
 
@@ -64,7 +66,6 @@ func newAuthenticator(secret []byte) openapi3filter.AuthenticationFunc {
 
 			return secret, nil
 		})
-
 		if err != nil {
 			return &TokenError{Token: token, Err: err}
 		}

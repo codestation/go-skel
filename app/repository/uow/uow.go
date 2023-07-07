@@ -58,13 +58,8 @@ func (u *unitOfWork) Store() UnitOfWorkStore {
 func (u *unitOfWork) Do(ctx context.Context, fn UnitOfWorkBlock) error {
 	err := u.conn.BeginFunc(ctx, func(conn sql.Executor) error {
 		uowTx := New(conn)
-		if err := fn(uowTx); err != nil {
-			return err
-		}
-
-		return nil
+		return fn(uowTx)
 	})
-
 	if err != nil {
 		return err
 	}
