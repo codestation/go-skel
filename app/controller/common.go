@@ -29,6 +29,8 @@ type Controller struct {
 	AuthController
 	ProfileController
 	HealthcheckController
+	TaskController
+	DelayController
 }
 
 type common struct {

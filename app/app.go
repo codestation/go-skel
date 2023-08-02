@@ -6,12 +6,14 @@ package app
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"strings"
 	"time"
 
+	"github.com/hibiken/asynq"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/swaggest/swgui"
@@ -58,16 +60,24 @@ func NewApp(cfg *config.Config) (*App, error) {
 	// Unit of Work initialization (all repos are initialized here)
 	unitOfWork := uow.New(s.conn)
 
+	// Redis client config
+	redisClient := asynq.RedisClientOpt{
+		Addr: cfg.GeneralSettings.RedisAddr,
+	}
+
 	// Usecase initialization
 	authUsecase := usecase.NewAuth(cfg.ServerSettings.JwtSecret)
 	healthcheckUsecase := usecase.NewHealthcheck(healthcheckRepo)
 	profileUsecase := usecase.NewProfile(unitOfWork)
+	taskUsecase := usecase.NewTask(redisClient)
 
 	// Controller initialization
 	ctrl := controller.Controller{
 		AuthController:        controller.NewAuth(cfg, authUsecase),
 		ProfileController:     controller.NewProfile(cfg, profileUsecase),
 		HealthcheckController: controller.NewHealthCheck(cfg, healthcheckUsecase),
+		TaskController:        controller.NewTask(cfg, taskUsecase),
+		DelayController:       controller.NewDelay(cfg, taskUsecase),
 	}
 
 	// HTTP server initialization
@@ -143,7 +153,7 @@ func (s *App) Start() error {
 
 	go func() {
 		err := s.EchoServer.StartServer(s.Server)
-		if err != nil && err != http.ErrServerClosed {
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
 			log.Printf("Error starting server: %s", err.Error())
 			time.Sleep(time.Second)
 		}

@@ -16,6 +16,9 @@ type ServerInterface interface {
 
 	// (POST /auth/login)
 	Login(ctx echo.Context) error
+	// Create a new delay job request
+	// (POST /background/delay)
+	ProcessBackground(ctx echo.Context) error
 	// Check if the app is started
 	// (GET /health/live)
 	LiveCheck(ctx echo.Context, params LiveCheckParams) error
@@ -37,6 +40,12 @@ type ServerInterface interface {
 	// Update a profile by ID
 	// (PATCH /profiles/{id})
 	UpdateProfile(ctx echo.Context, id ProfileId) error
+
+	// (GET /queues/{name}/tasks/{id})
+	GetTask(ctx echo.Context, name QueueName, id TaskId) error
+
+	// (GET /queues/{name}/tasks/{id}/response)
+	GetTaskResponse(ctx echo.Context, name QueueName, id TaskId) error
 }
 
 // ServerInterfaceWrapper converts echo contexts to parameters.
@@ -50,6 +59,17 @@ func (w *ServerInterfaceWrapper) Login(ctx echo.Context) error {
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.Login(ctx)
+	return err
+}
+
+// ProcessBackground converts echo context to params.
+func (w *ServerInterfaceWrapper) ProcessBackground(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BearerAuthScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.ProcessBackground(ctx)
 	return err
 }
 
@@ -247,6 +267,58 @@ func (w *ServerInterfaceWrapper) UpdateProfile(ctx echo.Context) error {
 	return err
 }
 
+// GetTask converts echo context to params.
+func (w *ServerInterfaceWrapper) GetTask(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "name" -------------
+	var name QueueName
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "name", runtime.ParamLocationPath, ctx.Param("name"), &name)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter name: %s", err))
+	}
+
+	// ------------- Path parameter "id" -------------
+	var id TaskId
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "id", runtime.ParamLocationPath, ctx.Param("id"), &id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+	}
+
+	ctx.Set(BearerAuthScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.GetTask(ctx, name, id)
+	return err
+}
+
+// GetTaskResponse converts echo context to params.
+func (w *ServerInterfaceWrapper) GetTaskResponse(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "name" -------------
+	var name QueueName
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "name", runtime.ParamLocationPath, ctx.Param("name"), &name)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter name: %s", err))
+	}
+
+	// ------------- Path parameter "id" -------------
+	var id TaskId
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "id", runtime.ParamLocationPath, ctx.Param("id"), &id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+	}
+
+	ctx.Set(BearerAuthScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.GetTaskResponse(ctx, name, id)
+	return err
+}
+
 // This is a simple interface which specifies echo.Route addition functions which
 // are present on both echo.Echo and echo.Group, since we want to allow using
 // either of them for path registration
@@ -276,6 +348,7 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	}
 
 	router.POST(baseURL+"/auth/login", wrapper.Login)
+	router.POST(baseURL+"/background/delay", wrapper.ProcessBackground)
 	router.GET(baseURL+"/health/live", wrapper.LiveCheck)
 	router.GET(baseURL+"/health/ready", wrapper.ReadyCheck)
 	router.GET(baseURL+"/profiles", wrapper.ListProfiles)
@@ -283,5 +356,7 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.DELETE(baseURL+"/profiles/:id", wrapper.RemoveProfile)
 	router.GET(baseURL+"/profiles/:id", wrapper.GetProfile)
 	router.PATCH(baseURL+"/profiles/:id", wrapper.UpdateProfile)
+	router.GET(baseURL+"/queues/:name/tasks/:id", wrapper.GetTask)
+	router.GET(baseURL+"/queues/:name/tasks/:id/response", wrapper.GetTaskResponse)
 
 }

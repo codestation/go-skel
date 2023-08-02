@@ -27,7 +27,7 @@ Content-Type: application/json
 }
 
 > {%
-    client.test("Request executed successfully", function() {
+    client.test("Request executed successfully", function () {
         client.assert(response.status === 200, "Response status is not 200");
     });
     client.global.set("auth_token", response.body.token);
@@ -112,3 +112,35 @@ Authorization: Bearer {{auth_token}}
         client.assert(response.status === 204, "Response status is not 204");
     });
 %}
+
+###
+POST {{host}}/apis/goapp/v1/background/delay
+Accept: application/json
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "delay": "5s"
+}
+
+> {%
+    client.test("Profile deleted successfully", function () {
+        client.assert(response.status === 202, "Response status is not 202");
+    });
+    client.global.set("task_id", response.body.task_id);
+%}
+
+###
+GET {{host}}//apis/goapp/v1/queues/default/tasks/{{task_id}}
+Accept: application/json
+Authorization: Bearer {{auth_token}}
+
+> {%
+    client.test("Profile deleted successfully", function () {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+###
+GET {{host}}//apis/goapp/v1/queues/default/tasks/{{task_id}}/response
+Authorization: Bearer {{auth_token}}

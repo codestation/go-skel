@@ -65,6 +65,38 @@ paths:
                 $ref: "#/components/schemas/Token"
       tags:
         - Authentication
+  "/queues/{name}/tasks/{id}":
+    parameters:
+      - $ref: "#/components/parameters/queueName"
+      - $ref: "#/components/parameters/taskId"
+    get:
+      description: Obtain a task status
+      operationId: getTask
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+        default:
+          $ref: "#/components/responses/UnexpectedError"
+      tags:
+        - Task
+  "/queues/{name}/tasks/{id}/response":
+    parameters:
+      - $ref: "#/components/parameters/queueName"
+      - $ref: "#/components/parameters/taskId"
+    get:
+      description: Obtain a task response
+      operationId: getTaskResponse
+      responses:
+        '200':
+          description: Successful operation
+        default:
+          $ref: "#/components/responses/UnexpectedError"
+      tags:
+        - Task
   "/profiles":
     get:
       parameters:
@@ -110,6 +142,9 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Profile"
+          headers:
+            Location:
+              $ref: "#/components/headers/Location"
         default:
           $ref: "#/components/responses/UnexpectedError"
       tags:
@@ -161,7 +196,32 @@ paths:
           $ref: "#/components/responses/UnexpectedError"
       tags:
         - Profile
+  /background/delay:
+    post:
+      summary: Create a new delay job request
+      operationId: processBackground
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DelayRequest"
+      responses:
+        '202':
+          description: Profile accepted for creation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskCreationResponse"
+        default:
+          $ref: "#/components/responses/UnexpectedError"
 components:
+  headers:
+    Location:
+      description: URL to check for task status/result
+      schema:
+        type: string
+        example: https://example.com/api/tasks/id
   schemas:
     AuthRequest:
       type: object
@@ -182,6 +242,56 @@ components:
       required:
         - username
         - password
+    TaskCreationResponse:
+      type: object
+      properties:
+        task_id:
+          type: string
+          description: Task identifier
+          example: 6a7faa73-fda4-4418-b826-85f27463a121
+        location:
+          type: string
+          description: URL to check for task updates
+          example: https://example.com/api/tasks/id
+      required:
+        - task_id
+        - location
+    Task:
+      type: object
+      properties:
+        task_id:
+          type: string
+          description: Task identifier
+          example: 6a7faa73-fda4-4418-b826-85f27463a121
+        state:
+          type: string
+          description: Task status
+          example: running
+          enum:
+            - pending
+            - running
+            - retry
+            - succeeded
+            - failed
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            details:
+              type: object
+          required:
+            - code
+            - message
+      required:
+        - task_id
+        - state
+    Location:
+      type: string
+      description: URL to check for task updates
+      example: https://example.com/api/tasks/id
     ProfileList:
       type: object
       properties:
@@ -213,6 +323,15 @@ components:
         - first_name
         - last_name
         - email
+    DelayRequest:
+      type: object
+      properties:
+        delay:
+          type: string
+          description: Delay duration
+          example: 5s
+      required:
+        - delay
     Token:
       type: object
       properties:
@@ -323,6 +442,21 @@ components:
       schema:
         type: boolean
         example: true
+    queueName:
+      name: name
+      in: path
+      description: Queue name.
+      schema:
+        type: string
+        example: default
+    taskId:
+      name: id
+      in: path
+      description: The ID of the task.
+      schema:
+        type: string
+        example: 07c49ebb-ee98-40bb-86bd-925fe21f4e87
+      required: true
     profileId:
       name: id
       in: path

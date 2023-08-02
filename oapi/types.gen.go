@@ -13,6 +13,15 @@ const (
 	BearerAuthScopes = "BearerAuth.Scopes"
 )
 
+// Defines values for TaskState.
+const (
+	Failed    TaskState = "failed"
+	Pending   TaskState = "pending"
+	Retry     TaskState = "retry"
+	Running   TaskState = "running"
+	Succeeded TaskState = "succeeded"
+)
+
 // AuthRequest defines model for AuthRequest.
 type AuthRequest struct {
 	// Password The password of the user.
@@ -20,6 +29,12 @@ type AuthRequest struct {
 
 	// Username The username of the user.
 	Username string `json:"username" validate:"required"`
+}
+
+// DelayRequest defines model for DelayRequest.
+type DelayRequest struct {
+	// Delay Delay duration
+	Delay string `json:"delay"`
 }
 
 // Error defines model for Error.
@@ -124,6 +139,33 @@ type ProfileRequest struct {
 	LastName string `json:"last_name"`
 }
 
+// Task defines model for Task.
+type Task struct {
+	Error *struct {
+		Code    string                  `json:"code"`
+		Details *map[string]interface{} `json:"details,omitempty"`
+		Message string                  `json:"message"`
+	} `json:"error,omitempty"`
+
+	// State Task status
+	State TaskState `json:"state"`
+
+	// TaskId Task identifier
+	TaskId string `json:"task_id"`
+}
+
+// TaskState Task status
+type TaskState string
+
+// TaskCreationResponse defines model for TaskCreationResponse.
+type TaskCreationResponse struct {
+	// Location URL to check for task updates
+	Location string `json:"location"`
+
+	// TaskId Task identifier
+	TaskId string `json:"task_id"`
+}
+
 // Token defines model for Token.
 type Token struct {
 	// Token The JWT token for authentication.
@@ -157,8 +199,14 @@ type ProfileId = int64
 // Query defines model for query.
 type Query = string
 
+// QueueName defines model for queueName.
+type QueueName = string
+
 // Sort defines model for sort.
 type Sort = string
+
+// TaskId defines model for taskId.
+type TaskId = string
 
 // Verbose defines model for verbose.
 type Verbose = bool
@@ -210,6 +258,9 @@ type ListProfilesParams struct {
 
 // LoginJSONRequestBody defines body for Login for application/json ContentType.
 type LoginJSONRequestBody = AuthRequest
+
+// ProcessBackgroundJSONRequestBody defines body for ProcessBackground for application/json ContentType.
+type ProcessBackgroundJSONRequestBody = DelayRequest
 
 // SaveProfileJSONRequestBody defines body for SaveProfile for application/json ContentType.
 type SaveProfileJSONRequestBody = ProfileRequest

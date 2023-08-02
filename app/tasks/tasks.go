@@ -8,76 +8,57 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
+	"time"
 
 	"github.com/hibiken/asynq"
-	"megpoid.dev/go/go-skel/app/repository/uow"
+	"megpoid.dev/go/go-skel/app/model"
 	"megpoid.dev/go/go-skel/app/usecase"
-	"megpoid.dev/go/go-skel/pkg/sql"
 )
 
 const (
-	TypeSayHello     = "say:hello"
-	TypeProfileCheck = "profile:check"
+	TypeDelay = "timer:delay"
 )
 
-type HelloPayload struct {
-	Message string
+type DelayPayload struct {
+	Delay time.Duration
 }
 
-type ProfilePayload struct {
-	ID int64
-}
-
-func NewSayHelloTask(message string) (*asynq.Task, error) {
-	payload, err := json.Marshal(HelloPayload{Message: message})
+func NewDelayTask(delay time.Duration) (*asynq.Task, error) {
+	payload, err := json.Marshal(DelayPayload{Delay: delay})
 	if err != nil {
 		return nil, err
 	}
-	return asynq.NewTask(TypeSayHello, payload), nil
+	return asynq.NewTask(TypeDelay, payload), nil
 }
 
-func NewProfileCheckTask(id int64) (*asynq.Task, error) {
-	payload, err := json.Marshal(ProfilePayload{ID: id})
-	if err != nil {
-		return nil, err
-	}
-	return asynq.NewTask(TypeProfileCheck, payload), nil
+type DelayTask struct {
+	backgroundJob usecase.DelayJob
 }
 
-func HandleSayHelloTask(_ context.Context, t *asynq.Task) error {
-	var p HelloPayload
-	if err := json.Unmarshal(t.Payload(), &p); err != nil {
-		return fmt.Errorf("json.Unmarshal failed: %v: %w", err, asynq.SkipRetry)
-	}
-	log.Printf("Sending Message: %s", p.Message)
-	fmt.Printf("Hello %s", p.Message)
-	return nil
-}
-
-type ProfileChecker struct {
-	pool sql.Connector
-}
-
-func (process *ProfileChecker) ProcessTask(ctx context.Context, t *asynq.Task) error {
-	var p ProfilePayload
+func (process *DelayTask) ProcessTask(ctx context.Context, t *asynq.Task) error {
+	var p DelayPayload
 	if err := json.Unmarshal(t.Payload(), &p); err != nil {
 		return fmt.Errorf("json.Unmarshal failed: %v: %w", err, asynq.SkipRetry)
 	}
 
-	unitOfWork := uow.New(process.pool)
-	uc := usecase.NewProfile(unitOfWork)
-
-	profile, err := uc.GetProfile(ctx, p.ID)
+	result, err := process.backgroundJob.Process(ctx, p.Delay)
 	if err != nil {
-		return fmt.Errorf("failed to find profile: %w", err)
+		return fmt.Errorf("failed to run job: %w", err)
 	}
 
-	log.Printf("Profile found: email=%s", profile.Email)
+	response := model.TaskResponse{
+		ContentType: "application/json",
+		Data:        result,
+	}
+
+	encoder := json.NewEncoder(t.ResultWriter())
+	if err := encoder.Encode(response); err != nil {
+		return fmt.Errorf("failed to encode result: %w", err)
+	}
 
 	return nil
 }
 
-func NewProfileProcessor(pool sql.Connector) *ProfileChecker {
-	return &ProfileChecker{pool: pool}
+func NewDelayProcessor(backgroundJob usecase.DelayJob) *DelayTask {
+	return &DelayTask{backgroundJob: backgroundJob}
 }

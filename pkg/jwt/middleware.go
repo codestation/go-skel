@@ -36,6 +36,7 @@ func WithSkipperFunc(skipFn middleware.Skipper) ValidatorOption {
 
 func OapiValidator(spec *openapi3.T, secret []byte, opts ...ValidatorOption) echo.MiddlewareFunc {
 	options := &oapimw.Options{
+		SilenceServersWarning: true,
 		Options: openapi3filter.Options{
 			AuthenticationFunc: newAuthenticator(secret),
 		},
