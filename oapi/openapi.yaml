@@ -36,7 +36,7 @@ paths:
       summary: Check if the app is ready to accept connections
       description: Check if the app has completed initialization and is ready to accept connections.
       operationId: readyCheck
-      security: []
+      security: [ ]
       parameters:
         - $ref: "#/components/parameters/verbose"
       responses:
@@ -48,7 +48,7 @@ paths:
         - Status
   "/auth/login":
     post:
-      security: []
+      security: [ ]
       operationId: login
       requestBody:
         required: true
@@ -449,6 +449,7 @@ components:
       schema:
         type: string
         example: default
+      required: true
     taskId:
       name: id
       in: path

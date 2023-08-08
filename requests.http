@@ -103,6 +103,17 @@ Authorization: Bearer {{auth_token}}
 %}
 
 ###
+GET {{host}}/apis/goapp/v1/profiles/0
+Accept: application/json
+Authorization: Bearer {{auth_token}}
+
+> {%
+    client.test("Profile not found", function () {
+        client.assert(response.status === 404, "Response status is not 404");
+    });
+%}
+
+###
 DELETE {{host}}/apis/goapp/v1/profiles/{{profile_id}}
 Accept: application/json
 Authorization: Bearer {{auth_token}}
