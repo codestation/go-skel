@@ -6,7 +6,7 @@ package cmd
 
 import (
 	"context"
-	"log"
+	"log/slog"
 	"os"
 	"os/signal"
 	"syscall"
@@ -51,7 +51,7 @@ var migrateCmd = &cobra.Command{
 		go func() {
 			err := db.RunMigrations(ctx, pool, cfg)
 			if err != nil {
-				log.Println(err.Error())
+				slog.Info(err.Error())
 			}
 
 			quit <- os.Interrupt

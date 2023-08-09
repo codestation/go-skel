@@ -5,17 +5,20 @@
 package cmd
 
 import (
-	"fmt"
+	"log/slog"
 
 	"megpoid.dev/go/go-skel/version"
 
 	"github.com/spf13/cobra"
 )
 
-const versionFormatter = "GoApp version: %s, commit: %s, date: %s, clean build: %t\n"
-
 func printVersion() {
-	fmt.Printf(versionFormatter, version.Tag, version.Revision, version.LastCommit, !version.Modified)
+	slog.Info("GoApp",
+		slog.String("version", version.Tag),
+		slog.String("commit", version.Revision),
+		slog.Time("date", version.LastCommit),
+		slog.Bool("clean_build", !version.Modified),
+	)
 }
 
 // versionCmd represents the version command

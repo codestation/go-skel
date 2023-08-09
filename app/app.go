@@ -8,8 +8,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
+	"log/slog"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -45,6 +46,11 @@ type App struct {
 
 func NewApp(cfg *config.Config) (*App, error) {
 	s := &App{cfg: cfg}
+
+	if cfg.GeneralSettings.Debug {
+		textHandler := slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug})
+		slog.SetDefault(slog.New(textHandler))
+	}
 
 	// Database initialization
 	pool, err := sql.NewConnection(sql.Config(cfg.DatabaseSettings))
@@ -149,12 +155,12 @@ func (s *App) Start() error {
 		IdleTimeout:  s.cfg.ServerSettings.IdleTimeout,
 	}
 
-	log.Printf("Starting server")
+	slog.Info("Starting server")
 
 	go func() {
 		err := s.EchoServer.StartServer(s.Server)
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
-			log.Printf("Error starting server: %s", err.Error())
+			slog.Info("Error starting server: %s", err.Error())
 			time.Sleep(time.Second)
 		}
 	}()
@@ -168,11 +174,11 @@ func (s *App) stopHTTPServer() {
 		defer cancel()
 
 		if err := s.EchoServer.Shutdown(shutdownCtx); err != nil {
-			log.Printf("App: stopHTTPServer: Shutdown failed: %s", err.Error())
+			slog.Info("App: stopHTTPServer: Shutdown failed: %s", err.Error())
 		}
 
 		if err := s.Server.Close(); err != nil {
-			log.Printf("App: stopHTTPServer: Close failed: %s", err.Error())
+			slog.Info("App: stopHTTPServer: Close failed: %s", err.Error())
 		}
 
 		s.Server = nil

@@ -8,7 +8,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/doug-martin/goqu/v9"
@@ -205,7 +204,6 @@ func NewConnection(config Config) (*pgxpool.Pool, error) {
 		}
 
 		if i < pingMaxAttempts {
-			log.Printf("Failed to ping database: %s, retrying in %d seconds", err.Error(), pingTimeoutSecs)
 			time.Sleep(pingTimeoutSecs * time.Second)
 		} else {
 			return nil, errors.New("failed to ping database, aborting")

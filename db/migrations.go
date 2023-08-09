@@ -7,7 +7,7 @@ package db
 import (
 	"context"
 	"fmt"
-	"log"
+	"log/slog"
 	"path"
 	"strings"
 
@@ -36,7 +36,7 @@ func RunMigrations(ctx context.Context, pool *pgxpool.Pool, config *config.Confi
 		if err != nil {
 			return nil
 		}
-		log.Printf("Recreated 'public' schema")
+		slog.Info("Recreated 'public' schema")
 	}
 
 	step := 0
@@ -54,7 +54,7 @@ func RunMigrations(ctx context.Context, pool *pgxpool.Pool, config *config.Confi
 		if err != nil {
 			return fmt.Errorf("failed to revert migrations: %w", err)
 		}
-		log.Printf("Reverted %d migrations", n)
+		slog.Info("Reverted %d migrations", n)
 	}
 
 	if config.MigrationSettings.Reset || !config.MigrationSettings.Rollback || config.MigrationSettings.Redo {
@@ -66,7 +66,7 @@ func RunMigrations(ctx context.Context, pool *pgxpool.Pool, config *config.Confi
 		if err != nil {
 			return fmt.Errorf("failed to apply migrations: %w", err)
 		}
-		log.Printf("Applied %d migrations", n)
+		slog.Info("Applied %d migrations", n)
 	}
 
 	if config.MigrationSettings.Seed {
