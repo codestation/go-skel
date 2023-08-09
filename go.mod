@@ -1,18 +1,18 @@
 module megpoid.dev/go/go-skel
 
-go 1.20
+go 1.21
 
 require (
-	github.com/deepmap/oapi-codegen v1.13.1
+	github.com/deepmap/oapi-codegen v1.13.4
 	github.com/doug-martin/goqu/v9 v9.18.0
 	github.com/georgysavva/scany/v2 v2.0.0
 	github.com/getkin/kin-openapi v0.118.0
-	github.com/go-playground/validator/v10 v10.14.1
+	github.com/go-playground/validator/v10 v10.15.0
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/golang-jwt/jwt/v5 v5.0.0
 	github.com/heroiclabs/sql-migrate v0.0.0-20230615133120-fb3ad977aaaf
 	github.com/hibiken/asynq v0.24.1
-	github.com/jackc/pgx/v5 v5.4.2
+	github.com/jackc/pgx/v5 v5.4.3
 	github.com/jinzhu/inflection v1.0.0
 	github.com/labstack/echo-jwt/v4 v4.2.0
 	github.com/labstack/echo/v4 v4.11.1
@@ -22,8 +22,8 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.16.0
 	github.com/stretchr/testify v1.8.4
-	github.com/swaggest/swgui v1.6.4
-	golang.org/x/text v0.11.0
+	github.com/swaggest/swgui v1.7.2
+	golang.org/x/text v0.12.0
 )
 
 require (
@@ -74,7 +74,7 @@ require (
 	github.com/spf13/afero v1.9.5 // indirect
 	github.com/spf13/cast v1.5.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
-	github.com/stretchr/objx v0.5.0 // indirect
+	github.com/stretchr/objx v0.5.1 // indirect
 	github.com/subosito/gotenv v1.4.2 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
@@ -82,10 +82,10 @@ require (
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/vearutop/statigz v1.4.0 // indirect
 	golang.org/x/arch v0.4.0 // indirect
-	golang.org/x/crypto v0.11.0 // indirect
-	golang.org/x/net v0.12.0 // indirect
+	golang.org/x/crypto v0.12.0 // indirect
+	golang.org/x/net v0.14.0 // indirect
 	golang.org/x/sync v0.3.0 // indirect
-	golang.org/x/sys v0.10.0 // indirect
+	golang.org/x/sys v0.11.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
