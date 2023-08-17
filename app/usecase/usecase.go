@@ -35,7 +35,7 @@ type Profile interface {
 
 //go:generate go run github.com/vektra/mockery/v2@v2.23.1 --name Healthcheck
 type Healthcheck interface {
-	Execute(ctx context.Context) *model.HealthcheckResult
+	Execute(ctx context.Context) error
 }
 
 type DelayJob interface {

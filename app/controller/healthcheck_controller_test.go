@@ -12,7 +12,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
-	"megpoid.dev/go/go-skel/app/model"
 	"megpoid.dev/go/go-skel/app/usecase"
 	"megpoid.dev/go/go-skel/oapi"
 )
@@ -42,7 +41,7 @@ func (s *healthcheckSuite) TestLive() {
 
 func (s *healthcheckSuite) TestReady() {
 	uc := usecase.NewMockHealthcheck(s.T())
-	uc.EXPECT().Execute(mock.Anything).Return(&model.HealthcheckResult{})
+	uc.EXPECT().Execute(mock.Anything).Return(nil)
 
 	ctrl := NewHealthCheck(nil, uc)
 
@@ -59,9 +58,7 @@ func (s *healthcheckSuite) TestReady() {
 
 func (s *healthcheckSuite) TestReadyFailed() {
 	uc := usecase.NewMockHealthcheck(s.T())
-	uc.EXPECT().Execute(mock.Anything).Return(&model.HealthcheckResult{
-		Ping: errors.New("an error occurred"),
-	})
+	uc.EXPECT().Execute(mock.Anything).Return(errors.New("an error occurred"))
 
 	ctrl := NewHealthCheck(nil, uc)
 

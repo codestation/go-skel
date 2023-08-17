@@ -54,7 +54,7 @@ func RunMigrations(ctx context.Context, pool *pgxpool.Pool, config *config.Confi
 		if err != nil {
 			return fmt.Errorf("failed to revert migrations: %w", err)
 		}
-		slog.Info("Reverted %d migrations", n)
+		slog.Info("Reverted migrations", slog.Int("count", n))
 	}
 
 	if config.MigrationSettings.Reset || !config.MigrationSettings.Rollback || config.MigrationSettings.Redo {
@@ -66,7 +66,7 @@ func RunMigrations(ctx context.Context, pool *pgxpool.Pool, config *config.Confi
 		if err != nil {
 			return fmt.Errorf("failed to apply migrations: %w", err)
 		}
-		slog.Info("Applied %d migrations", n)
+		slog.Info("Applied migrations", slog.Int("count", n))
 	}
 
 	if config.MigrationSettings.Seed {

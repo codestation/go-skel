@@ -37,23 +37,22 @@ func (ctrl *HealthcheckController) LiveCheck(ctx echo.Context, params oapi.LiveC
 }
 
 func (ctrl *HealthcheckController) ReadyCheck(ctx echo.Context, params oapi.ReadyCheckParams) error {
-	result := ctrl.healthcheckUsecase.Execute(ctx.Request().Context())
+	err := ctrl.healthcheckUsecase.Execute(ctx.Request().Context())
 	if params.Verbose != nil && *params.Verbose {
 		var check strings.Builder
-		if result.Ping != nil {
-			check.WriteString(fmt.Sprintf("[+] ping err: %s\n", result.Ping.Error()))
+
+		if err != nil {
+			check.WriteString(fmt.Sprintf("[+] ping err: %s\n", err.Error()))
+			check.WriteString("ready check failed\n")
 		} else {
 			check.WriteString("[+] ping ok\n")
-		}
-		if result.AllOk() {
 			check.WriteString("ready check passed\n")
-		} else {
-			check.WriteString("ready check failed\n")
 		}
+
 		return ctx.String(http.StatusOK, check.String())
 	}
 
-	if !result.AllOk() {
+	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "error")
 	}
 

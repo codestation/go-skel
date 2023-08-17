@@ -160,7 +160,7 @@ func (s *App) Start() error {
 	go func() {
 		err := s.EchoServer.StartServer(s.Server)
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
-			slog.Info("Error starting server: %s", err.Error())
+			slog.Error("Error starting server", slog.String("error", err.Error()))
 			time.Sleep(time.Second)
 		}
 	}()
@@ -174,11 +174,11 @@ func (s *App) stopHTTPServer() {
 		defer cancel()
 
 		if err := s.EchoServer.Shutdown(shutdownCtx); err != nil {
-			slog.Info("App: stopHTTPServer: Shutdown failed: %s", err.Error())
+			slog.Error("App: stopHTTPServer: shutdown failed", slog.String("error", err.Error()))
 		}
 
 		if err := s.Server.Close(); err != nil {
-			slog.Info("App: stopHTTPServer: Close failed: %s", err.Error())
+			slog.Error("App: stopHTTPServer: close failed", slog.String("error", err.Error()))
 		}
 
 		s.Server = nil

@@ -19,9 +19,8 @@ func TestApp_Healthcheck(t *testing.T) {
 	repo.EXPECT().Execute(mock.Anything).Return(nil)
 
 	u := NewHealthcheck(repo)
-	result := u.Execute(context.Background())
-	assert.NotNil(t, result)
-	assert.True(t, result.AllOk())
+	err := u.Execute(context.Background())
+	assert.NoError(t, err)
 }
 
 func TestApp_HealthcheckError(t *testing.T) {
@@ -29,7 +28,6 @@ func TestApp_HealthcheckError(t *testing.T) {
 	repo.EXPECT().Execute(mock.Anything).Return(errors.New("an error"))
 
 	app := NewHealthcheck(repo)
-	result := app.Execute(context.Background())
-	assert.NotNil(t, result)
-	assert.False(t, result.AllOk())
+	err := app.Execute(context.Background())
+	assert.Error(t, err)
 }

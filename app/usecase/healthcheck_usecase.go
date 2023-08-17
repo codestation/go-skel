@@ -7,7 +7,6 @@ package usecase
 import (
 	"context"
 
-	"megpoid.dev/go/go-skel/app/model"
 	"megpoid.dev/go/go-skel/app/repository"
 )
 
@@ -19,11 +18,8 @@ type HealthcheckInteractor struct {
 	healthcheckRepo repository.HealthcheckRepo
 }
 
-func (u *HealthcheckInteractor) Execute(ctx context.Context) *model.HealthcheckResult {
-	err := u.healthcheckRepo.Execute(ctx)
-	return &model.HealthcheckResult{
-		Ping: err,
-	}
+func (u *HealthcheckInteractor) Execute(ctx context.Context) error {
+	return u.healthcheckRepo.Execute(ctx)
 }
 
 func NewHealthcheck(repo repository.HealthcheckRepo) *HealthcheckInteractor {

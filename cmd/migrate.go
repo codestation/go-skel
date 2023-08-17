@@ -51,7 +51,7 @@ var migrateCmd = &cobra.Command{
 		go func() {
 			err := db.RunMigrations(ctx, pool, cfg)
 			if err != nil {
-				slog.Info(err.Error())
+				slog.Error(err.Error())
 			}
 
 			quit <- os.Interrupt
