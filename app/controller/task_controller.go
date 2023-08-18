@@ -8,17 +8,17 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"megpoid.dev/go/go-skel/app/usecase"
 	"megpoid.dev/go/go-skel/config"
 	"megpoid.dev/go/go-skel/oapi"
+	"megpoid.dev/go/go-skel/pkg/task"
 )
 
 type TaskController struct {
 	common
-	task usecase.Task
+	task task.Task
 }
 
-func NewTask(cfg *config.Config, task usecase.Task) TaskController {
+func NewTask(cfg *config.Config, task task.Task) TaskController {
 	return TaskController{
 		common: newCommon(cfg),
 		task:   task,

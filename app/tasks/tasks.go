@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/hibiken/asynq"
-	"megpoid.dev/go/go-skel/app/model"
 	"megpoid.dev/go/go-skel/app/usecase"
+	"megpoid.dev/go/go-skel/pkg/task"
 )
 
 const (
@@ -46,7 +46,7 @@ func (process *DelayTask) ProcessTask(ctx context.Context, t *asynq.Task) error 
 		return fmt.Errorf("failed to run job: %w", err)
 	}
 
-	response := model.TaskResponse{
+	response := task.Response{
 		ContentType: "application/json",
 		Data:        result,
 	}

@@ -29,6 +29,7 @@ import (
 	"megpoid.dev/go/go-skel/pkg/i18n"
 	"megpoid.dev/go/go-skel/pkg/jwt"
 	"megpoid.dev/go/go-skel/pkg/sql"
+	"megpoid.dev/go/go-skel/pkg/task"
 	"megpoid.dev/go/go-skel/pkg/validator"
 	"megpoid.dev/go/go-skel/web"
 )
@@ -75,7 +76,7 @@ func NewApp(cfg *config.Config) (*App, error) {
 	authUsecase := usecase.NewAuth(cfg.ServerSettings.JwtSecret)
 	healthcheckUsecase := usecase.NewHealthcheck(healthcheckRepo)
 	profileUsecase := usecase.NewProfile(unitOfWork)
-	taskUsecase := usecase.NewTask(redisClient)
+	taskUsecase := task.NewClient(redisClient)
 
 	// Controller initialization
 	ctrl := controller.Controller{

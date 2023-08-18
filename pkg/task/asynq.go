@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT-license
 // that can be found in the LICENSE file.
 
-package usecase
+package task
 
 import (
 	"context"
@@ -11,21 +11,17 @@ import (
 	"time"
 
 	"github.com/hibiken/asynq"
-	"megpoid.dev/go/go-skel/app/model"
 )
 
-const DefaultQueueName = "default"
-
 // used to validate that the implementation matches the interface
-var _ Task = &TaskInteractor{}
+var _ Task = &AsynqTask{}
 
-type TaskInteractor struct {
-	common
+type AsynqTask struct {
 	inspector *asynq.Inspector
 	client    *asynq.Client
 }
 
-func (u *TaskInteractor) Enqueue(ctx context.Context, task *asynq.Task) (string, error) {
+func (u *AsynqTask) Enqueue(ctx context.Context, task *asynq.Task) (string, error) {
 	info, err := u.client.EnqueueContext(ctx, task, asynq.Queue(DefaultQueueName), asynq.Retention(24*time.Hour))
 	if err != nil {
 		return "", fmt.Errorf("failed to enqueue task: %w", err)
@@ -34,13 +30,13 @@ func (u *TaskInteractor) Enqueue(ctx context.Context, task *asynq.Task) (string,
 	return info.ID, err
 }
 
-func (u *TaskInteractor) GetTaskInfo(_ context.Context, queue, id string) (*model.Task, error) {
+func (u *AsynqTask) GetTaskInfo(_ context.Context, queue, id string) (*Info, error) {
 	info, err := u.inspector.GetTaskInfo(queue, id)
 	if err != nil {
 		return nil, err
 	}
 
-	status := &model.Task{
+	status := &Info{
 		ID: info.ID,
 	}
 
@@ -70,7 +66,7 @@ func (u *TaskInteractor) GetTaskInfo(_ context.Context, queue, id string) (*mode
 	return status, nil
 }
 
-func (u *TaskInteractor) GetTaskResponse(_ context.Context, queue, id string) (*model.TaskResponse, error) {
+func (u *AsynqTask) GetTaskResponse(_ context.Context, queue, id string) (*Response, error) {
 	info, err := u.inspector.GetTaskInfo(queue, id)
 	if err != nil {
 		return nil, err
@@ -80,7 +76,7 @@ func (u *TaskInteractor) GetTaskResponse(_ context.Context, queue, id string) (*
 		return nil, fmt.Errorf("task isn't completed yet")
 	}
 
-	response := &model.TaskResponse{}
+	response := &Response{}
 	if err := json.Unmarshal(info.Result, response); err != nil {
 		return nil, err
 	}
@@ -88,9 +84,8 @@ func (u *TaskInteractor) GetTaskResponse(_ context.Context, queue, id string) (*
 	return response, nil
 }
 
-func NewTask(redis asynq.RedisClientOpt) *TaskInteractor {
-	return &TaskInteractor{
-		common:    newCommon(),
+func NewClient(redis asynq.RedisClientOpt) *AsynqTask {
+	return &AsynqTask{
 		inspector: asynq.NewInspector(redis),
 		client:    asynq.NewClient(redis),
 	}

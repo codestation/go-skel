@@ -10,18 +10,18 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"megpoid.dev/go/go-skel/app/tasks"
-	"megpoid.dev/go/go-skel/app/usecase"
 	"megpoid.dev/go/go-skel/config"
 	"megpoid.dev/go/go-skel/oapi"
 	"megpoid.dev/go/go-skel/pkg/apperror"
+	"megpoid.dev/go/go-skel/pkg/task"
 )
 
 type DelayController struct {
 	common
-	task usecase.Task
+	task task.Task
 }
 
-func NewDelay(cfg *config.Config, task usecase.Task) DelayController {
+func NewDelay(cfg *config.Config, task task.Task) DelayController {
 	return DelayController{
 		common: newCommon(cfg),
 		task:   task,
@@ -42,12 +42,12 @@ func (ctrl *DelayController) ProcessBackground(ctx echo.Context) error {
 		return apperror.NewValidationError(t.Sprintf("Failed to parse duration"), err)
 	}
 
-	task, err := tasks.NewDelayTask(delay)
+	delayTask, err := tasks.NewDelayTask(delay)
 	if err != nil {
 		return apperror.NewValidationError(t.Sprintf("Failed to create task"), err)
 	}
 
-	taskId, err := ctrl.task.Enqueue(ctx.Request().Context(), task)
+	taskId, err := ctrl.task.Enqueue(ctx.Request().Context(), delayTask)
 	if err != nil {
 		return apperror.NewValidationError(t.Sprintf("Failed to enqueue task"), err)
 	}
