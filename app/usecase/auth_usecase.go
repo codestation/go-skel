@@ -37,7 +37,7 @@ func (uc *AuthInteractor) Login(ctx context.Context, username, password string) 
 
 	// TODO: really verify username/password
 	if len(username) == 0 || len(password) == 0 {
-		return "", apperror.NewAuthError(t.Sprintf("Invalid username or password"), nil)
+		return "", apperror.NewAuthnError(t.Sprintf("Invalid username or password"), nil)
 	}
 
 	claims := JwtCustomClaims{

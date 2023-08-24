@@ -49,7 +49,8 @@ func createAppError(message string, err error, skip int) *Error {
 		var httpErr *echo.HTTPError
 		var validateErr validator.ValidationErrors
 		var bindingErr *echo.BindingError
-		var authErr *authError
+		var authnErr *authnError
+		var authzErr *authzError
 		var validationErr *validationError
 
 		appErr.DetailedError = err.Error()
@@ -69,12 +70,15 @@ func createAppError(message string, err error, skip int) *Error {
 				})
 			}
 			appErr.StatusCode = http.StatusBadRequest
-		case errors.As(err, &authErr):
+		case errors.As(err, &authnErr):
 			appErr.StatusCode = http.StatusUnauthorized
-			appErr.DetailedError = authErr.Error()
+			appErr.DetailedError = authnErr.Error()
 		case errors.As(err, &validationErr):
 			appErr.StatusCode = http.StatusBadRequest
 			appErr.DetailedError = validationErr.Error()
+		case errors.As(err, &authzErr):
+			appErr.StatusCode = http.StatusForbidden
+			appErr.DetailedError = authzErr.Error()
 		default:
 			appErr.StatusCode = http.StatusInternalServerError
 		}
@@ -89,11 +93,11 @@ func NewAppError(message string, err error) *Error {
 	return createAppError(message, err, 3)
 }
 
-type authError struct {
+type authnError struct {
 	err error
 }
 
-func (e *authError) Error() string {
+func (e *authnError) Error() string {
 	if e.err != nil {
 		return e.err.Error()
 	}
@@ -111,10 +115,25 @@ func (e *validationError) Error() string {
 	return ""
 }
 
-func NewAuthError(message string, err error) *Error {
-	return createAppError(message, &authError{err: err}, 4)
+func NewAuthnError(message string, err error) *Error {
+	return createAppError(message, &authnError{err: err}, 4)
 }
 
 func NewValidationError(message string, err error) *Error {
 	return createAppError(message, &validationError{err: err}, 4)
+}
+
+type authzError struct {
+	err error
+}
+
+func (e *authzError) Error() string {
+	if e.err != nil {
+		return e.err.Error()
+	}
+	return ""
+}
+
+func NewAuthzError(message string, err error) *Error {
+	return createAppError(message, &authzError{err: err}, 4)
 }
