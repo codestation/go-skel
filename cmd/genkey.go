@@ -23,6 +23,9 @@ var genkeyCmd = &cobra.Command{
 	Use:   "genkey",
 	Short: "Generate a random key",
 	Long:  `Generate a random key to be used as a secret for other configurations`,
+	PreRun: func(cmd *cobra.Command, _ []string) {
+		cobra.CheckErr(viper.BindPFlags(cmd.Flags()))
+	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		length := viper.GetInt("length")
 		if length < 8 || length > 8192 {
@@ -64,6 +67,4 @@ func init() {
 	genkeyCmd.Flags().StringP("output", "o", "", "Insert generated key to file")
 	genkeyCmd.Flags().BoolP("quiet", "q", false, "Do not print extra messages")
 	genkeyCmd.Flags().IntP("length", "l", ApplicationKeySize, "Use an specific key length")
-
-	cobra.CheckErr(viper.BindPFlags(genkeyCmd.Flags()))
 }

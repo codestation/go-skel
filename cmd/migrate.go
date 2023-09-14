@@ -23,6 +23,9 @@ var migrateCmd = &cobra.Command{
 	Use:   "migrate",
 	Short: "Run database migrations",
 	Long:  `Apply the database migrations to the database`,
+	PreRun: func(cmd *cobra.Command, _ []string) {
+		cobra.CheckErr(viper.BindPFlags(cmd.Flags()))
+	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfg, err := config.NewConfig(config.WithUnmarshal(unmarshalFunc))
 		if err != nil {
@@ -74,7 +77,4 @@ func init() {
 
 	migrateCmd.Flags().AddFlagSet(databaseFlags)
 	migrateCmd.Flags().AddFlagSet(migrateFlags)
-
-	cobra.CheckErr(viper.BindPFlags(databaseFlags))
-	cobra.CheckErr(viper.BindPFlags(migrateFlags))
 }

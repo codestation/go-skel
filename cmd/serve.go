@@ -22,6 +22,9 @@ var serveCmd = &cobra.Command{
 	Use:   "serve",
 	Short: "Start service",
 	Long:  `Starts the HTTP endpoint and other services`,
+	PreRun: func(cmd *cobra.Command, _ []string) {
+		cobra.CheckErr(viper.BindPFlags(cmd.Flags()))
+	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return runServer()
 	},
@@ -72,8 +75,4 @@ func init() {
 	serveCmd.Flags().AddFlagSet(generalFs)
 	serveCmd.Flags().AddFlagSet(serverFs)
 	serveCmd.Flags().AddFlagSet(databaseFs)
-
-	cobra.CheckErr(viper.BindPFlags(generalFs))
-	cobra.CheckErr(viper.BindPFlags(serverFs))
-	cobra.CheckErr(viper.BindPFlags(databaseFs))
 }

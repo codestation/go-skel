@@ -20,6 +20,9 @@ var queueCmd = &cobra.Command{
 	Use:   "queue",
 	Short: "Run task queue",
 	Long:  `Run the task queue`,
+	PreRun: func(cmd *cobra.Command, _ []string) {
+		cobra.CheckErr(viper.BindPFlags(cmd.Flags()))
+	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfg, err := config.NewConfig(config.WithUnmarshal(unmarshalFunc))
 		if err != nil {
@@ -56,7 +59,4 @@ func init() {
 
 	queueCmd.Flags().AddFlagSet(databaseFlags)
 	queueCmd.Flags().AddFlagSet(generalFlags)
-
-	cobra.CheckErr(viper.BindPFlags(databaseFlags))
-	cobra.CheckErr(viper.BindPFlags(generalFlags))
 }

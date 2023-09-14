@@ -42,6 +42,9 @@ var migrationCmd = &cobra.Command{
 	Short: "Create a database migration file",
 	Long:  `Create a database migration file`,
 	Args:  cobra.ExactArgs(1),
+	PreRun: func(cmd *cobra.Command, _ []string) {
+		cobra.CheckErr(viper.BindPFlags(cmd.Flags()))
+	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		timestamp := time.Now().Format("20060102150405")
 		name := toSnakeCase(args[0])
@@ -66,6 +69,4 @@ func init() {
 	rootCmd.AddCommand(migrationCmd)
 
 	migrationCmd.Flags().Bool("seed", false, "Create a seed file")
-
-	cobra.CheckErr(viper.BindPFlags(migrationCmd.Flags()))
 }
