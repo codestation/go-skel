@@ -51,10 +51,12 @@ var migrateCmd = &cobra.Command{
 		}
 		defer pool.Close()
 
+		var migrationErr error
+
 		go func() {
-			err := db.RunMigrations(ctx, pool, cfg)
-			if err != nil {
-				slog.Error(err.Error())
+			migrationErr := db.RunMigrations(ctx, pool, cfg)
+			if migrationErr != nil {
+				slog.Error(migrationErr.Error())
 			}
 
 			quit <- os.Interrupt
@@ -65,7 +67,7 @@ var migrateCmd = &cobra.Command{
 
 		cancel()
 
-		return nil
+		return migrationErr
 	},
 }
 
