@@ -21,6 +21,102 @@ func (_m *MockUnitOfWork) EXPECT() *MockUnitOfWork_Expecter {
 	return &MockUnitOfWork_Expecter{mock: &_m.Mock}
 }
 
+// Begin provides a mock function with given fields: ctx
+func (_m *MockUnitOfWork) Begin(ctx context.Context) (UnitOfWork, error) {
+	ret := _m.Called(ctx)
+
+	var r0 UnitOfWork
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context) (UnitOfWork, error)); ok {
+		return rf(ctx)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context) UnitOfWork); ok {
+		r0 = rf(ctx)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(UnitOfWork)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockUnitOfWork_Begin_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Begin'
+type MockUnitOfWork_Begin_Call struct {
+	*mock.Call
+}
+
+// Begin is a helper method to define mock.On call
+//   - ctx context.Context
+func (_e *MockUnitOfWork_Expecter) Begin(ctx interface{}) *MockUnitOfWork_Begin_Call {
+	return &MockUnitOfWork_Begin_Call{Call: _e.mock.On("Begin", ctx)}
+}
+
+func (_c *MockUnitOfWork_Begin_Call) Run(run func(ctx context.Context)) *MockUnitOfWork_Begin_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context))
+	})
+	return _c
+}
+
+func (_c *MockUnitOfWork_Begin_Call) Return(_a0 UnitOfWork, _a1 error) *MockUnitOfWork_Begin_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockUnitOfWork_Begin_Call) RunAndReturn(run func(context.Context) (UnitOfWork, error)) *MockUnitOfWork_Begin_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Commit provides a mock function with given fields: ctx
+func (_m *MockUnitOfWork) Commit(ctx context.Context) error {
+	ret := _m.Called(ctx)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context) error); ok {
+		r0 = rf(ctx)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// MockUnitOfWork_Commit_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Commit'
+type MockUnitOfWork_Commit_Call struct {
+	*mock.Call
+}
+
+// Commit is a helper method to define mock.On call
+//   - ctx context.Context
+func (_e *MockUnitOfWork_Expecter) Commit(ctx interface{}) *MockUnitOfWork_Commit_Call {
+	return &MockUnitOfWork_Commit_Call{Call: _e.mock.On("Commit", ctx)}
+}
+
+func (_c *MockUnitOfWork_Commit_Call) Run(run func(ctx context.Context)) *MockUnitOfWork_Commit_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context))
+	})
+	return _c
+}
+
+func (_c *MockUnitOfWork_Commit_Call) Return(_a0 error) *MockUnitOfWork_Commit_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockUnitOfWork_Commit_Call) RunAndReturn(run func(context.Context) error) *MockUnitOfWork_Commit_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Do provides a mock function with given fields: ctx, fn
 func (_m *MockUnitOfWork) Do(ctx context.Context, fn UnitOfWorkBlock) error {
 	ret := _m.Called(ctx, fn)
@@ -60,6 +156,48 @@ func (_c *MockUnitOfWork_Do_Call) Return(_a0 error) *MockUnitOfWork_Do_Call {
 }
 
 func (_c *MockUnitOfWork_Do_Call) RunAndReturn(run func(context.Context, UnitOfWorkBlock) error) *MockUnitOfWork_Do_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Rollback provides a mock function with given fields: ctx
+func (_m *MockUnitOfWork) Rollback(ctx context.Context) error {
+	ret := _m.Called(ctx)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context) error); ok {
+		r0 = rf(ctx)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// MockUnitOfWork_Rollback_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Rollback'
+type MockUnitOfWork_Rollback_Call struct {
+	*mock.Call
+}
+
+// Rollback is a helper method to define mock.On call
+//   - ctx context.Context
+func (_e *MockUnitOfWork_Expecter) Rollback(ctx interface{}) *MockUnitOfWork_Rollback_Call {
+	return &MockUnitOfWork_Rollback_Call{Call: _e.mock.On("Rollback", ctx)}
+}
+
+func (_c *MockUnitOfWork_Rollback_Call) Run(run func(ctx context.Context)) *MockUnitOfWork_Rollback_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context))
+	})
+	return _c
+}
+
+func (_c *MockUnitOfWork_Rollback_Call) Return(_a0 error) *MockUnitOfWork_Rollback_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockUnitOfWork_Rollback_Call) RunAndReturn(run func(context.Context) error) *MockUnitOfWork_Rollback_Call {
 	_c.Call.Return(run)
 	return _c
 }

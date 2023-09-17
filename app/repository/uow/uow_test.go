@@ -39,7 +39,7 @@ func (s *unitOfWorkSuite) TestTransaction() {
 		return nil
 	})
 
-	assert.NoError(s.T(), err)
+	s.NoError(err)
 }
 
 func (s *unitOfWorkSuite) TestTransactionNested() {
@@ -52,7 +52,7 @@ func (s *unitOfWorkSuite) TestTransactionNested() {
 		return err2
 	})
 
-	assert.NoError(s.T(), err1)
+	s.NoError(err1)
 }
 
 func (s *unitOfWorkSuite) TestTransactionRollback() {
@@ -61,7 +61,7 @@ func (s *unitOfWorkSuite) TestTransactionRollback() {
 		return errors.New("an error")
 	})
 
-	assert.Error(s.T(), err)
+	s.Error(err)
 }
 
 func (s *unitOfWorkSuite) TestTransactionNestedRollback() {
@@ -80,5 +80,58 @@ func (s *unitOfWorkSuite) TestTransactionNestedRollback() {
 		return nil
 	})
 
-	assert.NoError(s.T(), err1)
+	s.NoError(err1)
+}
+
+func (s *unitOfWorkSuite) TestTransactionCommit() {
+	uow := New(s.conn.Db)
+	tx, err := uow.Begin(context.Background())
+	if s.NoError(err, "begin transaction") {
+		err = tx.Commit(context.Background())
+		s.NoError(err, "commit transaction")
+	}
+
+	assert.NoError(s.T(), err)
+}
+
+func (s *unitOfWorkSuite) TestTransactionRollbackOnCommit() {
+	uow := New(s.conn.Db)
+	tx, err := uow.Begin(context.Background())
+	if s.NoError(err, "begin transaction") {
+		err = tx.Rollback(context.Background())
+		s.NoError(err, "rollback transaction")
+	}
+
+	assert.NoError(s.T(), err)
+}
+
+func (s *unitOfWorkSuite) TestTransactionRollbackOnCommitNested() {
+	uow := New(s.conn.Db)
+	err := uow.Do(context.Background(), func(tx1 UnitOfWork) error {
+		tx2, err := tx1.Begin(context.Background())
+		if err != nil {
+			return err
+		}
+
+		err = tx2.Rollback(context.Background())
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	assert.NoError(s.T(), err)
+}
+
+func (s *unitOfWorkSuite) TestCommitWithoutBegin() {
+	uow := New(s.conn.Db)
+	err := uow.Commit(context.Background())
+	s.Error(err)
+}
+
+func (s *unitOfWorkSuite) TestRollbackWithoutBegin() {
+	uow := New(s.conn.Db)
+	err := uow.Rollback(context.Background())
+	s.Error(err)
 }

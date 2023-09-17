@@ -6,6 +6,7 @@ package uow
 
 import (
 	"context"
+	"errors"
 
 	"megpoid.dev/go/go-skel/app/repository"
 	"megpoid.dev/go/go-skel/pkg/sql"
@@ -36,6 +37,9 @@ type UnitOfWorkBlock func(UnitOfWork) error
 //go:generate go run github.com/vektra/mockery/v2@v2.23.1 --name UnitOfWork
 type UnitOfWork interface {
 	Do(ctx context.Context, fn UnitOfWorkBlock) error
+	Commit(ctx context.Context) error
+	Rollback(ctx context.Context) error
+	Begin(ctx context.Context) (UnitOfWork, error)
 	Store() UnitOfWorkStore
 }
 
@@ -65,4 +69,31 @@ func (u *unitOfWork) Do(ctx context.Context, fn UnitOfWorkBlock) error {
 	}
 
 	return nil
+}
+
+func (u *unitOfWork) Begin(ctx context.Context) (UnitOfWork, error) {
+	tx, err := u.conn.Begin(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return New(tx), nil
+}
+
+func (u *unitOfWork) Commit(ctx context.Context) error {
+	tx, ok := u.conn.(sql.Transactor)
+	if ok {
+		return tx.Commit(ctx)
+	}
+
+	return errors.New("connection does not support transactions")
+}
+
+func (u *unitOfWork) Rollback(ctx context.Context) error {
+	tx, ok := u.conn.(sql.Transactor)
+	if ok {
+		return tx.Rollback(ctx)
+	}
+
+	return errors.New("connection does not support transactions")
 }
