@@ -54,7 +54,7 @@ var migrateCmd = &cobra.Command{
 		var migrationErr error
 
 		go func() {
-			migrationErr := db.RunMigrations(ctx, pool, cfg)
+			migrationErr = db.RunMigrations(ctx, pool, migrationSettings)
 			if migrationErr != nil {
 				slog.Error(migrationErr.Error())
 			}
