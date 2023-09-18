@@ -38,23 +38,29 @@ const (
 	shutdownTimeout = 30 * time.Second
 )
 
+type Config struct {
+	General  config.GeneralSettings
+	Database config.DatabaseSettings
+	Server   config.ServerSettings
+}
+
 type App struct {
-	cfg        *config.Config
+	cfg        Config
 	conn       sql.Database
 	Server     *http.Server
 	EchoServer *echo.Echo
 }
 
-func NewApp(cfg *config.Config) (*App, error) {
+func NewApp(cfg Config) (*App, error) {
 	s := &App{cfg: cfg}
 
-	if cfg.GeneralSettings.Debug {
+	if cfg.General.Debug {
 		textHandler := slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug})
 		slog.SetDefault(slog.New(textHandler))
 	}
 
 	// Database initialization
-	pool, err := sql.NewConnection(sql.Config(cfg.DatabaseSettings))
+	pool, err := sql.NewConnection(sql.Config(cfg.Database))
 	if err != nil {
 		return nil, err
 	}
@@ -69,30 +75,30 @@ func NewApp(cfg *config.Config) (*App, error) {
 
 	// Redis client config
 	redisClient := asynq.RedisClientOpt{
-		Addr: cfg.GeneralSettings.RedisAddr,
+		Addr: cfg.General.RedisAddr,
 	}
 
 	// Usecase initialization
-	authUsecase := usecase.NewAuth(cfg.ServerSettings.JwtSecret)
+	authUsecase := usecase.NewAuth(cfg.Server.JwtSecret)
 	healthcheckUsecase := usecase.NewHealthcheck(healthcheckRepo)
 	profileUsecase := usecase.NewProfile(unitOfWork)
 	taskUsecase := task.NewClient(redisClient)
 
 	// Controller initialization
 	ctrl := controller.Controller{
-		AuthController:        controller.NewAuth(cfg, authUsecase),
-		ProfileController:     controller.NewProfile(cfg, profileUsecase),
-		HealthcheckController: controller.NewHealthCheck(cfg, healthcheckUsecase),
-		TaskController:        controller.NewTask(cfg, taskUsecase),
-		DelayController:       controller.NewDelay(cfg, taskUsecase),
+		AuthController:        controller.NewAuth(cfg.Server, authUsecase),
+		ProfileController:     controller.NewProfile(cfg.Server, profileUsecase),
+		HealthcheckController: controller.NewHealthCheck(cfg.Server, healthcheckUsecase),
+		TaskController:        controller.NewTask(cfg.Server, taskUsecase),
+		DelayController:       controller.NewDelay(cfg.Server, taskUsecase),
 	}
 
 	// HTTP server initialization
 	e := echo.New()
 	e.HideBanner = true
-	e.Debug = cfg.GeneralSettings.Debug
+	e.Debug = cfg.General.Debug
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: cfg.ServerSettings.CorsAllowOrigins,
+		AllowOrigins: cfg.Server.CorsAllowOrigins,
 		AllowMethods: []string{http.MethodGet, http.MethodHead, http.MethodPut, http.MethodPatch, http.MethodPost, http.MethodDelete},
 	}))
 	e.Use(middleware.GzipWithConfig(middleware.GzipConfig{
@@ -103,7 +109,7 @@ func NewApp(cfg *config.Config) (*App, error) {
 	e.Use(middleware.Recover())
 	e.Use(i18n.LoadMessagePrinter("user_lang"))
 	e.Use(middleware.Logger())
-	e.Use(middleware.BodyLimit(cfg.ServerSettings.BodyLimit))
+	e.Use(middleware.BodyLimit(cfg.Server.BodyLimit))
 	e.Use(middleware.RequestID())
 	e.Validator = validator.NewCustomValidator()
 	e.HTTPErrorHandler = apperror.ErrorHandler(e)
@@ -129,7 +135,7 @@ func NewApp(cfg *config.Config) (*App, error) {
 		return strings.HasPrefix(path, controller.BaseURL()+"/swagger")
 	})
 
-	oapiMiddleware := jwt.OapiValidator(spec, cfg.ServerSettings.JwtSecret, skipperFunc)
+	oapiMiddleware := jwt.OapiValidator(spec, cfg.Server.JwtSecret, skipperFunc)
 	e.Use(oapiMiddleware)
 
 	group := e.Group(controller.BaseURL())
@@ -150,10 +156,10 @@ func NewApp(cfg *config.Config) (*App, error) {
 
 func (s *App) Start() error {
 	s.Server = &http.Server{
-		Addr:         s.cfg.ServerSettings.ListenAddress,
-		ReadTimeout:  s.cfg.ServerSettings.ReadTimeout,
-		WriteTimeout: s.cfg.ServerSettings.WriteTimeout,
-		IdleTimeout:  s.cfg.ServerSettings.IdleTimeout,
+		Addr:         s.cfg.Server.ListenAddress,
+		ReadTimeout:  s.cfg.Server.ReadTimeout,
+		WriteTimeout: s.cfg.Server.WriteTimeout,
+		IdleTimeout:  s.cfg.Server.IdleTimeout,
 	}
 
 	slog.Info("Starting server")

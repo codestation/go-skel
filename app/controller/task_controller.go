@@ -18,7 +18,7 @@ type TaskController struct {
 	task task.Task
 }
 
-func NewTask(cfg *config.Config, task task.Task) TaskController {
+func NewTask(cfg config.ServerSettings, task task.Task) TaskController {
 	return TaskController{
 		common: newCommon(cfg),
 		task:   task,

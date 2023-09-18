@@ -21,7 +21,7 @@ type ProfileController struct {
 	profileUsecase usecase.Profile
 }
 
-func NewProfile(cfg *config.Config, profile usecase.Profile) ProfileController {
+func NewProfile(cfg config.ServerSettings, profile usecase.Profile) ProfileController {
 	return ProfileController{
 		common:         newCommon(cfg),
 		profileUsecase: profile,

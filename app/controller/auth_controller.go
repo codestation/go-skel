@@ -19,7 +19,7 @@ type AuthController struct {
 	auth usecase.Auth
 }
 
-func NewAuth(cfg *config.Config, auth usecase.Auth) AuthController {
+func NewAuth(cfg config.ServerSettings, auth usecase.Auth) AuthController {
 	return AuthController{
 		common: newCommon(cfg),
 		auth:   auth,

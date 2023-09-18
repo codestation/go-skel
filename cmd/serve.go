@@ -15,6 +15,7 @@ import (
 	"github.com/spf13/viper"
 	"megpoid.dev/go/go-skel/app"
 	"megpoid.dev/go/go-skel/config"
+	"megpoid.dev/go/go-skel/pkg/cfg"
 )
 
 // serveCmd represents the serve command
@@ -37,17 +38,24 @@ func runServer() error {
 	// show version on console
 	printVersion()
 
-	// load config
-	cfg, err := config.NewConfig(config.WithUnmarshal(unmarshalFunc))
-	if err != nil {
-		return err
+	appConfig := app.Config{}
+	if err := cfg.ReadConfig(&appConfig.General); err != nil {
+		return fmt.Errorf("failed to read general config: %w", err)
+	}
+
+	if err := cfg.ReadConfig(&appConfig.Server); err != nil {
+		return fmt.Errorf("failed to read server config: %w", err)
+	}
+
+	if err := cfg.ReadConfig(&appConfig.Database); err != nil {
+		return fmt.Errorf("failed to read database config: %w", err)
 	}
 
 	// setup channel to check when app is stopped
 	quit := make(chan os.Signal, 1)
 
 	// Create a new newApp
-	newApp, err := app.NewApp(cfg)
+	newApp, err := app.NewApp(appConfig)
 	if err != nil {
 		return fmt.Errorf("cannot create newApp: %w", err)
 	}
@@ -68,9 +76,9 @@ func runServer() error {
 func init() {
 	rootCmd.AddCommand(serveCmd)
 
-	generalFs := config.LoadGeneralFlags()
-	serverFs := config.LoadServerFlags()
-	databaseFs := config.LoadDatabaseFlags()
+	generalFs := config.LoadGeneralFlags(serveCmd.Name())
+	serverFs := config.LoadServerFlags(serveCmd.Name())
+	databaseFs := config.LoadDatabaseFlags(serveCmd.Name())
 
 	serveCmd.Flags().AddFlagSet(generalFs)
 	serveCmd.Flags().AddFlagSet(serverFs)

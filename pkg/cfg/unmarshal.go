@@ -2,16 +2,22 @@
 // Use of this source code is governed by a MIT-license
 // that can be found in the LICENSE file.
 
-package cmd
+package cfg
 
 import (
 	"encoding/hex"
+	"fmt"
 	"reflect"
 	"strings"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
 )
+
+type Configurable interface {
+	SetDefaults()
+	Validate() error
+}
 
 var typeOfBytes = reflect.TypeOf([]byte(nil))
 
@@ -21,16 +27,22 @@ var unmarshalDecoder = viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
 	mapstructure.StringToSliceHookFunc(","),
 ))
 
-func unmarshalFunc(val any) error {
-	return viper.Unmarshal(val, unmarshalDecoder)
+func ReadConfig(val Configurable) error {
+	if err := viper.Unmarshal(val, unmarshalDecoder); err != nil {
+		return fmt.Errorf("failed to read config: %w", err)
+	}
+
+	val.SetDefaults()
+
+	if err := val.Validate(); err != nil {
+		return fmt.Errorf("failed to validate config: %w", err)
+	}
+
+	return nil
 }
 
 func HexStringToByteArray() mapstructure.DecodeHookFuncType {
-	return func(
-		f reflect.Type,
-		t reflect.Type,
-		data any,
-	) (any, error) {
+	return func(f reflect.Type, t reflect.Type, data any) (any, error) {
 		if f.Kind() != reflect.String || t != typeOfBytes {
 			return data, nil
 		}

@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/suite"
 	appmodel "megpoid.dev/go/go-skel/app/model"
 	"megpoid.dev/go/go-skel/app/usecase"
+	"megpoid.dev/go/go-skel/config"
 	"megpoid.dev/go/go-skel/oapi"
 	"megpoid.dev/go/go-skel/pkg/model"
 	"megpoid.dev/go/go-skel/pkg/paginator"
@@ -25,6 +26,7 @@ func TestProfileController(t *testing.T) {
 
 type profileSuite struct {
 	suite.Suite
+	cfg config.ServerSettings
 }
 
 func (s *profileSuite) TestGet() {
@@ -38,7 +40,7 @@ func (s *profileSuite) TestGet() {
 	uc := usecase.NewMockProfile(s.T())
 	uc.EXPECT().GetProfile(mock.Anything, int64(1)).Return(&mockProfile, nil)
 
-	ctrl := NewProfile(nil, uc)
+	ctrl := NewProfile(s.cfg, uc)
 
 	e := echo.New()
 	req := httptest.NewRequest(echo.GET, "/", nil)
@@ -62,7 +64,7 @@ func (s *profileSuite) TestList() {
 	uc := usecase.NewMockProfile(s.T())
 	uc.EXPECT().ListProfiles(mock.Anything, mock.Anything).Return(resp, nil)
 
-	ctrl := NewProfile(nil, uc)
+	ctrl := NewProfile(s.cfg, uc)
 
 	e := echo.New()
 	req := httptest.NewRequest(echo.GET, "/", nil)

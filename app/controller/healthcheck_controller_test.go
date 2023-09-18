@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"megpoid.dev/go/go-skel/app/usecase"
+	"megpoid.dev/go/go-skel/config"
 	"megpoid.dev/go/go-skel/oapi"
 )
 
@@ -22,11 +23,12 @@ func TestHealthcheckController(t *testing.T) {
 
 type healthcheckSuite struct {
 	suite.Suite
+	cfg config.ServerSettings
 }
 
 func (s *healthcheckSuite) TestLive() {
 	uc := usecase.NewMockHealthcheck(s.T())
-	ctrl := NewHealthCheck(nil, uc)
+	ctrl := NewHealthCheck(s.cfg, uc)
 
 	e := echo.New()
 	req := httptest.NewRequest(echo.GET, "/", nil)
@@ -43,7 +45,7 @@ func (s *healthcheckSuite) TestReady() {
 	uc := usecase.NewMockHealthcheck(s.T())
 	uc.EXPECT().Execute(mock.Anything).Return(nil)
 
-	ctrl := NewHealthCheck(nil, uc)
+	ctrl := NewHealthCheck(s.cfg, uc)
 
 	e := echo.New()
 	req := httptest.NewRequest(echo.GET, "/", nil)
@@ -60,7 +62,7 @@ func (s *healthcheckSuite) TestReadyFailed() {
 	uc := usecase.NewMockHealthcheck(s.T())
 	uc.EXPECT().Execute(mock.Anything).Return(errors.New("an error occurred"))
 
-	ctrl := NewHealthCheck(nil, uc)
+	ctrl := NewHealthCheck(s.cfg, uc)
 
 	e := echo.New()
 	req := httptest.NewRequest(echo.GET, "/", nil)

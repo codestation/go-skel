@@ -34,10 +34,10 @@ type Controller struct {
 }
 
 type common struct {
-	config *config.Config
+	config config.ServerSettings
 }
 
-func newCommon(config *config.Config) common {
+func newCommon(config config.ServerSettings) common {
 	return common{
 		config: config,
 	}
@@ -55,7 +55,7 @@ type JwtCustomClaims struct {
 
 func (a *common) UseJWT(g *echo.Group) {
 	jwtConfig := echojwt.Config{
-		SigningKey: a.config.ServerSettings.JwtSecret,
+		SigningKey: a.config.JwtSecret,
 		NewClaimsFunc: func(c echo.Context) jwt.Claims {
 			return &JwtCustomClaims{}
 		},

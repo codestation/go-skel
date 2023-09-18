@@ -20,7 +20,7 @@ type HealthcheckController struct {
 	healthcheckUsecase usecase.Healthcheck
 }
 
-func NewHealthCheck(cfg *config.Config, healthcheck usecase.Healthcheck) HealthcheckController {
+func NewHealthCheck(cfg config.ServerSettings, healthcheck usecase.Healthcheck) HealthcheckController {
 	return HealthcheckController{
 		common:             newCommon(cfg),
 		healthcheckUsecase: healthcheck,

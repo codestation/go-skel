@@ -12,7 +12,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"megpoid.dev/go/go-skel/pkg/sql"
-	"megpoid.dev/go/go-skel/test"
+	"megpoid.dev/go/go-skel/testdata"
 )
 
 type Connection struct {
@@ -78,8 +78,8 @@ func (c *Connection) setupDatabase(t *testing.T) {
 }
 
 func (c *Connection) seedDatabase(t *testing.T, conn sql.Executor) {
-	assets := test.Assets()
-	data, err := assets.ReadFile("seed/base.sql")
+	assets := testdata.SqlAssets()
+	data, err := assets.ReadFile("sql/testdata.sql")
 	if err != nil {
 		assert.FailNowf(t, "Failed to read seed file", err.Error())
 	}

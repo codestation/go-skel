@@ -21,7 +21,7 @@ type DelayController struct {
 	task task.Task
 }
 
-func NewDelay(cfg *config.Config, task task.Task) DelayController {
+func NewDelay(cfg config.ServerSettings, task task.Task) DelayController {
 	return DelayController{
 		common: newCommon(cfg),
 		task:   task,

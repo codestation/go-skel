@@ -6,6 +6,7 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/hibiken/asynq"
 	"github.com/spf13/cobra"
@@ -13,6 +14,7 @@ import (
 	"megpoid.dev/go/go-skel/app/tasks"
 	"megpoid.dev/go/go-skel/app/usecase"
 	"megpoid.dev/go/go-skel/config"
+	"megpoid.dev/go/go-skel/pkg/cfg"
 )
 
 // migrateCmd represents the migrate command
@@ -24,16 +26,14 @@ var queueCmd = &cobra.Command{
 		cobra.CheckErr(viper.BindPFlags(cmd.Flags()))
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
-		cfg, err := config.NewConfig(config.WithUnmarshal(unmarshalFunc))
-		if err != nil {
-			return err
+		generalSettings := config.GeneralSettings{}
+		if err := cfg.ReadConfig(&generalSettings); err != nil {
+			return fmt.Errorf("failed to read config: %w", err)
 		}
 
 		queue := asynq.NewServer(
-			asynq.RedisClientOpt{Addr: cfg.GeneralSettings.RedisAddr},
-			asynq.Config{
-				Concurrency: cfg.GeneralSettings.Workers,
-			},
+			asynq.RedisClientOpt{Addr: generalSettings.RedisAddr},
+			asynq.Config{Concurrency: generalSettings.Workers},
 		)
 
 		backgroundUsecase := usecase.NewDelay()
@@ -43,7 +43,7 @@ var queueCmd = &cobra.Command{
 
 		if err := queue.Run(mux); err != nil {
 			if !errors.Is(err, asynq.ErrServerClosed) {
-				return err
+				return fmt.Errorf("failed to run queue: %w", err)
 			}
 		}
 
@@ -54,8 +54,8 @@ var queueCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(queueCmd)
 
-	databaseFlags := config.LoadDatabaseFlags()
-	generalFlags := config.LoadGeneralFlags()
+	databaseFlags := config.LoadDatabaseFlags(queueCmd.Name())
+	generalFlags := config.LoadGeneralFlags(queueCmd.Name())
 
 	queueCmd.Flags().AddFlagSet(databaseFlags)
 	queueCmd.Flags().AddFlagSet(generalFlags)

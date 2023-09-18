@@ -2,13 +2,13 @@
 // Use of this source code is governed by a MIT-license
 // that can be found in the LICENSE file.
 
-package test
+package testdata
 
 import "embed"
 
-//go:embed seed
-var assets embed.FS
+//go:embed sql
+var sqlAssets embed.FS
 
-func Assets() embed.FS {
-	return assets
+func SqlAssets() embed.FS {
+	return sqlAssets
 }
