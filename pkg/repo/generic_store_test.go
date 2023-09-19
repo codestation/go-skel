@@ -30,6 +30,7 @@ type testUser struct {
 	Name       string
 	ExternalID uuid.UUID `json:"external_id"`
 	ProfileID  int64     `goqu:"skipupdate"`
+	Code       int       `goqu:"skipinsert,skipupdate"`
 	Profile    *testProfile
 }
 
@@ -208,6 +209,32 @@ func (s *storeSuite) TestStoreSave() {
 	}
 }
 
+func (s *storeSuite) TestStoreSaveExtraField() {
+	st := NewStore[*testUser](s.conn.Store, WithReturnFields[*testUser]("code"))
+	tests := []struct {
+		name      string
+		profileId int64
+		err       error
+	}{
+		{"Some user", 1, nil},
+		{"Some user", 1, ErrDuplicated}, // do not run more tests after a constraint error
+	}
+
+	for _, test := range tests {
+		s.Run("Insert", func() {
+			user := newUser(test.name, test.profileId)
+			err := st.Insert(context.Background(), user)
+			if test.err != nil {
+				s.ErrorIs(err, test.err)
+			} else {
+				s.NoError(err)
+				s.NotZero(user.ID)
+				s.NotZero(user.Code)
+			}
+		})
+	}
+}
+
 func (s *storeSuite) TestStoreUpsert() {
 	st := NewStore[*testUser](s.conn.Store)
 	tests := []struct {
@@ -231,6 +258,35 @@ func (s *storeSuite) TestStoreUpsert() {
 				s.NoError(err)
 				s.NotZero(user.ID)
 				s.Equal(test.created, created)
+			}
+		})
+	}
+}
+
+func (s *storeSuite) TestStoreUpsertExtraField() {
+	st := NewStore[*testUser](s.conn.Store, WithReturnFields[*testUser]("code"))
+	tests := []struct {
+		name      string
+		profileId int64
+		created   bool
+		err       error
+	}{
+		{"Some user 1", 1, true, nil},
+		{"Some user 2", 1, true, nil},
+		{"Some user 2", 1, false, nil},
+	}
+
+	for _, test := range tests {
+		s.Run("Insert", func() {
+			user := newUser(test.name, test.profileId)
+			created, err := st.Upsert(context.Background(), user, "name")
+			if test.err != nil {
+				s.ErrorIs(err, test.err)
+			} else {
+				s.NoError(err)
+				s.NotZero(user.ID)
+				s.Equal(test.created, created)
+				s.NotZero(user.Code)
 			}
 		})
 	}

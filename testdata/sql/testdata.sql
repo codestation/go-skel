@@ -17,6 +17,7 @@ create table test_users
     deleted_at  timestamptz,
     external_id uuid        not null,
     name        text        not null,
+    code        integer generated always as identity,
     profile_id  integer not null,
     primary key (id),
     unique (name),
