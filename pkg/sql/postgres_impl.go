@@ -31,7 +31,8 @@ var (
 	_ Executor = PgxWrapper{}
 	_ Executor = PgxTxWrapper{}
 
-	ErrNoRows = pgx.ErrNoRows
+	ErrNoRows   = pgx.ErrNoRows
+	ErrTxClosed = pgx.ErrTxClosed
 )
 
 // PgxWrapper is a PostgreSQL wrapper that implements the Executor interface.
