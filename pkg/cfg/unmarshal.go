@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/mitchellh/mapstructure"
+	"github.com/shopspring/decimal"
 	"github.com/spf13/viper"
 )
 
@@ -23,6 +24,7 @@ var typeOfBytes = reflect.TypeOf([]byte(nil))
 
 var unmarshalDecoder = viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
 	HexStringToByteArray(),
+	StringToDecimal(),
 	mapstructure.StringToTimeDurationHookFunc(),
 	mapstructure.StringToSliceHookFunc(","),
 ))
@@ -52,5 +54,15 @@ func HexStringToByteArray() mapstructure.DecodeHookFuncType {
 		}
 
 		return hex.DecodeString(data.(string))
+	}
+}
+
+func StringToDecimal() mapstructure.DecodeHookFuncType {
+	return func(f reflect.Type, t reflect.Type, data any) (any, error) {
+		if f.Kind() != reflect.String || t != reflect.TypeOf(decimal.Decimal{}) {
+			return data, nil
+		}
+
+		return decimal.NewFromString(data.(string))
 	}
 }
