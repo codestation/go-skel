@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+	"time"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
@@ -25,6 +26,7 @@ var typeOfBytes = reflect.TypeOf([]byte(nil))
 var unmarshalDecoder = viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
 	HexStringToByteArray(),
 	StringToDecimal(),
+	StringToTime(),
 	mapstructure.StringToTimeDurationHookFunc(),
 	mapstructure.StringToSliceHookFunc(","),
 ))
@@ -64,5 +66,15 @@ func StringToDecimal() mapstructure.DecodeHookFuncType {
 		}
 
 		return decimal.NewFromString(data.(string))
+	}
+}
+
+func StringToTime() mapstructure.DecodeHookFuncType {
+	return func(f reflect.Type, t reflect.Type, data any) (any, error) {
+		if f.Kind() != reflect.String || t != reflect.TypeOf(time.Time{}) {
+			return data, nil
+		}
+
+		return time.Parse(time.RFC3339, data.(string))
 	}
 }
