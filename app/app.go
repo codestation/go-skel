@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
@@ -54,11 +53,6 @@ type App struct {
 func NewApp(cfg Config) (*App, error) {
 	s := &App{cfg: cfg}
 
-	if cfg.General.Debug {
-		textHandler := slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug})
-		slog.SetDefault(slog.New(textHandler))
-	}
-
 	// Database initialization
 	pool, err := sql.NewConnection(sql.Config(cfg.Database))
 	if err != nil {
@@ -96,6 +90,7 @@ func NewApp(cfg Config) (*App, error) {
 	// HTTP server initialization
 	e := echo.New()
 	e.HideBanner = true
+	e.HidePort = true
 	e.Debug = cfg.General.Debug
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: cfg.Server.CorsAllowOrigins,
@@ -110,7 +105,13 @@ func NewApp(cfg Config) (*App, error) {
 	e.Use(i18n.LoadMessagePrinter("user_lang"))
 	e.Use(middleware.Logger())
 	e.Use(middleware.BodyLimit(cfg.Server.BodyLimit))
-	e.Use(middleware.RequestID())
+	e.Use(middleware.RequestIDWithConfig(middleware.RequestIDConfig{
+		RequestIDHandler: func(ctx echo.Context, id string) {
+			// add request id to context
+			valueCtx := context.WithValue(ctx.Request().Context(), "request_id", id)
+			ctx.SetRequest(ctx.Request().WithContext(valueCtx))
+		},
+	}))
 	e.Validator = validator.NewCustomValidator()
 	e.HTTPErrorHandler = apperror.ErrorHandler(e)
 	s.EchoServer = e
@@ -162,7 +163,7 @@ func (s *App) Start() error {
 		IdleTimeout:  s.cfg.Server.IdleTimeout,
 	}
 
-	slog.Info("Starting server")
+	slog.Info("Starting server", "address", s.cfg.Server.ListenAddress)
 
 	go func() {
 		err := s.EchoServer.StartServer(s.Server)

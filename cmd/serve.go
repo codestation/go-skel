@@ -6,7 +6,6 @@ package cmd
 
 import (
 	"fmt"
-	"log/slog"
 	"os"
 	"os/signal"
 	"syscall"
@@ -32,9 +31,6 @@ var serveCmd = &cobra.Command{
 }
 
 func runServer() error {
-	handler := slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{})
-	slog.SetDefault(slog.New(handler))
-
 	// show version on console
 	printVersion()
 
