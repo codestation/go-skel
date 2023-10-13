@@ -12,6 +12,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"megpoid.dev/go/go-skel/app"
 	"megpoid.dev/go/go-skel/pkg/logger"
 )
 
@@ -59,7 +60,7 @@ func init() {
 
 	// Setup JSON logger
 	handler := slog.NewJSONHandler(os.Stdout, nil)
-	slog.SetDefault(slog.New(handler))
+	slog.SetDefault(slog.New(logger.NewContextHandler(handler, app.RequestID)))
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -94,6 +95,6 @@ func initConfig() {
 
 		// Setup logger
 		handler := slog.NewJSONHandler(os.Stdout, slogOpts)
-		slog.SetDefault(slog.New(logger.NewContextHandler(handler, "request_id")))
+		slog.SetDefault(slog.New(logger.NewContextHandler(handler, app.RequestID)))
 	}
 }

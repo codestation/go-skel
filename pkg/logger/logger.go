@@ -9,11 +9,11 @@ var _ slog.Handler = Handler{}
 
 type Handler struct {
 	handler slog.Handler
-	fields  []string
+	fields  []any
 }
 
 // NewContextHandler creates a new Handler with a list of fields to include in each log record from the context.
-func NewContextHandler(handler slog.Handler, fields ...string) slog.Handler {
+func NewContextHandler(handler slog.Handler, fields ...any) slog.Handler {
 	return Handler{
 		handler: handler,
 		fields:  fields,
@@ -27,7 +27,9 @@ func (h Handler) Enabled(ctx context.Context, level slog.Level) bool {
 func (h Handler) Handle(ctx context.Context, record slog.Record) error {
 	for _, field := range h.fields {
 		if v := ctx.Value(field); v != nil {
-			record.AddAttrs(slog.Any(field, v))
+			if key, ok := field.(interface{ String() string }); ok {
+				record.AddAttrs(slog.Any(key.String(), v))
+			}
 		}
 	}
 

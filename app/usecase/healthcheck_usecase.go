@@ -6,6 +6,7 @@ package usecase
 
 import (
 	"context"
+	"log/slog"
 
 	"megpoid.dev/go/go-skel/app/repository"
 )
@@ -19,6 +20,7 @@ type HealthcheckInteractor struct {
 }
 
 func (u *HealthcheckInteractor) Execute(ctx context.Context) error {
+	slog.InfoContext(ctx, "Executing healthcheck")
 	return u.healthcheckRepo.Execute(ctx)
 }
 

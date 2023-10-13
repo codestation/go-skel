@@ -37,6 +37,14 @@ const (
 	shutdownTimeout = 30 * time.Second
 )
 
+type RequestIDKey struct{}
+
+func (r RequestIDKey) String() string {
+	return "request_id"
+}
+
+var RequestID RequestIDKey
+
 type Config struct {
 	General  config.GeneralSettings
 	Database config.DatabaseSettings
@@ -108,7 +116,7 @@ func NewApp(cfg Config) (*App, error) {
 	e.Use(middleware.RequestIDWithConfig(middleware.RequestIDConfig{
 		RequestIDHandler: func(ctx echo.Context, id string) {
 			// add request id to context
-			valueCtx := context.WithValue(ctx.Request().Context(), "request_id", id)
+			valueCtx := context.WithValue(ctx.Request().Context(), RequestID, id)
 			ctx.SetRequest(ctx.Request().WithContext(valueCtx))
 		},
 	}))
