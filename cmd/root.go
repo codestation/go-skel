@@ -6,14 +6,11 @@ package cmd
 
 import (
 	"fmt"
-	"log/slog"
 	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"megpoid.dev/go/go-skel/app"
-	"megpoid.dev/go/go-skel/pkg/logger"
 )
 
 var cfgFile string
@@ -57,10 +54,6 @@ func init() {
 	rootCmd.PersistentFlags().BoolP("debug", "d", false, "Enable debug mode")
 	err := viper.BindPFlag("debug", rootCmd.PersistentFlags().Lookup("debug"))
 	cobra.CheckErr(err)
-
-	// Setup JSON logger
-	handler := slog.NewJSONHandler(os.Stdout, nil)
-	slog.SetDefault(slog.New(logger.NewContextHandler(handler, app.RequestID)))
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -87,14 +80,5 @@ func initConfig() {
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 		_, _ = fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
-	}
-
-	if viper.GetBool("debug") {
-		// Enable debug mode
-		slogOpts := &slog.HandlerOptions{Level: slog.LevelDebug}
-
-		// Setup logger
-		handler := slog.NewJSONHandler(os.Stdout, slogOpts)
-		slog.SetDefault(slog.New(logger.NewContextHandler(handler, app.RequestID)))
 	}
 }

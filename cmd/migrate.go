@@ -31,6 +31,14 @@ var migrateCmd = &cobra.Command{
 		cobra.CheckErr(viper.BindPFlags(cmd.Flags()))
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
+		if viper.GetBool("debug") {
+			// Setup logger
+			handler := slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug})
+			slog.SetDefault(slog.New(handler))
+		} else {
+			slog.SetDefault(slog.New(slog.NewTextHandler(os.Stdout, nil)))
+		}
+
 		databaseSettings := config.DatabaseSettings{}
 		if err := cfg.ReadConfig(&databaseSettings); err != nil {
 			return fmt.Errorf("failed to read database settings: %w", err)

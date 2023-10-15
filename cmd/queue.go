@@ -7,6 +7,8 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"log/slog"
+	"os"
 
 	"github.com/hibiken/asynq"
 	"github.com/spf13/cobra"
@@ -26,6 +28,16 @@ var queueCmd = &cobra.Command{
 		cobra.CheckErr(viper.BindPFlags(cmd.Flags()))
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
+		if viper.GetBool("debug") {
+			// Setup logger
+			handler := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug})
+			slog.SetDefault(slog.New(handler))
+		} else {
+			slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, nil)))
+		}
+
+		printVersion()
+
 		generalSettings := config.GeneralSettings{}
 		if err := cfg.ReadConfig(&generalSettings); err != nil {
 			return fmt.Errorf("failed to read config: %w", err)

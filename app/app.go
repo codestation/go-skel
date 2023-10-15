@@ -27,6 +27,7 @@ import (
 	"megpoid.dev/go/go-skel/pkg/apperror"
 	"megpoid.dev/go/go-skel/pkg/i18n"
 	"megpoid.dev/go/go-skel/pkg/jwt"
+	mwpkg "megpoid.dev/go/go-skel/pkg/middleware"
 	"megpoid.dev/go/go-skel/pkg/sql"
 	"megpoid.dev/go/go-skel/pkg/task"
 	"megpoid.dev/go/go-skel/pkg/validator"
@@ -36,14 +37,6 @@ import (
 const (
 	shutdownTimeout = 30 * time.Second
 )
-
-type RequestIDKey struct{}
-
-func (r RequestIDKey) String() string {
-	return "request_id"
-}
-
-var RequestID RequestIDKey
 
 type Config struct {
 	General  config.GeneralSettings
@@ -113,13 +106,7 @@ func NewApp(cfg Config) (*App, error) {
 	e.Use(i18n.LoadMessagePrinter("user_lang"))
 	e.Use(middleware.Logger())
 	e.Use(middleware.BodyLimit(cfg.Server.BodyLimit))
-	e.Use(middleware.RequestIDWithConfig(middleware.RequestIDConfig{
-		RequestIDHandler: func(ctx echo.Context, id string) {
-			// add request id to context
-			valueCtx := context.WithValue(ctx.Request().Context(), RequestID, id)
-			ctx.SetRequest(ctx.Request().WithContext(valueCtx))
-		},
-	}))
+	e.Use(mwpkg.SlogRequestID())
 	e.Validator = validator.NewCustomValidator()
 	e.HTTPErrorHandler = apperror.ErrorHandler(e)
 	s.EchoServer = e

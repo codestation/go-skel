@@ -6,6 +6,7 @@ package cmd
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 	"os/signal"
 	"syscall"
@@ -31,6 +32,14 @@ var serveCmd = &cobra.Command{
 }
 
 func runServer() error {
+	if viper.GetBool("debug") {
+		// Setup logger
+		handler := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug})
+		slog.SetDefault(slog.New(handler))
+	} else {
+		slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, nil)))
+	}
+
 	// show version on console
 	printVersion()
 
