@@ -3,6 +3,8 @@ module megpoid.dev/go/go-skel
 go 1.21
 
 require (
+	filippo.io/edwards25519 v1.0.0
+	github.com/aws/aws-sdk-go v1.45.25
 	github.com/deepmap/oapi-codegen v1.15.0
 	github.com/doug-martin/goqu/v9 v9.18.0
 	github.com/georgysavva/scany/v2 v2.0.0
@@ -10,6 +12,7 @@ require (
 	github.com/go-playground/validator/v10 v10.15.5
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/golang-jwt/jwt/v5 v5.0.0
+	github.com/hashicorp/vault v1.15.0
 	github.com/heroiclabs/sql-migrate v0.0.0-20230615133120-fb3ad977aaaf
 	github.com/hibiken/asynq v0.24.1
 	github.com/jackc/pgx/v5 v5.4.3
@@ -24,6 +27,7 @@ require (
 	github.com/spf13/viper v1.17.0
 	github.com/stretchr/testify v1.8.4
 	github.com/swaggest/swgui v1.7.4
+	golang.org/x/crypto v0.14.0
 	golang.org/x/text v0.13.0
 )
 
@@ -42,20 +46,20 @@ require (
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/uuid v1.3.1 // indirect
 	github.com/gorilla/mux v1.8.0 // indirect
-	github.com/hashicorp/hcl v1.0.0 // indirect
+	github.com/hashicorp/hcl v1.0.1-vault-5 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/invopop/yaml v0.2.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
 	github.com/jackc/puddle/v2 v2.2.1 // indirect
+	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/labstack/gommon v0.4.0 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect
-	github.com/lib/pq v1.10.7 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
-	github.com/mattn/go-isatty v0.0.19 // indirect
+	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
 	github.com/perimeterx/marshmallow v1.1.5 // indirect
@@ -73,7 +77,6 @@ require (
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/vearutop/statigz v1.4.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/crypto v0.14.0 // indirect
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d // indirect
 	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/sync v0.4.0 // indirect
