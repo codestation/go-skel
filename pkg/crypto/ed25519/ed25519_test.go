@@ -36,7 +36,7 @@ func TestCurve255519Conversion(t *testing.T) {
 	}
 
 	var bobCurve25519PublicKey, bobCurve25519PrivateKey [32]byte
-	if err := PublicKeyToCurve25519(&bobCurve25519PublicKey, bobPublicKey); err != nil {
+	if err = PublicKeyToCurve25519(&bobCurve25519PublicKey, bobPublicKey); err != nil {
 		t.Fatal(err)
 	}
 
@@ -57,7 +57,7 @@ func TestCurve255519Conversion(t *testing.T) {
 	}
 
 	var aliceCurve25519PublicKey, aliceCurve25519PrivateKey [32]byte
-	if err := PublicKeyToCurve25519(&aliceCurve25519PublicKey, alicePublicKey); err != nil {
+	if err = PublicKeyToCurve25519(&aliceCurve25519PublicKey, alicePublicKey); err != nil {
 		t.Fatal(err)
 	}
 

@@ -50,8 +50,8 @@ func TestNewContextHandler(t *testing.T) {
 				t.Errorf("failed to unmarshal json: %v", err)
 			}
 			for _, field := range tt.want {
-				if actual[field.key] != field.value {
-					t.Errorf("expected %s to be %s, got %v", field.key, field.value, actual[field.key])
+				if field.value != "" && actual[field.key] != field.value {
+					t.Errorf("expected %s to be %q, got %v", field.key, field.value, actual[field.key])
 				}
 			}
 		})

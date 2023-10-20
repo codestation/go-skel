@@ -63,12 +63,12 @@ func BenchmarkEncryptDecrypt(b *testing.B) {
 			b.Fatalf("Failed to encrypt: %v", err)
 		}
 
-		plaintext, err := Decrypt(key, ciphertext)
+		decryptedText, err := Decrypt(key, ciphertext)
 		if err != nil {
 			b.Fatalf("Failed to decrypt: %v", err)
 		}
 
-		if !bytes.Equal(plaintext, plaintext) {
+		if !bytes.Equal(plaintext, decryptedText) {
 			b.Fatal("Decryption failed: decrypted text does not match plaintext")
 		}
 	}
