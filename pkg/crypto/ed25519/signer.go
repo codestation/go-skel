@@ -29,3 +29,7 @@ func (s *Signer) Verify(data, signature []byte) error {
 
 	return nil
 }
+
+func (s *Signer) SignatureSize() int {
+	return ed25519.SignatureSize
+}

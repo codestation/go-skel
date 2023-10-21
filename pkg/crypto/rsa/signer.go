@@ -22,6 +22,10 @@ func (s *Signer) Verify(data, signature []byte) error {
 	return Verify(&s.privateKey.PublicKey, data, signature)
 }
 
+func (s *Signer) SignatureSize() int {
+	return SignatureSize
+}
+
 type Cipher struct {
 	privateKey *rsa.PrivateKey
 }

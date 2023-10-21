@@ -12,7 +12,10 @@ import (
 	"crypto/x509"
 	"errors"
 	"fmt"
+	"math/big"
 )
+
+const SignatureSize = 64
 
 // GenerateKey generates a new ECDSA private key for the P-256 curve
 func GenerateKey() (*ecdsa.PrivateKey, error) {
@@ -66,10 +69,14 @@ func UnmarshalPublicKey(data []byte) (*ecdsa.PublicKey, error) {
 // Sign signs a message using ECDSA and returns an ASN.1 encoded signature
 func Sign(privateKey *ecdsa.PrivateKey, data []byte) ([]byte, error) {
 	hashed := sha256.Sum256(data)
-	signature, err := ecdsa.SignASN1(rand.Reader, privateKey, hashed[:])
+	r, s, err := ecdsa.Sign(rand.Reader, privateKey, hashed[:])
 	if err != nil {
 		return nil, fmt.Errorf("error signing data: %w", err)
 	}
+
+	signature := make([]byte, SignatureSize)
+	r.FillBytes(signature[:SignatureSize/2])
+	s.FillBytes(signature[SignatureSize/2:])
 
 	return signature, nil
 }
@@ -77,7 +84,10 @@ func Sign(privateKey *ecdsa.PrivateKey, data []byte) ([]byte, error) {
 // Verify verifies a message using ECDSA with an ASN.1 encoded signature
 func Verify(publicKey *ecdsa.PublicKey, data, signature []byte) bool {
 	hashed := sha256.Sum256(data)
-	return ecdsa.VerifyASN1(publicKey, hashed[:], signature)
+	r := big.NewInt(0).SetBytes(signature[:SignatureSize/2])
+	s := big.NewInt(0).SetBytes(signature[SignatureSize/2:])
+
+	return ecdsa.Verify(publicKey, hashed[:], r, s)
 }
 
 // GenerateSharedKey generates a shared key using ECDH exchange between a public and private key

@@ -17,6 +17,7 @@ type Cipher interface {
 type Signer interface {
 	Sign(plaintext []byte) ([]byte, error)
 	Verify(plaintext, signature []byte) error
+	SignatureSize() int
 }
 
 // GenerateRandomBytes generates random bytes of a given size
