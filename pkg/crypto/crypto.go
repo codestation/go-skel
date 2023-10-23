@@ -16,6 +16,10 @@ type Cipher interface {
 
 type Signer interface {
 	Sign(plaintext []byte) ([]byte, error)
+	Verifier
+}
+
+type Verifier interface {
 	Verify(plaintext, signature []byte) error
 	SignatureSize() int
 }

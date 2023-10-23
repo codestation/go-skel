@@ -33,3 +33,19 @@ func (s *Signer) Verify(data, signature []byte) error {
 func (s *Signer) SignatureSize() int {
 	return ed25519.SignatureSize
 }
+
+type Verifier struct {
+	publicKey ed25519.PublicKey
+}
+
+func NewVerifier(publicKey ed25519.PublicKey) *Verifier {
+	return &Verifier{publicKey: publicKey}
+}
+
+func (v *Verifier) Verify(data, signature []byte) error {
+	if !Verify(v.publicKey, data, signature) {
+		return fmt.Errorf("invalid signature")
+	}
+
+	return nil
+}

@@ -41,3 +41,15 @@ func (c *Cipher) Encrypt(plaintext []byte) ([]byte, error) {
 func (c *Cipher) Decrypt(ciphertext []byte) ([]byte, error) {
 	return Decrypt(c.privateKey, ciphertext)
 }
+
+type Verifier struct {
+	publicKey *rsa.PublicKey
+}
+
+func NewVerifier(publicKey *rsa.PublicKey) *Verifier {
+	return &Verifier{publicKey: publicKey}
+}
+
+func (v *Verifier) Verify(data, signature []byte) error {
+	return Verify(v.publicKey, data, signature)
+}

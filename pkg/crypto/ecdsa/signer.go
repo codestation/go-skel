@@ -11,6 +11,7 @@ import (
 
 type Signer struct {
 	privateKey *ecdsa.PrivateKey
+	Verifier
 }
 
 func NewSigner(privateKey *ecdsa.PrivateKey) *Signer {
@@ -31,4 +32,20 @@ func (s *Signer) Verify(data, signature []byte) error {
 
 func (s *Signer) SignatureSize() int {
 	return SignatureSize
+}
+
+type Verifier struct {
+	publicKey *ecdsa.PublicKey
+}
+
+func NewVerifier(publicKey *ecdsa.PublicKey) *Verifier {
+	return &Verifier{publicKey: publicKey}
+}
+
+func (v *Verifier) Verify(data, signature []byte) error {
+	if !Verify(v.publicKey, data, signature) {
+		return fmt.Errorf("invalid signature")
+	}
+
+	return nil
 }
