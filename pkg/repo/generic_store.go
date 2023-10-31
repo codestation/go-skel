@@ -199,13 +199,10 @@ func (s *GenericStoreImpl[T]) GetBy(ctx context.Context, expr Expression) (T, er
 	}
 }
 
-func (s *GenericStoreImpl[T]) GetForUpdate(ctx context.Context, expr Expression) (T, error) {
+func (s *GenericStoreImpl[T]) GetForUpdate(ctx context.Context, expr Expression, order OrderedExpression) (T, error) {
 	queryBuilder := s.Builder.From(s.Table).Select(s.selectFields...).Where(expr)
-	if s.defaultFilters != nil && !s.defaultFilters.IsEmpty() {
-		queryBuilder = queryBuilder.Where(s.defaultFilters)
-	}
 
-	queryBuilder = queryBuilder.Order(goqu.C("id").Asc()).Limit(1).ForUpdate(goqu.SkipLocked)
+	queryBuilder = queryBuilder.Order(order).Limit(1).ForUpdate(goqu.SkipLocked)
 
 	query, args, err := queryBuilder.Prepared(true).ToSQL()
 	if err != nil {

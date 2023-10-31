@@ -8,16 +8,18 @@ import (
 	"context"
 
 	"github.com/doug-martin/goqu/v9"
+	"github.com/doug-martin/goqu/v9/exp"
 	"megpoid.dev/go/go-skel/pkg/clause"
 	"megpoid.dev/go/go-skel/pkg/model"
 	"megpoid.dev/go/go-skel/pkg/response"
 )
 
 type (
-	Ex         = goqu.Ex
-	ExOr       = goqu.ExOr
-	Expression = goqu.Expression
-	Op         = goqu.Op
+	Ex                = goqu.Ex
+	ExOr              = goqu.ExOr
+	Expression        = goqu.Expression
+	OrderedExpression = exp.OrderedExpression
+	Op                = goqu.Op
 )
 
 var (
@@ -36,7 +38,7 @@ type GenericStore[T model.Modelable] interface {
 	Find(ctx context.Context, dest T, id int64) error
 	Get(ctx context.Context, id int64) (T, error)
 	GetBy(ctx context.Context, expr Expression) (T, error)
-	GetForUpdate(ctx context.Context, expr Expression) (T, error)
+	GetForUpdate(ctx context.Context, expr Expression, order OrderedExpression) (T, error)
 	Exists(ctx context.Context, expr Expression) (bool, error)
 	List(ctx context.Context, opts ...clause.FilterOption) (*response.ListResponse[T], error)
 	ListBy(ctx context.Context, expr Expression, opts ...clause.FilterOption) (*response.ListResponse[T], error)

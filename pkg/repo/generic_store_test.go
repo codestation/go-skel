@@ -176,6 +176,31 @@ func (s *storeSuite) TestStoreGet() {
 	}
 }
 
+func (s *storeSuite) TestStoreGetForUpdate() {
+	st := NewStore[*testUser](s.conn.Store)
+	tests := []struct {
+		expr  Expression
+		err   error
+		order OrderedExpression
+	}{
+		{goqu.C("id").Gt(0), nil, goqu.C("id").Asc()},
+		{goqu.C("id").Eq(0), ErrNotFound, goqu.C("id").Asc()},
+	}
+
+	for _, test := range tests {
+		s.Run("GetForUpdate", func() {
+			user, err := st.GetForUpdate(context.Background(), test.expr, test.order)
+			if test.err != nil {
+				s.ErrorIs(err, test.err)
+			} else {
+				s.NoError(err)
+				s.NotZero(user.ID)
+				s.NotZero(user.CreatedAt)
+			}
+		})
+	}
+}
+
 func (s *storeSuite) TestStoreList() {
 	st := NewStore[*testUser](s.conn.Store)
 	users, err := st.List(context.Background())
