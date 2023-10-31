@@ -13,7 +13,7 @@ import (
 )
 
 func TestEncryptDecrypt(t *testing.T) {
-	key, err := crypto.GenerateRandomBytes(KeySize)
+	key, err := crypto.GenerateRandomKey(KeySize)
 	if err != nil {
 		t.Fatalf("Failed to generate random key: %v", err)
 	}
@@ -44,7 +44,7 @@ func TestEncryptDecrypt(t *testing.T) {
 }
 
 func BenchmarkEncryptDecrypt(b *testing.B) {
-	key, err := crypto.GenerateRandomBytes(KeySize)
+	key, err := crypto.GenerateRandomKey(KeySize)
 	if err != nil {
 		b.Fatalf("Failed to generate random key: %v", err)
 	}

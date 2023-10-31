@@ -24,12 +24,12 @@ type Verifier interface {
 	SignatureSize() int
 }
 
-// GenerateRandomBytes generates random bytes of a given size
-func GenerateRandomBytes(size int) ([]byte, error) {
+// GenerateRandomKey generates a random key of a given size
+func GenerateRandomKey(size int) ([]byte, error) {
 	randomBytes := make([]byte, size)
 	_, err := rand.Read(randomBytes)
 	if err != nil {
-		return nil, fmt.Errorf("failed to generate random bytes: %w", err)
+		return nil, fmt.Errorf("failed to generate random key: %w", err)
 	}
 
 	return randomBytes, nil

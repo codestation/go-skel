@@ -20,7 +20,7 @@ func TestCipherSignerEd25519(t *testing.T) {
 		t.Fatalf("cannot generate private key: %v", err)
 	}
 
-	secretKey, err := GenerateRandomBytes(aes.KeySize)
+	secretKey, err := GenerateRandomKey(aes.KeySize)
 	if err != nil {
 		t.Fatalf("cannot generate key: %v", err)
 	}
@@ -66,7 +66,7 @@ func TestCipherSignerECDSA(t *testing.T) {
 		t.Fatalf("cannot generate private key: %v", err)
 	}
 
-	secretKey, err := GenerateRandomBytes(aes.KeySize)
+	secretKey, err := GenerateRandomKey(aes.KeySize)
 	if err != nil {
 		t.Fatalf("cannot generate key: %v", err)
 	}
@@ -112,7 +112,7 @@ func TestCipherSignerRSA(t *testing.T) {
 		t.Fatalf("cannot generate private key: %v", err)
 	}
 
-	secretKey, err := GenerateRandomBytes(aes.KeySize)
+	secretKey, err := GenerateRandomKey(aes.KeySize)
 	if err != nil {
 		t.Fatalf("cannot generate key: %v", err)
 	}

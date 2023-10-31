@@ -82,7 +82,7 @@ func NewHasher(password string, opts ...Option) (*Hasher, error) {
 	}
 
 	if s.Salt == nil {
-		salt, err := crypto.GenerateRandomBytes(saltSize)
+		salt, err := crypto.GenerateRandomKey(saltSize)
 		if err != nil {
 			return nil, fmt.Errorf("failed to generate salt: %w", err)
 		}
