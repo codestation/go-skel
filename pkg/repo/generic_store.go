@@ -199,6 +199,32 @@ func (s *GenericStoreImpl[T]) GetBy(ctx context.Context, expr Expression) (T, er
 	}
 }
 
+func (s *GenericStoreImpl[T]) GetForUpdate(ctx context.Context, expr Expression) (T, error) {
+	queryBuilder := s.Builder.From(s.Table).Select(s.selectFields...).Where(expr)
+	if s.defaultFilters != nil && !s.defaultFilters.IsEmpty() {
+		queryBuilder = queryBuilder.Where(s.defaultFilters)
+	}
+
+	queryBuilder = queryBuilder.Order(goqu.C("id").Asc()).Limit(1).ForUpdate(goqu.SkipLocked)
+
+	query, args, err := queryBuilder.Prepared(true).ToSQL()
+	if err != nil {
+		return s.zero(), NewRepoError(ErrBackend, err)
+	}
+
+	result := s.new()
+	err = s.Conn.Get(ctx, result, query, args...)
+
+	switch {
+	case errors.Is(err, sql.ErrNoRows):
+		return s.zero(), NewRepoError(ErrNotFound, nil)
+	case err != nil:
+		return s.zero(), NewRepoError(ErrBackend, err)
+	default:
+		return result, nil
+	}
+}
+
 func (s *GenericStoreImpl[T]) Exists(ctx context.Context, expr Expression) (bool, error) {
 	_, err := s.GetBy(ctx, expr)
 	if err != nil {
