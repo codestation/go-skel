@@ -108,10 +108,19 @@ func (v *Validator) AuthenticatorFunc() openapi3filter.AuthenticationFunc {
 					return v.basic(v.next)(echoCtx)
 				}
 			case "bearer":
-				if v.jwt != nil {
-					echoCtx := oapimw.GetEchoContext(ctx)
-					return v.jwt(v.next)(echoCtx)
+				switch input.SecurityScheme.BearerFormat {
+				case "JWT", "jwt":
+					if v.jwt != nil {
+						echoCtx := oapimw.GetEchoContext(ctx)
+						return v.jwt(v.next)(echoCtx)
+					}
+				default:
+					if v.apiKey != nil {
+						echoCtx := oapimw.GetEchoContext(ctx)
+						return v.apiKey(v.next)(echoCtx)
+					}
 				}
+
 			default:
 				return fmt.Errorf("unknown http security scheme: %s", input.SecurityScheme.Scheme)
 			}
