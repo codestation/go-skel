@@ -71,10 +71,28 @@ paths:
   "/auth/oauth/login":
     get:
       security: [ ]
-      operationId: oauthLogin
+      operationId: oAuthLogin
       responses:
         '200':
           description: Successful login
+      tags:
+        - Authentication
+  "/auth/oauth/callback":
+    get:
+      security: [ ]
+      operationId: oAuthCallback
+      responses:
+        '200':
+          description: Successful login
+      tags:
+        - Authentication
+  "/auth/refresh":
+    post:
+      security: [ ]
+      operationId: oAuthRefresh
+      responses:
+        '200':
+          description: Successful refresh
       tags:
         - Authentication
   "/queues/{name}/tasks/{id}":

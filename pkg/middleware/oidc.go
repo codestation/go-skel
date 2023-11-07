@@ -198,14 +198,19 @@ func (auth *Auth) CallbackHandler(c echo.Context) error {
 	return nil
 }
 
-func (auth *Auth) RefreshHandler(c echo.Context, refreshToken string) error {
+func (auth *Auth) RefreshHandler(c echo.Context) error {
+	refreshCookie, err := c.Cookie(OauthCookieRefreshToken)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusUnauthorized, fmt.Sprintf("failed to get refresh token cookie: %v", err))
+	}
+
 	token := &oauth2.Token{
-		RefreshToken: refreshToken,
+		RefreshToken: refreshCookie.Value,
 	}
 
 	newToken, err := auth.oauthConfig.TokenSource(c.Request().Context(), token).Token()
 	if err != nil {
-		return fmt.Errorf("failed to refresh token: %w", err)
+		return echo.NewHTTPError(http.StatusUnauthorized, fmt.Sprintf("failed to refresh token: %v", err))
 	}
 
 	accessTokenExpire := time.Now().Add(time.Duration(newToken.Expiry.Unix()-time.Now().Unix()) * time.Second)

@@ -12,17 +12,20 @@ import (
 	"megpoid.dev/go/go-skel/config"
 	"megpoid.dev/go/go-skel/oapi"
 	"megpoid.dev/go/go-skel/pkg/apperror"
+	"megpoid.dev/go/go-skel/pkg/middleware"
 )
 
 type AuthController struct {
 	common
 	auth usecase.Auth
+	oidc *middleware.Auth
 }
 
-func NewAuth(cfg config.ServerSettings, auth usecase.Auth) AuthController {
+func NewAuth(cfg config.ServerSettings, auth usecase.Auth, oidc *middleware.Auth) AuthController {
 	return AuthController{
 		common: newCommon(cfg),
 		auth:   auth,
+		oidc:   oidc,
 	}
 }
 
@@ -46,6 +49,26 @@ func (ctrl *AuthController) Login(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, &oapi.Token{Token: result})
 }
 
-func (ctrl *AuthController) OauthLogin(ctx echo.Context) error {
-	return echo.NewHTTPError(http.StatusNotImplemented, "Not implemented")
+func (ctrl *AuthController) OAuthLogin(ctx echo.Context) error {
+	if err := ctrl.oidc.RedirectHandler(ctx); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return ctx.JSON(http.StatusOK, "oAuth redirect")
+}
+
+func (ctrl *AuthController) OAuthRefresh(ctx echo.Context) error {
+	if err := ctrl.oidc.RefreshHandler(ctx); err != nil {
+		return err
+	}
+
+	return ctx.JSON(http.StatusOK, "token refreshed")
+}
+
+func (ctrl *AuthController) OAuthCallback(ctx echo.Context) error {
+	if err := ctrl.oidc.CallbackHandler(ctx); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return ctx.Redirect(http.StatusFound, "/")
 }

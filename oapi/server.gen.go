@@ -17,8 +17,14 @@ type ServerInterface interface {
 	// (POST /auth/login)
 	Login(ctx echo.Context) error
 
+	// (GET /auth/oauth/callback)
+	OAuthCallback(ctx echo.Context) error
+
 	// (GET /auth/oauth/login)
-	OauthLogin(ctx echo.Context) error
+	OAuthLogin(ctx echo.Context) error
+
+	// (POST /auth/refresh)
+	OAuthRefresh(ctx echo.Context) error
 	// Create a new delay job request
 	// (POST /background/delay)
 	ProcessBackground(ctx echo.Context) error
@@ -65,12 +71,30 @@ func (w *ServerInterfaceWrapper) Login(ctx echo.Context) error {
 	return err
 }
 
-// OauthLogin converts echo context to params.
-func (w *ServerInterfaceWrapper) OauthLogin(ctx echo.Context) error {
+// OAuthCallback converts echo context to params.
+func (w *ServerInterfaceWrapper) OAuthCallback(ctx echo.Context) error {
 	var err error
 
 	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.OauthLogin(ctx)
+	err = w.Handler.OAuthCallback(ctx)
+	return err
+}
+
+// OAuthLogin converts echo context to params.
+func (w *ServerInterfaceWrapper) OAuthLogin(ctx echo.Context) error {
+	var err error
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.OAuthLogin(ctx)
+	return err
+}
+
+// OAuthRefresh converts echo context to params.
+func (w *ServerInterfaceWrapper) OAuthRefresh(ctx echo.Context) error {
+	var err error
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.OAuthRefresh(ctx)
 	return err
 }
 
@@ -408,7 +432,9 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	}
 
 	router.POST(baseURL+"/auth/login", wrapper.Login)
-	router.GET(baseURL+"/auth/oauth/login", wrapper.OauthLogin)
+	router.GET(baseURL+"/auth/oauth/callback", wrapper.OAuthCallback)
+	router.GET(baseURL+"/auth/oauth/login", wrapper.OAuthLogin)
+	router.POST(baseURL+"/auth/refresh", wrapper.OAuthRefresh)
 	router.POST(baseURL+"/background/delay", wrapper.ProcessBackground)
 	router.GET(baseURL+"/health/live", wrapper.LiveCheck)
 	router.GET(baseURL+"/health/ready", wrapper.ReadyCheck)

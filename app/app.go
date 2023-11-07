@@ -75,6 +75,17 @@ func NewApp(cfg Config) (*App, error) {
 		Addr: cfg.General.RedisAddr,
 	}
 
+	oidcAuth, err := mwpkg.NewOIDCAuth(context.Background(), &mwpkg.Config{
+		IssuerURL:    cfg.OIDC.IssuerURL,
+		ClientID:     cfg.OIDC.ClientID,
+		ClientSecret: cfg.OIDC.ClientSecret,
+		RedirectURL:  cfg.OIDC.RedirectURL,
+		Scopes:       cfg.OIDC.Scopes,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("error loading oidc auth: %w", err)
+	}
+
 	// Usecase initialization
 	authUsecase := usecase.NewAuth(cfg.Server.JwtSecret)
 	healthcheckUsecase := usecase.NewHealthcheck(healthcheckRepo)
@@ -83,7 +94,7 @@ func NewApp(cfg Config) (*App, error) {
 
 	// Controller initialization
 	ctrl := controller.Controller{
-		AuthController:        controller.NewAuth(cfg.Server, authUsecase),
+		AuthController:        controller.NewAuth(cfg.Server, authUsecase, oidcAuth),
 		ProfileController:     controller.NewProfile(cfg.Server, profileUsecase),
 		HealthcheckController: controller.NewHealthCheck(cfg.Server, healthcheckUsecase),
 		TaskController:        controller.NewTask(cfg.Server, taskUsecase),
@@ -146,17 +157,6 @@ func NewApp(cfg Config) (*App, error) {
 			return false, nil
 		},
 	}))
-
-	oidcAuth, err := mwpkg.NewOIDCAuth(context.Background(), &mwpkg.Config{
-		IssuerURL:    cfg.OIDC.IssuerURL,
-		ClientID:     cfg.OIDC.ClientID,
-		ClientSecret: cfg.OIDC.ClientSecret,
-		RedirectURL:  cfg.OIDC.RedirectURL,
-		Scopes:       cfg.OIDC.Scopes,
-	})
-	if err != nil {
-		return nil, fmt.Errorf("error loading oidc auth: %w", err)
-	}
 
 	oidcMiddleware := mwpkg.WithOpenIDConnectAuth(mwpkg.NewOIDC(oidcAuth))
 
