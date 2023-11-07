@@ -16,6 +16,9 @@ type ServerInterface interface {
 
 	// (POST /auth/login)
 	Login(ctx echo.Context) error
+
+	// (GET /auth/oauth/login)
+	OauthLogin(ctx echo.Context) error
 	// Create a new delay job request
 	// (POST /background/delay)
 	ProcessBackground(ctx echo.Context) error
@@ -62,11 +65,26 @@ func (w *ServerInterfaceWrapper) Login(ctx echo.Context) error {
 	return err
 }
 
+// OauthLogin converts echo context to params.
+func (w *ServerInterfaceWrapper) OauthLogin(ctx echo.Context) error {
+	var err error
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.OauthLogin(ctx)
+	return err
+}
+
 // ProcessBackground converts echo context to params.
 func (w *ServerInterfaceWrapper) ProcessBackground(ctx echo.Context) error {
 	var err error
 
 	ctx.Set(BearerAuthScopes, []string{})
+
+	ctx.Set(ApikeyAuthScopes, []string{})
+
+	ctx.Set(OAuthScopes, []string{"read", "write"})
+
+	ctx.Set(OpenIDScopes, []string{"read", "write"})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.ProcessBackground(ctx)
@@ -116,6 +134,12 @@ func (w *ServerInterfaceWrapper) ListProfiles(ctx echo.Context) error {
 	var err error
 
 	ctx.Set(BearerAuthScopes, []string{})
+
+	ctx.Set(ApikeyAuthScopes, []string{})
+
+	ctx.Set(OAuthScopes, []string{"read", "write"})
+
+	ctx.Set(OpenIDScopes, []string{"read", "write"})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params ListProfilesParams
@@ -208,6 +232,12 @@ func (w *ServerInterfaceWrapper) SaveProfile(ctx echo.Context) error {
 
 	ctx.Set(BearerAuthScopes, []string{})
 
+	ctx.Set(ApikeyAuthScopes, []string{})
+
+	ctx.Set(OAuthScopes, []string{"read", "write"})
+
+	ctx.Set(OpenIDScopes, []string{"read", "write"})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.SaveProfile(ctx)
 	return err
@@ -225,6 +255,12 @@ func (w *ServerInterfaceWrapper) RemoveProfile(ctx echo.Context) error {
 	}
 
 	ctx.Set(BearerAuthScopes, []string{})
+
+	ctx.Set(ApikeyAuthScopes, []string{})
+
+	ctx.Set(OAuthScopes, []string{"read", "write"})
+
+	ctx.Set(OpenIDScopes, []string{"read", "write"})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.RemoveProfile(ctx, id)
@@ -244,6 +280,12 @@ func (w *ServerInterfaceWrapper) GetProfile(ctx echo.Context) error {
 
 	ctx.Set(BearerAuthScopes, []string{})
 
+	ctx.Set(ApikeyAuthScopes, []string{})
+
+	ctx.Set(OAuthScopes, []string{"read", "write"})
+
+	ctx.Set(OpenIDScopes, []string{"read", "write"})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.GetProfile(ctx, id)
 	return err
@@ -261,6 +303,12 @@ func (w *ServerInterfaceWrapper) UpdateProfile(ctx echo.Context) error {
 	}
 
 	ctx.Set(BearerAuthScopes, []string{})
+
+	ctx.Set(ApikeyAuthScopes, []string{})
+
+	ctx.Set(OAuthScopes, []string{"read", "write"})
+
+	ctx.Set(OpenIDScopes, []string{"read", "write"})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.UpdateProfile(ctx, id)
@@ -288,6 +336,12 @@ func (w *ServerInterfaceWrapper) GetTask(ctx echo.Context) error {
 
 	ctx.Set(BearerAuthScopes, []string{})
 
+	ctx.Set(ApikeyAuthScopes, []string{})
+
+	ctx.Set(OAuthScopes, []string{"read", "write"})
+
+	ctx.Set(OpenIDScopes, []string{"read", "write"})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.GetTask(ctx, name, id)
 	return err
@@ -313,6 +367,12 @@ func (w *ServerInterfaceWrapper) GetTaskResponse(ctx echo.Context) error {
 	}
 
 	ctx.Set(BearerAuthScopes, []string{})
+
+	ctx.Set(ApikeyAuthScopes, []string{})
+
+	ctx.Set(OAuthScopes, []string{"read", "write"})
+
+	ctx.Set(OpenIDScopes, []string{"read", "write"})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.GetTaskResponse(ctx, name, id)
@@ -348,6 +408,7 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	}
 
 	router.POST(baseURL+"/auth/login", wrapper.Login)
+	router.GET(baseURL+"/auth/oauth/login", wrapper.OauthLogin)
 	router.POST(baseURL+"/background/delay", wrapper.ProcessBackground)
 	router.GET(baseURL+"/health/live", wrapper.LiveCheck)
 	router.GET(baseURL+"/health/ready", wrapper.ReadyCheck)

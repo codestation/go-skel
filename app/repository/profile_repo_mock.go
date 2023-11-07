@@ -456,6 +456,62 @@ func (_c *MockProfileRepo_GetByEmail_Call) RunAndReturn(run func(context.Context
 	return _c
 }
 
+// GetForUpdate provides a mock function with given fields: ctx, expr, order
+func (_m *MockProfileRepo) GetForUpdate(ctx context.Context, expr exp.Expression, order exp.OrderedExpression) (*model.Profile, error) {
+	ret := _m.Called(ctx, expr, order)
+
+	var r0 *model.Profile
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, exp.Expression, exp.OrderedExpression) (*model.Profile, error)); ok {
+		return rf(ctx, expr, order)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, exp.Expression, exp.OrderedExpression) *model.Profile); ok {
+		r0 = rf(ctx, expr, order)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*model.Profile)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, exp.Expression, exp.OrderedExpression) error); ok {
+		r1 = rf(ctx, expr, order)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockProfileRepo_GetForUpdate_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetForUpdate'
+type MockProfileRepo_GetForUpdate_Call struct {
+	*mock.Call
+}
+
+// GetForUpdate is a helper method to define mock.On call
+//   - ctx context.Context
+//   - expr exp.Expression
+//   - order exp.OrderedExpression
+func (_e *MockProfileRepo_Expecter) GetForUpdate(ctx interface{}, expr interface{}, order interface{}) *MockProfileRepo_GetForUpdate_Call {
+	return &MockProfileRepo_GetForUpdate_Call{Call: _e.mock.On("GetForUpdate", ctx, expr, order)}
+}
+
+func (_c *MockProfileRepo_GetForUpdate_Call) Run(run func(ctx context.Context, expr exp.Expression, order exp.OrderedExpression)) *MockProfileRepo_GetForUpdate_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(exp.Expression), args[2].(exp.OrderedExpression))
+	})
+	return _c
+}
+
+func (_c *MockProfileRepo_GetForUpdate_Call) Return(_a0 *model.Profile, _a1 error) *MockProfileRepo_GetForUpdate_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockProfileRepo_GetForUpdate_Call) RunAndReturn(run func(context.Context, exp.Expression, exp.OrderedExpression) (*model.Profile, error)) *MockProfileRepo_GetForUpdate_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Insert provides a mock function with given fields: ctx, req
 func (_m *MockProfileRepo) Insert(ctx context.Context, req *model.Profile) error {
 	ret := _m.Called(ctx, req)

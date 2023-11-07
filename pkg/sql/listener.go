@@ -12,27 +12,25 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type Notification pgconn.Notification
-
-type Listener struct {
+type PgxListener struct {
 	conn *pgxpool.Conn
 }
 
-func (l *Listener) WaitForNotification(ctx context.Context) (*Notification, error) {
+func (l *PgxListener) WaitForNotification(ctx context.Context) (*pgconn.Notification, error) {
 	n, err := l.conn.Conn().WaitForNotification(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	return (*Notification)(n), nil
+	return n, nil
 }
 
-func (l *Listener) Release() {
+func (l *PgxListener) Release() {
 	l.conn.Release()
 }
 
-func NewListener(ctx context.Context, db *PgxWrapper, name string) (*Listener, error) {
-	conn, err := db.pool.Acquire(ctx)
+func NewListener(ctx context.Context, db Acquirer, name string) (*PgxListener, error) {
+	conn, err := db.Acquire(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -42,5 +40,5 @@ func NewListener(ctx context.Context, db *PgxWrapper, name string) (*Listener, e
 		return nil, err
 	}
 
-	return &Listener{conn}, nil
+	return &PgxListener{conn}, nil
 }

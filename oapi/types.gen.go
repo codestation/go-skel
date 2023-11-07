@@ -10,7 +10,10 @@ import (
 )
 
 const (
+	ApikeyAuthScopes = "ApikeyAuth.Scopes"
 	BearerAuthScopes = "BearerAuth.Scopes"
+	OAuthScopes      = "OAuth.Scopes"
+	OpenIDScopes     = "OpenID.Scopes"
 )
 
 // Defines values for TaskState.

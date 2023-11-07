@@ -22,8 +22,8 @@ Accept: application/json
 Content-Type: application/json
 
 {
-  "username": "johndoe",
-  "password": "secret"
+  "username": "{{username}}",
+  "password": "{{password}}"
 }
 
 > {%

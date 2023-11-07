@@ -12,6 +12,7 @@ import (
 
 	"github.com/doug-martin/goqu/v9"
 	"github.com/doug-martin/goqu/v9/exp"
+	"github.com/jackc/pgx/v5"
 	"github.com/mitchellh/mapstructure"
 	"megpoid.dev/go/go-skel/pkg/clause"
 	"megpoid.dev/go/go-skel/pkg/model"
@@ -106,6 +107,23 @@ func NewStore[T model.Modelable](conn sql.Executor, opts ...StoreOption[T]) *Gen
 	return st
 }
 
+func (s *GenericStoreImpl[T]) WithTx(conn sql.Executor) *GenericStoreImpl[T] {
+	return &GenericStoreImpl[T]{
+		Conn:           conn,
+		Builder:        s.Builder,
+		Table:          s.Table,
+		prefix:         s.prefix,
+		selectFields:   s.selectFields,
+		returnFields:   s.returnFields,
+		defaultFilters: s.defaultFilters,
+		sortKeys:       s.sortKeys,
+		includes:       s.includes,
+		rules:          s.rules,
+		options:        s.options,
+		attachFunc:     s.attachFunc,
+	}
+}
+
 func (s *GenericStoreImpl[T]) zero() T {
 	var result T
 	return result
@@ -135,7 +153,7 @@ func (s *GenericStoreImpl[T]) First(ctx context.Context, expr ...Expression) (T,
 	err = s.Conn.Get(ctx, result, query, args...)
 
 	switch {
-	case errors.Is(err, sql.ErrNoRows):
+	case errors.Is(err, pgx.ErrNoRows):
 		return s.zero(), NewRepoError(ErrNotFound, nil)
 	case err != nil:
 		return s.zero(), NewRepoError(ErrBackend, err)
@@ -159,7 +177,7 @@ func (s *GenericStoreImpl[T]) Find(ctx context.Context, dest T, id int64) error 
 	err = s.Conn.Get(ctx, dest, query, args...)
 
 	switch {
-	case errors.Is(err, sql.ErrNoRows):
+	case errors.Is(err, pgx.ErrNoRows):
 		return NewRepoError(ErrNotFound, nil)
 	case err != nil:
 		return NewRepoError(ErrBackend, err)
@@ -190,7 +208,7 @@ func (s *GenericStoreImpl[T]) GetBy(ctx context.Context, expr Expression) (T, er
 	err = s.Conn.Get(ctx, result, query, args...)
 
 	switch {
-	case errors.Is(err, sql.ErrNoRows):
+	case errors.Is(err, pgx.ErrNoRows):
 		return s.zero(), NewRepoError(ErrNotFound, nil)
 	case err != nil:
 		return s.zero(), NewRepoError(ErrBackend, err)
@@ -213,7 +231,7 @@ func (s *GenericStoreImpl[T]) GetForUpdate(ctx context.Context, expr Expression,
 	err = s.Conn.Get(ctx, result, query, args...)
 
 	switch {
-	case errors.Is(err, sql.ErrNoRows):
+	case errors.Is(err, pgx.ErrNoRows):
 		return s.zero(), NewRepoError(ErrNotFound, nil)
 	case err != nil:
 		return s.zero(), NewRepoError(ErrBackend, err)
@@ -257,7 +275,7 @@ func (s *GenericStoreImpl[T]) ListBy(ctx context.Context, expr Expression, opts 
 	cur, err := cl.ApplyFilters(ctx, s.Conn, query, &results)
 
 	switch {
-	case errors.Is(err, sql.ErrNoRows):
+	case errors.Is(err, pgx.ErrNoRows):
 		return response.NewListResponse[T](results, cur), nil
 	case err != nil:
 		return nil, NewRepoError(ErrBackend, err)
@@ -345,10 +363,7 @@ func (s *GenericStoreImpl[T]) Update(ctx context.Context, req T) error {
 		return NewRepoError(ErrBackend, err)
 	}
 
-	n, err := result.RowsAffected()
-	if err != nil {
-		return NewRepoError(ErrBackend, err)
-	}
+	n := result.RowsAffected()
 
 	if n != 1 {
 		return NewRepoError(ErrNotFound, nil)
@@ -370,10 +385,7 @@ func (s *GenericStoreImpl[T]) UpdateMap(ctx context.Context, id int64, req map[s
 		return NewRepoError(ErrBackend, err)
 	}
 
-	n, err := result.RowsAffected()
-	if err != nil {
-		return NewRepoError(ErrBackend, err)
-	}
+	n := result.RowsAffected()
 
 	if n != 1 {
 		return NewRepoError(ErrNotFound, nil)
@@ -449,10 +461,7 @@ func (s *GenericStoreImpl[T]) DeleteBy(ctx context.Context, expr Ex) (int64, err
 		return 0, NewRepoError(ErrBackend, err)
 	}
 
-	n, err := result.RowsAffected()
-	if err != nil {
-		return 0, NewRepoError(ErrBackend, err)
-	}
+	n := result.RowsAffected()
 
 	return n, nil
 }

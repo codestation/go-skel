@@ -56,6 +56,10 @@ func runServer() error {
 		return fmt.Errorf("failed to read database config: %w", err)
 	}
 
+	if err := cfg.ReadConfig(&appConfig.OIDC); err != nil {
+		return fmt.Errorf("failed to read oidc config: %w", err)
+	}
+
 	// setup channel to check when app is stopped
 	quit := make(chan os.Signal, 1)
 
@@ -84,8 +88,10 @@ func init() {
 	generalFs := config.LoadGeneralFlags(serveCmd.Name())
 	serverFs := config.LoadServerFlags(serveCmd.Name())
 	databaseFs := config.LoadDatabaseFlags(serveCmd.Name())
+	oidcFs := config.LoadOIDCFlags(serveCmd.Name())
 
 	serveCmd.Flags().AddFlagSet(generalFs)
 	serveCmd.Flags().AddFlagSet(serverFs)
 	serveCmd.Flags().AddFlagSet(databaseFs)
+	serveCmd.Flags().AddFlagSet(oidcFs)
 }

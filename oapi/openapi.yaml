@@ -15,6 +15,9 @@ servers:
         default: '8000'
 security:
   - BearerAuth: []
+  - ApikeyAuth: []
+  - OAuth: [ read, write ]
+  - OpenID: [ read, write ]
 paths:
   "/health/live":
     get:
@@ -63,6 +66,15 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Token"
+      tags:
+        - Authentication
+  "/auth/oauth/login":
+    get:
+      security: [ ]
+      operationId: oauthLogin
+      responses:
+        '200':
+          description: Successful login
       tags:
         - Authentication
   "/queues/{name}/tasks/{id}":
@@ -543,3 +555,18 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+    ApikeyAuth:
+        type: apiKey
+        in: header
+        name: X-API-Key
+    OAuth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: /oauth/dialog
+          scopes:
+            write: Grants write access
+            read: Grants read access
+    OpenID:
+      type: openIdConnect
+      openIdConnectUrl: /.well-known/openid-configuration

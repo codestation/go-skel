@@ -13,11 +13,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/hibiken/asynq"
+	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/swaggest/swgui"
-	"github.com/swaggest/swgui/v4emb"
+	"github.com/swaggest/swgui/v5emb"
 	"megpoid.dev/go/go-skel/app/controller"
 	"megpoid.dev/go/go-skel/app/repository"
 	"megpoid.dev/go/go-skel/app/repository/uow"
@@ -26,7 +28,6 @@ import (
 	"megpoid.dev/go/go-skel/oapi"
 	"megpoid.dev/go/go-skel/pkg/apperror"
 	"megpoid.dev/go/go-skel/pkg/i18n"
-	"megpoid.dev/go/go-skel/pkg/jwt"
 	mwpkg "megpoid.dev/go/go-skel/pkg/middleware"
 	"megpoid.dev/go/go-skel/pkg/sql"
 	"megpoid.dev/go/go-skel/pkg/task"
@@ -42,6 +43,7 @@ type Config struct {
 	General  config.GeneralSettings
 	Database config.DatabaseSettings
 	Server   config.ServerSettings
+	OIDC     config.OIDCSettings
 }
 
 type App struct {
@@ -60,7 +62,7 @@ func NewApp(cfg Config) (*App, error) {
 		return nil, err
 	}
 
-	s.conn = sql.NewPgxWrapper(pool)
+	s.conn = sql.NewPgxPool(pool)
 
 	// Repository initialization (not attached to the unit of work)
 	healthcheckRepo := repository.NewHealthCheck(s.conn)
@@ -112,7 +114,7 @@ func NewApp(cfg Config) (*App, error) {
 	s.EchoServer = e
 
 	// Serve Swagger UI
-	handler := v4emb.NewHandlerWithConfig(swgui.Config{
+	handler := v5emb.NewHandlerWithConfig(swgui.Config{
 		Title:       "Skel API",
 		SwaggerJSON: controller.BaseURL() + "/swagger/docs/openapi.yaml",
 		BasePath:    controller.BaseURL() + "/swagger",
@@ -126,12 +128,44 @@ func NewApp(cfg Config) (*App, error) {
 		return nil, fmt.Errorf("error loading spec: %w", err)
 	}
 
-	skipperFunc := jwt.WithSkipperFunc(func(ctx echo.Context) bool {
+	spec.Servers = openapi3.Servers{&openapi3.Server{URL: controller.BaseURL()}}
+
+	skipperFunc := mwpkg.WithSkipperFunc(func(ctx echo.Context) bool {
 		path := ctx.Path()
 		return strings.HasPrefix(path, controller.BaseURL()+"/swagger")
 	})
 
-	oapiMiddleware := jwt.OapiValidator(spec, cfg.Server.JwtSecret, skipperFunc)
+	jwtMiddleware := mwpkg.WithJWTAuth(echojwt.JWT(cfg.Server.JwtSecret))
+
+	apiKeyMiddleware := mwpkg.WithAPIKeyAuth(middleware.KeyAuthWithConfig(middleware.KeyAuthConfig{
+		KeyLookup: "header:X-API-Key",
+		Validator: func(key string, ctx echo.Context) (bool, error) {
+			if key == "secret" {
+				return true, nil
+			}
+			return false, nil
+		},
+	}))
+
+	oidcAuth, err := mwpkg.NewOIDCAuth(context.Background(), &mwpkg.Config{
+		IssuerURL:    cfg.OIDC.IssuerURL,
+		ClientID:     cfg.OIDC.ClientID,
+		ClientSecret: cfg.OIDC.ClientSecret,
+		RedirectURL:  cfg.OIDC.RedirectURL,
+		Scopes:       cfg.OIDC.Scopes,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("error loading oidc auth: %w", err)
+	}
+
+	oidcMiddleware := mwpkg.WithOpenIDConnectAuth(mwpkg.NewOIDC(oidcAuth))
+
+	oapiMiddleware := mwpkg.OapiValidator(spec, skipperFunc,
+		jwtMiddleware,
+		apiKeyMiddleware,
+		oidcMiddleware,
+	)
+
 	e.Use(oapiMiddleware)
 
 	group := e.Group(controller.BaseURL())

@@ -519,7 +519,7 @@ func (s *storeSuite) TestBackendError() {
 	_, err = st.DeleteBy(ctx, Ex{"external_id": uuid.Must(uuid.FromString("00000000-0000-0000-0000-000000000001"))})
 	s.ErrorIs(err, ErrBackend)
 
-	db.Result = &fakeSQLResult{Error: errors.New("not implemented")}
+	db.Error = errors.New("not implemented")
 	err = st.Update(ctx, newUser("John Doe", 1))
 	s.ErrorIs(err, ErrBackend)
 	err = st.Delete(ctx, 1)

@@ -6,12 +6,15 @@ package sql
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Executor interface {
-	Begin(ctx context.Context) (*PgxTxWrapper, error)
-	BeginFunc(ctx context.Context, f func(conn Executor) error) error
-	Exec(ctx context.Context, query string, arguments ...any) (Result, error)
+	Begin(ctx context.Context) (*PgxTx, error)
+	BeginFunc(ctx context.Context, f func(conn Tx) error) error
+	Exec(ctx context.Context, query string, arguments ...any) (pgconn.CommandTag, error)
 	Get(ctx context.Context, dst any, query string, args ...any) error
 	Select(ctx context.Context, dest any, query string, args ...any) error
 }
@@ -43,4 +46,13 @@ type Connector interface {
 type Database interface {
 	Connector
 	Close()
+}
+
+type Listener interface {
+	WaitForNotification(ctx context.Context) (*pgconn.Notification, error)
+	Release()
+}
+
+type Acquirer interface {
+	Acquire(ctx context.Context) (*pgxpool.Conn, error)
 }

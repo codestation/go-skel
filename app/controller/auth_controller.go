@@ -45,3 +45,7 @@ func (ctrl *AuthController) Login(ctx echo.Context) error {
 
 	return ctx.JSON(http.StatusOK, &oapi.Token{Token: result})
 }
+
+func (ctrl *AuthController) OauthLogin(ctx echo.Context) error {
+	return echo.NewHTTPError(http.StatusNotImplemented, "Not implemented")
+}

@@ -10,6 +10,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/stretchr/testify/assert"
 	"megpoid.dev/go/go-skel/pkg/sql"
 	"megpoid.dev/go/go-skel/testdata"
@@ -60,7 +61,7 @@ func (c *Connection) setupDatabase(t *testing.T) {
 		assert.FailNowf(t, "Failed to create database Connection", err.Error())
 	}
 
-	c.Db = sql.NewPgxWrapper(conn)
+	c.Db = &sql.PgxPool{Pool: conn}
 
 	if c.withTransaction {
 		// create a new transaction so a test doesn't interfere with another
@@ -91,23 +92,19 @@ func (c *Connection) seedDatabase(t *testing.T, conn sql.Executor) {
 }
 
 type fakeDatabase struct {
-	Error  error
-	Result *fakeSQLResult
+	Error error
 }
 
-func (d fakeDatabase) BeginFunc(ctx context.Context, f func(conn sql.Executor) error) error {
+func (d fakeDatabase) BeginFunc(ctx context.Context, f func(conn sql.Tx) error) error {
 	return d.Error
 }
 
-func (d fakeDatabase) Begin(ctx context.Context) (*sql.PgxTxWrapper, error) {
+func (d fakeDatabase) Begin(ctx context.Context) (*sql.PgxTx, error) {
 	return nil, d.Error
 }
 
-func (d fakeDatabase) Exec(ctx context.Context, query string, arguments ...any) (sql.Result, error) {
-	if d.Result != nil {
-		return d.Result, nil
-	}
-	return nil, d.Error
+func (d fakeDatabase) Exec(ctx context.Context, query string, arguments ...any) (pgconn.CommandTag, error) {
+	return pgconn.CommandTag{}, d.Error
 }
 
 func (d fakeDatabase) Get(ctx context.Context, dst any, query string, args ...any) error {
@@ -119,17 +116,3 @@ func (d fakeDatabase) Select(ctx context.Context, dest any, query string, args .
 }
 
 var _ sql.Executor = &fakeDatabase{}
-
-type fakeSQLResult struct {
-	Error error
-}
-
-func (f fakeSQLResult) LastInsertId() (int64, error) {
-	return 0, f.Error
-}
-
-func (f fakeSQLResult) RowsAffected() (int64, error) {
-	return 0, f.Error
-}
-
-var _ sql.Result = &fakeSQLResult{}
