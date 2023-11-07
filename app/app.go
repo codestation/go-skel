@@ -15,7 +15,6 @@ import (
 
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/hibiken/asynq"
-	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/swaggest/swgui"
@@ -75,7 +74,7 @@ func NewApp(cfg Config) (*App, error) {
 		Addr: cfg.General.RedisAddr,
 	}
 
-	oidcAuth, err := mwpkg.NewOIDCAuth(context.Background(), &mwpkg.Config{
+	oidcHandler, err := mwpkg.NewOIDCAuth(context.Background(), &mwpkg.Config{
 		IssuerURL:    cfg.OIDC.IssuerURL,
 		ClientID:     cfg.OIDC.ClientID,
 		ClientSecret: cfg.OIDC.ClientSecret,
@@ -94,7 +93,7 @@ func NewApp(cfg Config) (*App, error) {
 
 	// Controller initialization
 	ctrl := controller.Controller{
-		AuthController:        controller.NewAuth(cfg.Server, authUsecase, oidcAuth),
+		AuthController:        controller.NewAuth(cfg.Server, authUsecase, oidcHandler),
 		ProfileController:     controller.NewProfile(cfg.Server, profileUsecase),
 		HealthcheckController: controller.NewHealthCheck(cfg.Server, healthcheckUsecase),
 		TaskController:        controller.NewTask(cfg.Server, taskUsecase),
@@ -146,9 +145,9 @@ func NewApp(cfg Config) (*App, error) {
 		return strings.HasPrefix(path, controller.BaseURL()+"/swagger")
 	})
 
-	jwtMiddleware := mwpkg.WithJWTAuth(echojwt.JWT(cfg.Server.JwtSecret))
+	jwtAuth := mwpkg.JWTAuth(cfg.Server.JwtSecret)
 
-	apiKeyMiddleware := mwpkg.WithAPIKeyAuth(middleware.KeyAuthWithConfig(middleware.KeyAuthConfig{
+	keyAuth := mwpkg.KeyAuthWithConfig(middleware.KeyAuthConfig{
 		KeyLookup: "header:X-API-Key",
 		Validator: func(key string, ctx echo.Context) (bool, error) {
 			if key == "secret" {
@@ -156,15 +155,11 @@ func NewApp(cfg Config) (*App, error) {
 			}
 			return false, nil
 		},
-	}))
+	})
 
-	oidcMiddleware := mwpkg.WithOpenIDConnectAuth(mwpkg.NewOIDC(oidcAuth))
+	oidcAuth := mwpkg.OpenIDConnect(oidcHandler)
 
-	oapiMiddleware := mwpkg.OapiValidator(spec, skipperFunc,
-		jwtMiddleware,
-		apiKeyMiddleware,
-		oidcMiddleware,
-	)
+	oapiMiddleware := mwpkg.OapiValidator(spec, skipperFunc, jwtAuth, keyAuth, oidcAuth)
 
 	e.Use(oapiMiddleware)
 

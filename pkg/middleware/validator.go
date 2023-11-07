@@ -11,6 +11,7 @@ import (
 	oapimw "github.com/deepmap/oapi-codegen/pkg/middleware"
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/getkin/kin-openapi/openapi3filter"
+	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -23,33 +24,45 @@ func WithSkipperFunc(skipFn middleware.Skipper) ValidatorOption {
 	}
 }
 
-func WithJWTAuth(jwt echo.MiddlewareFunc) ValidatorOption {
+func JWTAuth(signingKey any) ValidatorOption {
 	return func(o *Validator) {
-		o.jwt = jwt
+		o.jwt = echojwt.JWT(signingKey)
 	}
 }
 
-func WithBasicAuth(basic echo.MiddlewareFunc) ValidatorOption {
+func JWTAuthWithConfig(config echojwt.Config) ValidatorOption {
 	return func(o *Validator) {
-		o.basic = basic
+		o.jwt = echojwt.WithConfig(config)
 	}
 }
 
-func WithAPIKeyAuth(apiKey echo.MiddlewareFunc) ValidatorOption {
+func BasicAuth(fn middleware.BasicAuthValidator) ValidatorOption {
 	return func(o *Validator) {
-		o.apiKey = apiKey
+		o.basic = middleware.BasicAuth(fn)
 	}
 }
 
-func WithOAuth2Auth(oauth2 echo.MiddlewareFunc) ValidatorOption {
+func BasicAuthWithConfig(config middleware.BasicAuthConfig) ValidatorOption {
 	return func(o *Validator) {
-		o.oauth2 = oauth2
+		o.basic = middleware.BasicAuthWithConfig(config)
 	}
 }
 
-func WithOpenIDConnectAuth(openIdConnect echo.MiddlewareFunc) ValidatorOption {
+func KeyAuth(fn middleware.KeyAuthValidator) ValidatorOption {
 	return func(o *Validator) {
-		o.openIdConnect = openIdConnect
+		o.apiKey = middleware.KeyAuth(fn)
+	}
+}
+
+func KeyAuthWithConfig(config middleware.KeyAuthConfig) ValidatorOption {
+	return func(o *Validator) {
+		o.apiKey = middleware.KeyAuthWithConfig(config)
+	}
+}
+
+func OpenIDConnect(auth *Auth) ValidatorOption {
+	return func(o *Validator) {
+		o.openIdConnect = NewOIDC(auth)
 	}
 }
 

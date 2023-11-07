@@ -40,9 +40,9 @@ type Config struct {
 }
 
 type Auth struct {
-	provider    *oidc.Provider
-	verifier    *oidc.IDTokenVerifier
-	oauthConfig *oauth2.Config
+	Provider    *oidc.Provider
+	Verifier    *oidc.IDTokenVerifier
+	OAuthConfig *oauth2.Config
 }
 
 func NewOIDCAuth(ctx context.Context, config *Config) (*Auth, error) {
@@ -78,9 +78,9 @@ func NewOIDCAuth(ctx context.Context, config *Config) (*Auth, error) {
 	})
 
 	auth := &Auth{
-		provider:    provider,
-		verifier:    oidcVerifier,
-		oauthConfig: &oauth2Config,
+		Provider:    provider,
+		Verifier:    oidcVerifier,
+		OAuthConfig: &oauth2Config,
 	}
 
 	return auth, nil
@@ -126,7 +126,7 @@ func (auth *Auth) RedirectHandler(e echo.Context) error {
 		HttpOnly: true,
 	})
 
-	return e.Redirect(http.StatusFound, auth.oauthConfig.AuthCodeURL(stateValue, oidc.Nonce(nonceValue)))
+	return e.Redirect(http.StatusFound, auth.OAuthConfig.AuthCodeURL(stateValue, oidc.Nonce(nonceValue)))
 }
 
 func (auth *Auth) CallbackHandler(c echo.Context) error {
@@ -141,7 +141,7 @@ func (auth *Auth) CallbackHandler(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "state did not match")
 	}
 
-	oauth2Token, err := auth.oauthConfig.Exchange(req.Context(), req.URL.Query().Get("code"))
+	oauth2Token, err := auth.OAuthConfig.Exchange(req.Context(), req.URL.Query().Get("code"))
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("failed to exchange oauth token: %v", err))
 	}
@@ -153,7 +153,7 @@ func (auth *Auth) CallbackHandler(c echo.Context) error {
 	}
 
 	// Parse and verify ID Token payload.
-	idToken, err := auth.verifier.Verify(req.Context(), rawIDToken)
+	idToken, err := auth.Verifier.Verify(req.Context(), rawIDToken)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("failed to verify ID Token: %v", err))
 	}
@@ -208,7 +208,7 @@ func (auth *Auth) RefreshHandler(c echo.Context) error {
 		RefreshToken: refreshCookie.Value,
 	}
 
-	newToken, err := auth.oauthConfig.TokenSource(c.Request().Context(), token).Token()
+	newToken, err := auth.OAuthConfig.TokenSource(c.Request().Context(), token).Token()
 	if err != nil {
 		return echo.NewHTTPError(http.StatusUnauthorized, fmt.Sprintf("failed to refresh token: %v", err))
 	}
