@@ -75,30 +75,47 @@ var migrateCmd = &cobra.Command{
 			Redo:      migrationSettings.Redo,
 			Reset:     migrationSettings.Reset,
 			Rollback:  migrationSettings.Rollback,
-			Seed:      migrationSettings.Seed,
 			Step:      migrationSettings.Step,
-			Test:      migrationSettings.Test,
 			MigrationAsset: migration.AssetOptions{
 				FS:   db.Assets(),
 				Root: "migrations",
 			},
-			SeedAsset: migration.AssetOptions{
-				FS:   db.Seeds(),
-				Root: "seed",
-			},
-			TestAsset: migration.AssetOptions{
-				FS:   testdata.SqlAssets(),
-				Root: "sql",
-			},
 		}
 
 		go func() {
+			defer func() {
+				quit <- os.Interrupt
+			}()
+
 			migrationErr = migration.RunMigrations(ctx, pool, migrationConfig)
 			if migrationErr != nil {
 				slog.Error("migration failed", "error", migrationErr)
+				return
 			}
 
-			quit <- os.Interrupt
+			if migrationSettings.Seed {
+				seedAssets := migration.AssetOptions{
+					FS:   db.Seeds(),
+					Root: "seed",
+				}
+				migrationErr = migration.ApplySQLFiles(ctx, sql.NewPgxPool(pool), seedAssets)
+				if migrationErr != nil {
+					slog.Error("migration failed", "error", migrationErr)
+					return
+				}
+			}
+
+			if migrationSettings.Test {
+				testAssets := migration.AssetOptions{
+					FS:   testdata.SqlAssets(),
+					Root: "sql",
+				}
+				migrationErr = migration.ApplySQLFiles(ctx, sql.NewPgxPool(pool), testAssets)
+				if migrationErr != nil {
+					slog.Error("migration failed", "error", migrationErr)
+					return
+				}
+			}
 		}()
 
 		signal.Notify(quit, os.Interrupt, syscall.SIGTERM)

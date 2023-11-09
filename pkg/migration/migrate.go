@@ -15,6 +15,7 @@ import (
 	migrate "github.com/heroiclabs/sql-migrate"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"megpoid.dev/go/go-skel/pkg/sql"
 )
 
 type Options struct {
@@ -22,12 +23,8 @@ type Options struct {
 	Redo           bool
 	Reset          bool
 	Rollback       bool
-	Seed           bool
 	Step           int
-	Test           bool
 	MigrationAsset AssetOptions
-	SeedAsset      AssetOptions
-	TestAsset      AssetOptions
 }
 
 type AssetOptions struct {
@@ -88,23 +85,11 @@ func RunMigrations(ctx context.Context, pool *pgxpool.Pool, opts Options) error 
 		slog.Info("Applied migrations", slog.Int("count", n))
 	}
 
-	if opts.Seed {
-		if err := ApplySQLFiles(ctx, conn, opts.SeedAsset); err != nil {
-			return fmt.Errorf("failed to apply database seed data: %w", err)
-		}
-	}
-
-	if opts.Test {
-		if err := ApplySQLFiles(ctx, conn, opts.TestAsset); err != nil {
-			return fmt.Errorf("failed to apply database test data: %w", err)
-		}
-	}
-
 	return nil
 }
 
 // ApplySQLFiles initializes the database with data from a directory of SQL files
-func ApplySQLFiles(ctx context.Context, conn *pgxpool.Conn, config AssetOptions) error {
+func ApplySQLFiles(ctx context.Context, conn sql.Executor, config AssetOptions) error {
 	assets := config.FS
 	entries, err := assets.ReadDir(config.Root)
 	if err != nil {
@@ -116,7 +101,7 @@ func ApplySQLFiles(ctx context.Context, conn *pgxpool.Conn, config AssetOptions)
 		return fmt.Errorf("failed to start transaction: %w", err)
 	}
 
-	defer func(tx pgx.Tx, ctx context.Context) {
+	defer func(tx sql.Tx, ctx context.Context) {
 		err := tx.Rollback(ctx)
 		if err != nil && !errors.Is(err, pgx.ErrTxClosed) {
 			slog.Error("Failed to rollback transaction", slog.String("error", err.Error()))
