@@ -16,6 +16,27 @@
             "fuzzy": true
         },
         {
+            "id": "Failed to parse duration",
+            "message": "Failed to parse duration",
+            "translation": "Failed to parse duration",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Failed to create task",
+            "message": "Failed to create task",
+            "translation": "Failed to create task",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Failed to enqueue task",
+            "message": "Failed to enqueue task",
+            "translation": "Failed to enqueue task",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
             "id": "The request did not pass validation",
             "message": "The request did not pass validation",
             "translation": "The request did not pass validation",

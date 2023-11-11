@@ -6,7 +6,6 @@ require (
 	filippo.io/edwards25519 v1.0.0
 	github.com/aws/aws-sdk-go v1.45.25
 	github.com/coreos/go-oidc/v3 v3.7.0
-	github.com/deepmap/oapi-codegen v1.16.2
 	github.com/doug-martin/goqu/v9 v9.18.0
 	github.com/georgysavva/scany/v2 v2.0.0
 	github.com/getkin/kin-openapi v0.120.0
@@ -20,6 +19,7 @@ require (
 	github.com/labstack/echo-jwt/v4 v4.2.0
 	github.com/labstack/echo/v4 v4.11.3
 	github.com/mitchellh/mapstructure v1.5.0
+	github.com/oapi-codegen/echo-middleware v1.0.1
 	github.com/oapi-codegen/runtime v1.0.0
 	github.com/shopspring/decimal v1.3.1
 	github.com/spf13/cobra v1.8.0

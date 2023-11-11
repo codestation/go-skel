@@ -123,7 +123,7 @@ func (s *storeSuite) TestStoreFind() {
 
 func (s *storeSuite) TestStoreFirst() {
 	st := NewStore[*testUser](s.conn.Store)
-	user, err := st.First(context.Background())
+	user, err := st.First(context.Background(), Ex{}, C("id").Asc())
 	s.NoError(err)
 	s.NotNil(user)
 }
@@ -140,7 +140,7 @@ func (s *storeSuite) TestStoreFirstWithFilters() {
 
 	for _, test := range tests {
 		s.Run("First", func() {
-			user, err := st.First(context.Background(), Ex{"name": test.name})
+			user, err := st.First(context.Background(), Ex{"name": test.name}, C("id").Asc())
 			if test.err != nil {
 				s.ErrorIs(err, test.err)
 			} else {

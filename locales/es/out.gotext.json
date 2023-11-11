@@ -12,6 +12,21 @@
             "translation": "Error al leer la petición"
         },
         {
+            "id": "Failed to parse duration",
+            "message": "Failed to parse duration",
+            "translation": ""
+        },
+        {
+            "id": "Failed to create task",
+            "message": "Failed to create task",
+            "translation": ""
+        },
+        {
+            "id": "Failed to enqueue task",
+            "message": "Failed to enqueue task",
+            "translation": ""
+        },
+        {
             "id": "The request did not pass validation",
             "message": "The request did not pass validation",
             "translation": "La petición no pasó la validación"

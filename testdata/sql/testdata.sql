@@ -1,4 +1,4 @@
-create table test_profiles
+create table if not exists test_profiles
 (
     id          integer generated always as identity,
     created_at  timestamptz not null,
@@ -9,7 +9,7 @@ create table test_profiles
     primary key (id)
 );
 
-create table test_users
+create table if not exists test_users
 (
     id          integer generated always as identity,
     created_at  timestamptz not null,
@@ -24,6 +24,11 @@ create table test_users
     CONSTRAINT fk_users_profile FOREIGN KEY (profile_id) REFERENCES test_profiles (id)
 );
 
+delete from test_profiles;
+select setval('test_profiles_id_seq', COALESCE((SELECT max(id) FROM test_profiles), 1), false);
+
+delete from test_users;
+select setval('test_users_id_seq', COALESCE((SELECT max(id) FROM test_users), 1), false);
 
 insert into test_profiles (created_at, updated_at, external_id, avatar)
 values (now(), now(), '00000000-0000-0000-0000-000000000001'::uuid, 'https://example.com/avatar.jpg');

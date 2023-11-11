@@ -8,12 +8,12 @@ import (
 	"context"
 	"fmt"
 
-	oapimw "github.com/deepmap/oapi-codegen/pkg/middleware"
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/getkin/kin-openapi/openapi3filter"
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	oapimw "github.com/oapi-codegen/echo-middleware"
 )
 
 type ValidatorOption func(*Validator)

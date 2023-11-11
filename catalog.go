@@ -39,42 +39,48 @@ func init() {
 }
 
 var messageKeyToIndex = map[string]int{
-	"An error occurred": 12,
-	"Email is already registered with another profile": 8,
-	"Failed to get profile":                            6,
-	"Failed to list profiles":                          7,
+	"An error occurred": 15,
+	"Email is already registered with another profile": 11,
+	"Failed to create task":                            3,
+	"Failed to enqueue task":                           4,
+	"Failed to get profile":                            9,
+	"Failed to list profiles":                          10,
+	"Failed to parse duration":                         2,
 	"Failed to read request":                           1,
-	"Failed to remove profile":                         11,
-	"Failed to save profile":                           9,
-	"Failed to sign token":                             4,
-	"Failed to update profile":                         10,
+	"Failed to remove profile":                         14,
+	"Failed to save profile":                           12,
+	"Failed to sign token":                             7,
+	"Failed to update profile":                         13,
 	"Invalid login request":                            0,
-	"Invalid username or password":                     3,
-	"Profile not found":                                5,
-	"The request did not pass validation":              2,
+	"Invalid username or password":                     6,
+	"Profile not found":                                8,
+	"The request did not pass validation":              5,
 }
 
-var enIndex = []uint32{ // 14 elements
-	0x00000000, 0x00000016, 0x0000002d, 0x00000051,
-	0x0000006e, 0x00000083, 0x00000095, 0x000000ab,
-	0x000000c3, 0x000000f4, 0x0000010b, 0x00000124,
-	0x0000013d, 0x0000014f,
-} // Size: 80 bytes
+var enIndex = []uint32{ // 17 elements
+	0x00000000, 0x00000016, 0x0000002d, 0x00000046,
+	0x0000005c, 0x00000073, 0x00000097, 0x000000b4,
+	0x000000c9, 0x000000db, 0x000000f1, 0x00000109,
+	0x0000013a, 0x00000151, 0x0000016a, 0x00000183,
+	0x00000195,
+} // Size: 92 bytes
 
-const enData string = "" + // Size: 335 bytes
-	"\x02Invalid login request\x02Failed to read request\x02The request did n" +
-	"ot pass validation\x02Invalid username or password\x02Failed to sign tok" +
-	"en\x02Profile not found\x02Failed to get profile\x02Failed to list profi" +
-	"les\x02Email is already registered with another profile\x02Failed to sav" +
-	"e profile\x02Failed to update profile\x02Failed to remove profile\x02An " +
-	"error occurred"
+const enData string = "" + // Size: 405 bytes
+	"\x02Invalid login request\x02Failed to read request\x02Failed to parse d" +
+	"uration\x02Failed to create task\x02Failed to enqueue task\x02The reques" +
+	"t did not pass validation\x02Invalid username or password\x02Failed to s" +
+	"ign token\x02Profile not found\x02Failed to get profile\x02Failed to lis" +
+	"t profiles\x02Email is already registered with another profile\x02Failed" +
+	" to save profile\x02Failed to update profile\x02Failed to remove profile" +
+	"\x02An error occurred"
 
-var esIndex = []uint32{ // 14 elements
-	0x00000000, 0x00000028, 0x00000043, 0x00000068,
-	0x00000087, 0x0000009d, 0x000000b2, 0x000000ca,
-	0x000000e3, 0x00000114, 0x0000012f, 0x0000014d,
-	0x00000169, 0x0000017e,
-} // Size: 80 bytes
+var esIndex = []uint32{ // 17 elements
+	0x00000000, 0x00000028, 0x00000043, 0x00000043,
+	0x00000043, 0x00000043, 0x00000068, 0x00000087,
+	0x0000009d, 0x000000b2, 0x000000ca, 0x000000e3,
+	0x00000114, 0x0000012f, 0x0000014d, 0x00000169,
+	0x0000017e,
+} // Size: 92 bytes
 
 const esData string = "" + // Size: 382 bytes
 	"\x02Petición de inicio de sesión invalida\x02Error al leer la petición" +
@@ -84,4 +90,4 @@ const esData string = "" + // Size: 382 bytes
 	"otro perfil\x02Error al guardar el perfil\x02Error al actualizar el perf" +
 	"il\x02Error al eliminar el perfil\x02Ha ocurrido un error"
 
-	// Total table size 877 bytes (0KiB); checksum: DB66DE91
+	// Total table size 971 bytes (0KiB); checksum: 495BCA02
