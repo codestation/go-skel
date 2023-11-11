@@ -137,9 +137,9 @@ func (s *GenericStoreImpl[T]) AttachFunc(fn AttachFunc[T]) {
 	s.attachFunc = fn
 }
 
-func (s *GenericStoreImpl[T]) First(ctx context.Context, expr Expression, order OrderedExpression) (T, error) {
+func (s *GenericStoreImpl[T]) First(ctx context.Context, expr Expression, order ...OrderedExpression) (T, error) {
 	queryBuilder := s.Builder.From(s.Table).Select(s.selectFields...).Where(expr).
-		Order(order).Limit(1)
+		Order(order...).Limit(1)
 	if s.defaultFilters != nil && !s.defaultFilters.IsEmpty() {
 		queryBuilder = queryBuilder.Where(s.defaultFilters)
 	}

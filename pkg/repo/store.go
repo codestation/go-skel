@@ -34,7 +34,7 @@ var (
 )
 
 type GenericStore[T model.Modelable] interface {
-	First(ctx context.Context, expr Expression, order OrderedExpression) (T, error)
+	First(ctx context.Context, expr Expression, order ...OrderedExpression) (T, error)
 	Find(ctx context.Context, dest T, id int64) error
 	Get(ctx context.Context, id int64) (T, error)
 	GetBy(ctx context.Context, expr Expression) (T, error)

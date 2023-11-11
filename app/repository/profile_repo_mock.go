@@ -223,24 +223,31 @@ func (_c *MockProfileRepo_Find_Call) RunAndReturn(run func(context.Context, *mod
 }
 
 // First provides a mock function with given fields: ctx, expr, order
-func (_m *MockProfileRepo) First(ctx context.Context, expr exp.Expression, order exp.OrderedExpression) (*model.Profile, error) {
-	ret := _m.Called(ctx, expr, order)
+func (_m *MockProfileRepo) First(ctx context.Context, expr exp.Expression, order ...exp.OrderedExpression) (*model.Profile, error) {
+	_va := make([]interface{}, len(order))
+	for _i := range order {
+		_va[_i] = order[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, expr)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
 
 	var r0 *model.Profile
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, exp.Expression, exp.OrderedExpression) (*model.Profile, error)); ok {
-		return rf(ctx, expr, order)
+	if rf, ok := ret.Get(0).(func(context.Context, exp.Expression, ...exp.OrderedExpression) (*model.Profile, error)); ok {
+		return rf(ctx, expr, order...)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, exp.Expression, exp.OrderedExpression) *model.Profile); ok {
-		r0 = rf(ctx, expr, order)
+	if rf, ok := ret.Get(0).(func(context.Context, exp.Expression, ...exp.OrderedExpression) *model.Profile); ok {
+		r0 = rf(ctx, expr, order...)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.Profile)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, exp.Expression, exp.OrderedExpression) error); ok {
-		r1 = rf(ctx, expr, order)
+	if rf, ok := ret.Get(1).(func(context.Context, exp.Expression, ...exp.OrderedExpression) error); ok {
+		r1 = rf(ctx, expr, order...)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -256,14 +263,21 @@ type MockProfileRepo_First_Call struct {
 // First is a helper method to define mock.On call
 //   - ctx context.Context
 //   - expr exp.Expression
-//   - order exp.OrderedExpression
-func (_e *MockProfileRepo_Expecter) First(ctx interface{}, expr interface{}, order interface{}) *MockProfileRepo_First_Call {
-	return &MockProfileRepo_First_Call{Call: _e.mock.On("First", ctx, expr, order)}
+//   - order ...exp.OrderedExpression
+func (_e *MockProfileRepo_Expecter) First(ctx interface{}, expr interface{}, order ...interface{}) *MockProfileRepo_First_Call {
+	return &MockProfileRepo_First_Call{Call: _e.mock.On("First",
+		append([]interface{}{ctx, expr}, order...)...)}
 }
 
-func (_c *MockProfileRepo_First_Call) Run(run func(ctx context.Context, expr exp.Expression, order exp.OrderedExpression)) *MockProfileRepo_First_Call {
+func (_c *MockProfileRepo_First_Call) Run(run func(ctx context.Context, expr exp.Expression, order ...exp.OrderedExpression)) *MockProfileRepo_First_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(exp.Expression), args[2].(exp.OrderedExpression))
+		variadicArgs := make([]exp.OrderedExpression, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(exp.OrderedExpression)
+			}
+		}
+		run(args[0].(context.Context), args[1].(exp.Expression), variadicArgs...)
 	})
 	return _c
 }
@@ -273,7 +287,7 @@ func (_c *MockProfileRepo_First_Call) Return(_a0 *model.Profile, _a1 error) *Moc
 	return _c
 }
 
-func (_c *MockProfileRepo_First_Call) RunAndReturn(run func(context.Context, exp.Expression, exp.OrderedExpression) (*model.Profile, error)) *MockProfileRepo_First_Call {
+func (_c *MockProfileRepo_First_Call) RunAndReturn(run func(context.Context, exp.Expression, ...exp.OrderedExpression) (*model.Profile, error)) *MockProfileRepo_First_Call {
 	_c.Call.Return(run)
 	return _c
 }
