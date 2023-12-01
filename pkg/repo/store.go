@@ -38,7 +38,7 @@ type GenericStore[T model.Modelable] interface {
 	Find(ctx context.Context, dest T, id int64) error
 	Get(ctx context.Context, id int64) (T, error)
 	GetBy(ctx context.Context, expr Expression) (T, error)
-	GetForUpdate(ctx context.Context, expr Expression, order OrderedExpression) (T, error)
+	GetForUpdate(ctx context.Context, expr Expression, order ...OrderedExpression) (T, error)
 	Exists(ctx context.Context, expr Expression) (bool, error)
 	List(ctx context.Context, opts ...clause.FilterOption) (*response.ListResponse[T], error)
 	ListBy(ctx context.Context, expr Expression, opts ...clause.FilterOption) (*response.ListResponse[T], error)
