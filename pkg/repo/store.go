@@ -52,6 +52,8 @@ type GenericStore[T model.Modelable] interface {
 	Update(ctx context.Context, req T) error
 	// UpdateMap updates a record from the repository, only updates the specified fields in the map
 	UpdateMap(ctx context.Context, id int64, req map[string]any) error
+	// UpdateMapBy updates the records matched by the expression, only updates the specified fields in the map
+	UpdateMapBy(ctx context.Context, req map[string]any, expr Expression) (int64, error)
 	// Delete removes a record from the repository, returns ErrNotFound if the ID doesn't exist
 	Delete(ctx context.Context, id int64) error
 	// DeleteBy removes the records matched by the expression, returns the deleted count on success

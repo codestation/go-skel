@@ -394,6 +394,24 @@ func (s *GenericStoreImpl[T]) UpdateMap(ctx context.Context, id int64, req map[s
 	return nil
 }
 
+func (s *GenericStoreImpl[T]) UpdateMapBy(ctx context.Context, req map[string]any, expr Expression) (int64, error) {
+	queryBuilder := s.Builder.Update(s.Table).Set(req).Where(expr)
+
+	query, args, err := queryBuilder.Prepared(true).ToSQL()
+	if err != nil {
+		return 0, NewRepoError(ErrBackend, err)
+	}
+
+	result, err := s.Conn.Exec(ctx, query, args...)
+	if err != nil {
+		return 0, NewRepoError(ErrBackend, err)
+	}
+
+	n := result.RowsAffected()
+
+	return n, nil
+}
+
 func (s *GenericStoreImpl[T]) Upsert(ctx context.Context, req T, target string) (bool, error) {
 	conflict := exp.NewDoUpdateConflictExpression(target, req)
 	inserted := goqu.Case().When(goqu.L("xmax::text::int").Gt(0), "updated").Else("inserted").As("upsert_status")

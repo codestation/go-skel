@@ -369,6 +369,36 @@ func (s *storeSuite) TestStoreUpdateMap() {
 	}
 }
 
+func (s *storeSuite) TestStoreUpdateMapBy() {
+	st := NewStore[*testUser](s.conn.Store)
+	tests := []struct {
+		expr Ex
+		err  error
+		n    int64
+	}{
+		{Ex{"id": 1}, nil, 1},
+		{Ex{"id": 0}, nil, 0},
+	}
+
+	for _, test := range tests {
+		s.Run("UpdateMapBy", func() {
+			user := Ex{
+				"name":       "John Doe",
+				"profile_id": 1,
+				"updated_at": time.Now(),
+			}
+			n, err := st.UpdateMapBy(context.Background(), user, test.expr)
+			if test.err != nil {
+				s.ErrorIs(err, test.err)
+			} else {
+				if s.NoError(err) {
+					s.Equal(test.n, n)
+				}
+			}
+		})
+	}
+}
+
 func (s *storeSuite) TestStoreDelete() {
 	st := NewStore[*testUser](s.conn.Store)
 	tests := []struct {
