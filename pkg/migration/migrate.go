@@ -15,7 +15,7 @@ import (
 	migrate "github.com/heroiclabs/sql-migrate"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"megpoid.dev/go/go-skel/pkg/sql"
+	"go.megpoid.dev/go-skel/pkg/sql"
 )
 
 type Options struct {

@@ -7,7 +7,7 @@ package paginator
 import (
 	"reflect"
 
-	"megpoid.dev/go/go-skel/pkg/paginator/util"
+	"go.megpoid.dev/go-skel/pkg/paginator/util"
 )
 
 // Rule for paginator

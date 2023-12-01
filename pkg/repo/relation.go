@@ -7,8 +7,8 @@ package repo
 import (
 	"context"
 
-	"megpoid.dev/go/go-skel/pkg/model"
-	"megpoid.dev/go/go-skel/pkg/response"
+	"go.megpoid.dev/go-skel/pkg/model"
+	"go.megpoid.dev/go-skel/pkg/response"
 )
 
 func AttachRelation[T, U model.Modelable](

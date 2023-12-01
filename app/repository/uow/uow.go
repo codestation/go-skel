@@ -8,8 +8,8 @@ import (
 	"context"
 	"errors"
 
-	"megpoid.dev/go/go-skel/app/repository"
-	"megpoid.dev/go/go-skel/pkg/sql"
+	"go.megpoid.dev/go-skel/app/repository"
+	"go.megpoid.dev/go-skel/pkg/sql"
 )
 
 //go:generate go run github.com/vektra/mockery/v2@v2.23.1 --name UnitOfWorkStore

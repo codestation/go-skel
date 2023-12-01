@@ -15,7 +15,7 @@ import (
 	"github.com/doug-martin/goqu/v9"
 	"github.com/doug-martin/goqu/v9/exp"
 	"github.com/georgysavva/scany/v2/dbscan"
-	"megpoid.dev/go/go-skel/pkg/paginator/cursor"
+	"go.megpoid.dev/go-skel/pkg/paginator/cursor"
 )
 
 type SQLSelector interface {

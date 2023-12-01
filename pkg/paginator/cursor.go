@@ -5,7 +5,7 @@
 package paginator
 
 import (
-	"megpoid.dev/go/go-skel/pkg/paginator/cursor"
+	"go.megpoid.dev/go-skel/pkg/paginator/cursor"
 )
 
 type MetaType string

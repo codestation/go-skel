@@ -12,8 +12,8 @@ import (
 
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/stretchr/testify/assert"
-	"megpoid.dev/go/go-skel/pkg/sql"
-	"megpoid.dev/go/go-skel/testdata"
+	"go.megpoid.dev/go-skel/pkg/sql"
+	"go.megpoid.dev/go-skel/testdata"
 )
 
 type Connection struct {

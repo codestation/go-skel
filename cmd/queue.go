@@ -13,10 +13,10 @@ import (
 	"github.com/hibiken/asynq"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"megpoid.dev/go/go-skel/app/tasks"
-	"megpoid.dev/go/go-skel/app/usecase"
-	"megpoid.dev/go/go-skel/config"
-	"megpoid.dev/go/go-skel/pkg/cfg"
+	"go.megpoid.dev/go-skel/app/tasks"
+	"go.megpoid.dev/go-skel/app/usecase"
+	"go.megpoid.dev/go-skel/config"
+	"go.megpoid.dev/go-skel/pkg/cfg"
 )
 
 // migrateCmd represents the migrate command

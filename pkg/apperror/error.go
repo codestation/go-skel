@@ -11,7 +11,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
-	"megpoid.dev/go/go-skel/pkg/repo"
+	"go.megpoid.dev/go-skel/pkg/repo"
 )
 
 type ValidationError struct {

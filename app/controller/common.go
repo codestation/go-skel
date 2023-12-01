@@ -8,10 +8,10 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
+	"go.megpoid.dev/go-skel/config"
+	"go.megpoid.dev/go-skel/oapi"
+	"go.megpoid.dev/go-skel/pkg/i18n"
 	"golang.org/x/text/message"
-	"megpoid.dev/go/go-skel/config"
-	"megpoid.dev/go/go-skel/oapi"
-	"megpoid.dev/go/go-skel/pkg/i18n"
 )
 
 const (

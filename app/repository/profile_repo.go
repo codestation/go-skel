@@ -7,10 +7,10 @@ package repository
 import (
 	"context"
 
-	"megpoid.dev/go/go-skel/app/model"
-	"megpoid.dev/go/go-skel/pkg/repo"
-	"megpoid.dev/go/go-skel/pkg/repo/filter"
-	"megpoid.dev/go/go-skel/pkg/sql"
+	"go.megpoid.dev/go-skel/app/model"
+	"go.megpoid.dev/go-skel/pkg/repo"
+	"go.megpoid.dev/go-skel/pkg/repo/filter"
+	"go.megpoid.dev/go-skel/pkg/sql"
 )
 
 type ProfileRepoImpl struct {

@@ -8,9 +8,9 @@ import (
 	"context"
 	"time"
 
-	"megpoid.dev/go/go-skel/app/model"
-	"megpoid.dev/go/go-skel/pkg/request"
-	"megpoid.dev/go/go-skel/pkg/response"
+	"go.megpoid.dev/go-skel/app/model"
+	"go.megpoid.dev/go-skel/pkg/request"
+	"go.megpoid.dev/go-skel/pkg/response"
 )
 
 type Auth interface {

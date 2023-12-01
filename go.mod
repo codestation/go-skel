@@ -1,4 +1,4 @@
-module megpoid.dev/go/go-skel
+module go.megpoid.dev/go-skel
 
 go 1.21
 

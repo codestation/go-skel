@@ -12,9 +12,9 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
-	"megpoid.dev/go/go-skel/app/usecase"
-	"megpoid.dev/go/go-skel/config"
-	"megpoid.dev/go/go-skel/oapi"
+	"go.megpoid.dev/go-skel/app/usecase"
+	"go.megpoid.dev/go-skel/config"
+	"go.megpoid.dev/go-skel/oapi"
 )
 
 func TestHealthcheckController(t *testing.T) {

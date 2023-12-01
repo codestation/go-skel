@@ -15,8 +15,8 @@ import (
 
 	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/labstack/echo/v4"
+	"go.megpoid.dev/go-skel/pkg/crypto"
 	"golang.org/x/oauth2"
-	"megpoid.dev/go/go-skel/pkg/crypto"
 )
 
 const (

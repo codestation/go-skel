@@ -13,10 +13,10 @@ import (
 	"github.com/doug-martin/goqu/v9"
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/suite"
-	"megpoid.dev/go/go-skel/pkg/clause"
-	"megpoid.dev/go/go-skel/pkg/model"
-	"megpoid.dev/go/go-skel/pkg/paginator"
-	"megpoid.dev/go/go-skel/pkg/types"
+	"go.megpoid.dev/go-skel/pkg/clause"
+	"go.megpoid.dev/go-skel/pkg/model"
+	"go.megpoid.dev/go-skel/pkg/paginator"
+	"go.megpoid.dev/go-skel/pkg/types"
 )
 
 type testProfile struct {

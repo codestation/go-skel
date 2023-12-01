@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"megpoid.dev/go/go-skel/pkg/types"
+	"go.megpoid.dev/go-skel/pkg/types"
 )
 
 func TestMetaEmpty(t *testing.T) {

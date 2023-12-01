@@ -4,7 +4,7 @@
 
 package model
 
-import "megpoid.dev/go/go-skel/pkg/model"
+import "go.megpoid.dev/go-skel/pkg/model"
 
 type Profile struct {
 	model.Model

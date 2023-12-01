@@ -8,10 +8,10 @@ import (
 	"bytes"
 	"testing"
 
-	"megpoid.dev/go/go-skel/pkg/crypto/aes"
-	"megpoid.dev/go/go-skel/pkg/crypto/ecdsa"
-	"megpoid.dev/go/go-skel/pkg/crypto/ed25519"
-	"megpoid.dev/go/go-skel/pkg/crypto/rsa"
+	"go.megpoid.dev/go-skel/pkg/crypto/aes"
+	"go.megpoid.dev/go-skel/pkg/crypto/ecdsa"
+	"go.megpoid.dev/go-skel/pkg/crypto/ed25519"
+	"go.megpoid.dev/go-skel/pkg/crypto/rsa"
 )
 
 func TestCipherSignerEd25519(t *testing.T) {

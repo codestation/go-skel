@@ -7,8 +7,8 @@ package repository
 import (
 	"context"
 
-	"megpoid.dev/go/go-skel/pkg/repo"
-	"megpoid.dev/go/go-skel/pkg/sql"
+	"go.megpoid.dev/go-skel/pkg/repo"
+	"go.megpoid.dev/go-skel/pkg/sql"
 )
 
 type HealthcheckRepoImpl struct {

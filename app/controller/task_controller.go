@@ -8,9 +8,9 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"megpoid.dev/go/go-skel/config"
-	"megpoid.dev/go/go-skel/oapi"
-	"megpoid.dev/go/go-skel/pkg/task"
+	"go.megpoid.dev/go-skel/config"
+	"go.megpoid.dev/go-skel/oapi"
+	"go.megpoid.dev/go-skel/pkg/task"
 )
 
 type TaskController struct {

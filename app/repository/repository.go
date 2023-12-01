@@ -7,8 +7,8 @@ package repository
 import (
 	"context"
 
-	"megpoid.dev/go/go-skel/app/model"
-	"megpoid.dev/go/go-skel/pkg/repo"
+	"go.megpoid.dev/go-skel/app/model"
+	"go.megpoid.dev/go-skel/pkg/repo"
 )
 
 // HealthcheckRepo handles all healthCheck related operations on the repository

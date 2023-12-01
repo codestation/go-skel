@@ -10,14 +10,14 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	appmodel "megpoid.dev/go/go-skel/app/model"
-	"megpoid.dev/go/go-skel/app/repository"
-	"megpoid.dev/go/go-skel/app/repository/uow"
-	"megpoid.dev/go/go-skel/pkg/model"
-	"megpoid.dev/go/go-skel/pkg/paginator"
-	"megpoid.dev/go/go-skel/pkg/repo"
-	"megpoid.dev/go/go-skel/pkg/request"
-	"megpoid.dev/go/go-skel/pkg/response"
+	appmodel "go.megpoid.dev/go-skel/app/model"
+	"go.megpoid.dev/go-skel/app/repository"
+	"go.megpoid.dev/go-skel/app/repository/uow"
+	"go.megpoid.dev/go-skel/pkg/model"
+	"go.megpoid.dev/go-skel/pkg/paginator"
+	"go.megpoid.dev/go-skel/pkg/repo"
+	"go.megpoid.dev/go-skel/pkg/request"
+	"go.megpoid.dev/go-skel/pkg/response"
 )
 
 func TestProfileList(t *testing.T) {

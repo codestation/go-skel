@@ -9,8 +9,8 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"go.megpoid.dev/go-skel/pkg/i18n"
 	"golang.org/x/text/message"
-	"megpoid.dev/go/go-skel/pkg/i18n"
 )
 
 func ErrorHandler(e *echo.Echo) echo.HTTPErrorHandler {

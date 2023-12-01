@@ -9,8 +9,8 @@ import (
 	"fmt"
 	"strings"
 
-	"megpoid.dev/go/go-skel/oapi"
-	"megpoid.dev/go/go-skel/pkg/request"
+	"go.megpoid.dev/go-skel/oapi"
+	"go.megpoid.dev/go-skel/pkg/request"
 )
 
 type Params struct {

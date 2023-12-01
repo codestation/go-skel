@@ -14,12 +14,12 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"megpoid.dev/go/go-skel/config"
-	"megpoid.dev/go/go-skel/db"
-	"megpoid.dev/go/go-skel/pkg/cfg"
-	"megpoid.dev/go/go-skel/pkg/migration"
-	"megpoid.dev/go/go-skel/pkg/sql"
-	"megpoid.dev/go/go-skel/testdata"
+	"go.megpoid.dev/go-skel/config"
+	"go.megpoid.dev/go-skel/db"
+	"go.megpoid.dev/go-skel/pkg/cfg"
+	"go.megpoid.dev/go-skel/pkg/migration"
+	"go.megpoid.dev/go-skel/pkg/sql"
+	"go.megpoid.dev/go-skel/testdata"
 )
 
 // migrateCmd represents the migrate command

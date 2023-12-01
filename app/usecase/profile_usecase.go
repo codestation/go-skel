@@ -8,14 +8,14 @@ import (
 	"context"
 	"errors"
 
-	"megpoid.dev/go/go-skel/app/model"
-	"megpoid.dev/go/go-skel/app/repository"
-	"megpoid.dev/go/go-skel/app/repository/uow"
-	"megpoid.dev/go/go-skel/pkg/apperror"
-	"megpoid.dev/go/go-skel/pkg/clause"
-	"megpoid.dev/go/go-skel/pkg/repo"
-	"megpoid.dev/go/go-skel/pkg/request"
-	"megpoid.dev/go/go-skel/pkg/response"
+	"go.megpoid.dev/go-skel/app/model"
+	"go.megpoid.dev/go-skel/app/repository"
+	"go.megpoid.dev/go-skel/app/repository/uow"
+	"go.megpoid.dev/go-skel/pkg/apperror"
+	"go.megpoid.dev/go-skel/pkg/clause"
+	"go.megpoid.dev/go-skel/pkg/repo"
+	"go.megpoid.dev/go-skel/pkg/request"
+	"go.megpoid.dev/go-skel/pkg/response"
 )
 
 // used to validate that the implementation matches the interface

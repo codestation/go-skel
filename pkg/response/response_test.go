@@ -8,10 +8,10 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"megpoid.dev/go/go-skel/pkg/model"
-	"megpoid.dev/go/go-skel/pkg/paginator"
-	"megpoid.dev/go/go-skel/pkg/paginator/cursor"
-	"megpoid.dev/go/go-skel/pkg/types"
+	"go.megpoid.dev/go-skel/pkg/model"
+	"go.megpoid.dev/go-skel/pkg/paginator"
+	"go.megpoid.dev/go-skel/pkg/paginator/cursor"
+	"go.megpoid.dev/go-skel/pkg/types"
 )
 
 type Profile struct {

@@ -9,10 +9,10 @@ import (
 	"fmt"
 
 	"github.com/doug-martin/goqu/v9"
-	"megpoid.dev/go/go-skel/pkg/paginator"
-	"megpoid.dev/go/go-skel/pkg/repo/filter"
-	"megpoid.dev/go/go-skel/pkg/request"
-	"megpoid.dev/go/go-skel/pkg/response"
+	"go.megpoid.dev/go-skel/pkg/paginator"
+	"go.megpoid.dev/go-skel/pkg/repo/filter"
+	"go.megpoid.dev/go-skel/pkg/request"
+	"go.megpoid.dev/go-skel/pkg/response"
 )
 
 type Clause struct {

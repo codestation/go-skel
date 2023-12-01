@@ -9,9 +9,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/suite"
-	"megpoid.dev/go/go-skel/pkg/clause"
-	"megpoid.dev/go/go-skel/pkg/repo"
-	"megpoid.dev/go/go-skel/pkg/repo/filter"
+	"go.megpoid.dev/go-skel/pkg/clause"
+	"go.megpoid.dev/go-skel/pkg/repo"
+	"go.megpoid.dev/go-skel/pkg/repo/filter"
 )
 
 func TestProfileStore(t *testing.T) {

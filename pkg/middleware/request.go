@@ -9,7 +9,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"megpoid.dev/go/go-skel/pkg/ctxlog"
+	"go.megpoid.dev/go-skel/pkg/ctxlog"
 )
 
 func SlogRequestID() echo.MiddlewareFunc {

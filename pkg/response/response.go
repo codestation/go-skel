@@ -7,9 +7,9 @@ package response
 import (
 	"math"
 
-	"megpoid.dev/go/go-skel/pkg/model"
-	"megpoid.dev/go/go-skel/pkg/paginator"
-	"megpoid.dev/go/go-skel/pkg/types"
+	"go.megpoid.dev/go-skel/pkg/model"
+	"go.megpoid.dev/go-skel/pkg/paginator"
+	"go.megpoid.dev/go-skel/pkg/types"
 )
 
 type ListResponse[T model.Modelable] struct {

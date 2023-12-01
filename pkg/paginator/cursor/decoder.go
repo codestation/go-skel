@@ -10,7 +10,7 @@ import (
 	"encoding/json"
 	"reflect"
 
-	"megpoid.dev/go/go-skel/pkg/paginator/util"
+	"go.megpoid.dev/go-skel/pkg/paginator/util"
 )
 
 // NewDecoder creates cursor decoder for entity

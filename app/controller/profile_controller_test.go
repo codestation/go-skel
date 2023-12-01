@@ -11,13 +11,13 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
-	appmodel "megpoid.dev/go/go-skel/app/model"
-	"megpoid.dev/go/go-skel/app/usecase"
-	"megpoid.dev/go/go-skel/config"
-	"megpoid.dev/go/go-skel/oapi"
-	"megpoid.dev/go/go-skel/pkg/model"
-	"megpoid.dev/go/go-skel/pkg/paginator"
-	"megpoid.dev/go/go-skel/pkg/response"
+	appmodel "go.megpoid.dev/go-skel/app/model"
+	"go.megpoid.dev/go-skel/app/usecase"
+	"go.megpoid.dev/go-skel/config"
+	"go.megpoid.dev/go-skel/oapi"
+	"go.megpoid.dev/go-skel/pkg/model"
+	"go.megpoid.dev/go-skel/pkg/paginator"
+	"go.megpoid.dev/go-skel/pkg/response"
 )
 
 func TestProfileController(t *testing.T) {

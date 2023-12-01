@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/hibiken/asynq"
-	"megpoid.dev/go/go-skel/app/usecase"
-	"megpoid.dev/go/go-skel/pkg/task"
+	"go.megpoid.dev/go-skel/app/usecase"
+	"go.megpoid.dev/go-skel/pkg/task"
 )
 
 const (

@@ -9,7 +9,7 @@ import (
 	"crypto/rand"
 	"testing"
 
-	"megpoid.dev/go/go-skel/pkg/crypto"
+	"go.megpoid.dev/go-skel/pkg/crypto"
 )
 
 func TestEncryptDecrypt(t *testing.T) {

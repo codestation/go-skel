@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/suite"
-	"megpoid.dev/go/go-skel/pkg/repo"
+	"go.megpoid.dev/go-skel/pkg/repo"
 )
 
 func TestHealthcheckStore(t *testing.T) {

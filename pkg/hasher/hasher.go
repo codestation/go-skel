@@ -9,9 +9,9 @@ import (
 	"fmt"
 	"io"
 
+	"go.megpoid.dev/go-skel/pkg/crypto"
 	"golang.org/x/crypto/argon2"
 	"golang.org/x/crypto/hkdf"
-	"megpoid.dev/go/go-skel/pkg/crypto"
 )
 
 const (

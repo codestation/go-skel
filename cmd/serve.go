@@ -13,9 +13,9 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"megpoid.dev/go/go-skel/app"
-	"megpoid.dev/go/go-skel/config"
-	"megpoid.dev/go/go-skel/pkg/cfg"
+	"go.megpoid.dev/go-skel/app"
+	"go.megpoid.dev/go-skel/config"
+	"go.megpoid.dev/go-skel/pkg/cfg"
 )
 
 // serveCmd represents the serve command

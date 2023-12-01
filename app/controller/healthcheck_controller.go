@@ -10,9 +10,9 @@ import (
 	"strings"
 
 	"github.com/labstack/echo/v4"
-	"megpoid.dev/go/go-skel/app/usecase"
-	"megpoid.dev/go/go-skel/config"
-	"megpoid.dev/go/go-skel/oapi"
+	"go.megpoid.dev/go-skel/app/usecase"
+	"go.megpoid.dev/go-skel/config"
+	"go.megpoid.dev/go-skel/oapi"
 )
 
 type HealthcheckController struct {

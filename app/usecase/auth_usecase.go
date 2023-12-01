@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"megpoid.dev/go/go-skel/pkg/apperror"
+	"go.megpoid.dev/go-skel/pkg/apperror"
 )
 
 // used to validate that the implementation matches the interface

@@ -16,7 +16,7 @@ RUN set -ex; \
     -trimpath \
     -tags viper_yaml3 \
     -ldflags "-w -s \
-    -X megpoid.dev/go/go-skel/version.Tag=${CI_COMMIT_TAG}"
+    -X go.megpoid.dev/go-skel/version.Tag=${CI_COMMIT_TAG}"
 
 FROM alpine:3.18
 LABEL maintainer="codestation <codestation@megpoid.dev>"

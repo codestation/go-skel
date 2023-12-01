@@ -11,7 +11,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
-	"megpoid.dev/go/go-skel/pkg/repo"
+	"go.megpoid.dev/go-skel/pkg/repo"
 )
 
 func TestUnitOfWork(t *testing.T) {

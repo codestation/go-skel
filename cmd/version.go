@@ -7,7 +7,7 @@ package cmd
 import (
 	"log/slog"
 
-	"megpoid.dev/go/go-skel/version"
+	"go.megpoid.dev/go-skel/version"
 
 	"github.com/spf13/cobra"
 )

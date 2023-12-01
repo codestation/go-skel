@@ -14,12 +14,12 @@ import (
 	"github.com/doug-martin/goqu/v9/exp"
 	"github.com/jackc/pgx/v5"
 	"github.com/mitchellh/mapstructure"
-	"megpoid.dev/go/go-skel/pkg/clause"
-	"megpoid.dev/go/go-skel/pkg/model"
-	"megpoid.dev/go/go-skel/pkg/paginator"
-	"megpoid.dev/go/go-skel/pkg/repo/filter"
-	"megpoid.dev/go/go-skel/pkg/response"
-	"megpoid.dev/go/go-skel/pkg/sql"
+	"go.megpoid.dev/go-skel/pkg/clause"
+	"go.megpoid.dev/go-skel/pkg/model"
+	"go.megpoid.dev/go-skel/pkg/paginator"
+	"go.megpoid.dev/go-skel/pkg/repo/filter"
+	"go.megpoid.dev/go-skel/pkg/response"
+	"go.megpoid.dev/go-skel/pkg/sql"
 )
 
 // compile time validator for the interfaces

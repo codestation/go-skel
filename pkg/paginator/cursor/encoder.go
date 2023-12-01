@@ -9,7 +9,7 @@ import (
 	"encoding/json"
 	"reflect"
 
-	"megpoid.dev/go/go-skel/pkg/paginator/util"
+	"go.megpoid.dev/go-skel/pkg/paginator/util"
 )
 
 // NewEncoder creates cursor encoder

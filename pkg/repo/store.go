@@ -9,9 +9,9 @@ import (
 
 	"github.com/doug-martin/goqu/v9"
 	"github.com/doug-martin/goqu/v9/exp"
-	"megpoid.dev/go/go-skel/pkg/clause"
-	"megpoid.dev/go/go-skel/pkg/model"
-	"megpoid.dev/go/go-skel/pkg/response"
+	"go.megpoid.dev/go-skel/pkg/clause"
+	"go.megpoid.dev/go-skel/pkg/model"
+	"go.megpoid.dev/go-skel/pkg/response"
 )
 
 type (

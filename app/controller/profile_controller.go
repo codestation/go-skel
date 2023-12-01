@@ -8,12 +8,12 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"megpoid.dev/go/go-skel/app/controller/filter"
-	"megpoid.dev/go/go-skel/app/model"
-	"megpoid.dev/go/go-skel/app/usecase"
-	"megpoid.dev/go/go-skel/config"
-	"megpoid.dev/go/go-skel/oapi"
-	"megpoid.dev/go/go-skel/pkg/apperror"
+	"go.megpoid.dev/go-skel/app/controller/filter"
+	"go.megpoid.dev/go-skel/app/model"
+	"go.megpoid.dev/go-skel/app/usecase"
+	"go.megpoid.dev/go-skel/config"
+	"go.megpoid.dev/go-skel/oapi"
+	"go.megpoid.dev/go-skel/pkg/apperror"
 )
 
 type ProfileController struct {

@@ -8,8 +8,8 @@ import (
 	"context"
 	"time"
 
+	"go.megpoid.dev/go-skel/pkg/i18n"
 	"golang.org/x/text/message"
-	"megpoid.dev/go/go-skel/pkg/i18n"
 )
 
 // common has all the repositories and other data required for all the usecases.
