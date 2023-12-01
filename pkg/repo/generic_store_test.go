@@ -495,6 +495,7 @@ func (s *storeSuite) TestStoreExpression() {
 		I("name").Eq("John Doe 1"),
 		Or(
 			C("name").IsNotNull(),
+			L("name").IsNull(),
 		),
 	))
 	if s.NoError(err) {

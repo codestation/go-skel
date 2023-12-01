@@ -27,6 +27,8 @@ var (
 	I = goqu.I
 	// C represents a column
 	C = goqu.C
+	// L represents a literal value
+	L = goqu.L
 	// And represent multiple AND operations together
 	And = goqu.And
 	// Or represent multiple OR operations together
