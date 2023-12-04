@@ -14,12 +14,12 @@ steps:
      - golangci-lint run --no-config -v --timeout 10m ./...
 
   - name: postgres-healthcheck
-    image: postgres:14
+    image: postgres:15
     commands:
       - while ! pg_isready -h database -U postgres; do sleep 1; done
 
   - name: test
-    image: golang:1.20
+    image: golang:1.21
     commands:
       - go install github.com/rubenv/sql-migrate/sql-migrate@v1.4.0
       - sql-migrate up -env production
@@ -69,7 +69,7 @@ steps:
 
 services:
   - name: database
-    image: postgres:14
+    image: postgres:15
     environment:
       POSTGRES_DB: testdb
       POSTGRES_PASSWORD: secret
