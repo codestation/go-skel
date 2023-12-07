@@ -9,7 +9,7 @@ platform:
 
 steps:
   - name: lint
-    image: golangci/golangci-lint:v1.54.0
+    image: golangci/golangci-lint:v1.55.2
     commands:
      - golangci-lint run --no-config -v --timeout 10m ./...
 
@@ -37,6 +37,8 @@ steps:
       tags: latest
       buildkit: true
       registry: registry.megpoid.dev
+      config:
+        from_secret: regcreds
       username:
         from_secret: docker_username
       password:
@@ -53,19 +55,6 @@ steps:
       event:
         - push
         - tag
-
-  - name: update
-    image: plugins/webhook
-    settings:
-      urls: http://updater:8000/apis/swarm/v1/update
-      token_value:
-        from_secret: updater_apikey
-      template: |
-        {
-          "images": [
-            "registry.megpoid.dev/codestation/goapp"
-          ]
-        }
 
 services:
   - name: database
