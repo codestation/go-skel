@@ -390,10 +390,8 @@ func (s *storeSuite) TestStoreUpdateMapBy() {
 			n, err := st.UpdateMapBy(context.Background(), user, test.expr)
 			if test.err != nil {
 				s.ErrorIs(err, test.err)
-			} else {
-				if s.NoError(err) {
-					s.Equal(test.n, n)
-				}
+			} else if s.NoError(err) {
+				s.Equal(test.n, n)
 			}
 		})
 	}
