@@ -31,11 +31,10 @@ steps:
         from_secret: goproxy_url
 
   - name: build
-    image: ghcr.io/codestation/drone-docker
+    image: ghcr.io/codestation/drone-kaniko
     settings:
       repo: registry.megpoid.dev/codestation/goapp
       tags: latest
-      buildkit: true
       registry: registry.megpoid.dev
       config:
         from_secret: regcreds
