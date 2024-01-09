@@ -14,7 +14,7 @@ steps:
      - golangci-lint run --no-config -v --timeout 10m ./...
 
   - name: postgres-healthcheck
-    image: postgres:15
+    image: postgres:16
     commands:
       - while ! pg_isready -h database -U postgres; do sleep 1; done
 
@@ -57,7 +57,7 @@ steps:
 
 services:
   - name: database
-    image: postgres:15
+    image: postgres:16
     environment:
       POSTGRES_DB: testdb
       POSTGRES_PASSWORD: secret
