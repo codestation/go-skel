@@ -30,6 +30,18 @@ func MultiError() ValidatorOption {
 	}
 }
 
+func ErrorHandler(fn oapimw.ErrorHandler) ValidatorOption {
+	return func(o *Validator) {
+		o.errorHandler = fn
+	}
+}
+
+func MultiErrorHandler(fn oapimw.MultiErrorHandler) ValidatorOption {
+	return func(o *Validator) {
+		o.multiErrorHandler = fn
+	}
+}
+
 func JWTAuth(signingKey any) ValidatorOption {
 	return func(o *Validator) {
 		o.jwt = echojwt.JWT(signingKey)
@@ -80,6 +92,8 @@ func OapiValidator(spec *openapi3.T, opts ...ValidatorOption) echo.MiddlewareFun
 	}
 
 	oapiOptions := &oapimw.Options{
+		ErrorHandler:          options.errorHandler,
+		MultiErrorHandler:     options.multiErrorHandler,
 		SilenceServersWarning: true,
 		Skipper:               options.skipper,
 		Options: openapi3filter.Options{
@@ -92,13 +106,15 @@ func OapiValidator(spec *openapi3.T, opts ...ValidatorOption) echo.MiddlewareFun
 }
 
 type Validator struct {
-	jwt           echo.MiddlewareFunc
-	basic         echo.MiddlewareFunc
-	apiKey        echo.MiddlewareFunc
-	oauth2        echo.MiddlewareFunc
-	openIdConnect echo.MiddlewareFunc
-	skipper       middleware.Skipper
-	multiError    bool
+	jwt               echo.MiddlewareFunc
+	basic             echo.MiddlewareFunc
+	apiKey            echo.MiddlewareFunc
+	oauth2            echo.MiddlewareFunc
+	openIdConnect     echo.MiddlewareFunc
+	skipper           middleware.Skipper
+	multiError        bool
+	errorHandler      oapimw.ErrorHandler
+	multiErrorHandler oapimw.MultiErrorHandler
 }
 
 func (v *Validator) next(c echo.Context) error {
