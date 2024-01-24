@@ -24,6 +24,12 @@ func WithSkipperFunc(skipFn middleware.Skipper) ValidatorOption {
 	}
 }
 
+func MultiError() ValidatorOption {
+	return func(o *Validator) {
+		o.multiError = true
+	}
+}
+
 func JWTAuth(signingKey any) ValidatorOption {
 	return func(o *Validator) {
 		o.jwt = echojwt.JWT(signingKey)
@@ -77,6 +83,7 @@ func OapiValidator(spec *openapi3.T, opts ...ValidatorOption) echo.MiddlewareFun
 		SilenceServersWarning: true,
 		Skipper:               options.skipper,
 		Options: openapi3filter.Options{
+			MultiError:         options.multiError,
 			AuthenticationFunc: options.AuthenticatorFunc(),
 		},
 	}
@@ -91,6 +98,7 @@ type Validator struct {
 	oauth2        echo.MiddlewareFunc
 	openIdConnect echo.MiddlewareFunc
 	skipper       middleware.Skipper
+	multiError    bool
 }
 
 func (v *Validator) next(c echo.Context) error {
