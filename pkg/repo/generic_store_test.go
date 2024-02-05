@@ -6,6 +6,8 @@ package repo
 
 import (
 	"context"
+	"database/sql/driver"
+	"encoding/json"
 	"errors"
 	"testing"
 	"time"
@@ -19,6 +21,55 @@ import (
 	"go.megpoid.dev/go-skel/pkg/types"
 )
 
+type jsonField struct {
+	Foo string `json:"foo"`
+	Bar int    `json:"bar"`
+}
+
+func (j *jsonField) Scan(src any) error {
+	var source []byte
+
+	switch v := src.(type) {
+	case string:
+		source = []byte(v)
+	case []byte:
+		source = v
+	case nil:
+		source = nil
+	default:
+		return errors.New("incompatible type")
+	}
+
+	return json.Unmarshal(source, j)
+}
+
+func (j jsonField) Value() (driver.Value, error) {
+	return json.Marshal(j)
+}
+
+type jsonFieldSlice []jsonField
+
+func (j *jsonFieldSlice) Scan(src any) error {
+	var source []byte
+
+	switch v := src.(type) {
+	case string:
+		source = []byte(v)
+	case []byte:
+		source = v
+	case nil:
+		source = nil
+	default:
+		return errors.New("incompatible type")
+	}
+
+	return json.Unmarshal(source, j)
+}
+
+func (j jsonFieldSlice) Value() (driver.Value, error) {
+	return json.Marshal(j)
+}
+
 type testProfile struct {
 	model.Model
 	ExternalID uuid.UUID `json:"external_id"`
@@ -28,9 +79,11 @@ type testProfile struct {
 type testUser struct {
 	model.Model
 	Name       string
-	ExternalID uuid.UUID `json:"external_id"`
-	ProfileID  int64     `goqu:"skipupdate"`
-	Code       int       `goqu:"skipinsert,skipupdate"`
+	ExternalID uuid.UUID      `json:"external_id"`
+	ProfileID  int64          `goqu:"skipupdate"`
+	Code       int            `goqu:"skipinsert,skipupdate"`
+	Data1      jsonField      `json:"data1"`
+	Data2      jsonFieldSlice `json:"data2"`
 	Profile    *testProfile
 }
 
@@ -214,15 +267,19 @@ func (s *storeSuite) TestStoreSave() {
 	tests := []struct {
 		name      string
 		profileId int64
+		data1     jsonField
+		data2     []jsonField
 		err       error
 	}{
-		{"Some user", 1, nil},
-		{"Some user", 1, ErrDuplicated}, // do not run more tests after a constraint error
+		{"Some user", 1, jsonField{"foo", 1}, []jsonField{{"foo", 1}}, nil},
+		{"Some user", 1, jsonField{"foo", 1}, []jsonField{{"foo", 1}}, ErrDuplicated}, // do not run more tests after a constraint error
 	}
 
 	for _, test := range tests {
 		s.Run("Insert", func() {
 			user := newUser(test.name, test.profileId)
+			user.Data1 = test.data1
+			user.Data2 = test.data2
 			err := st.Insert(context.Background(), user)
 			if test.err != nil {
 				s.ErrorIs(err, test.err)

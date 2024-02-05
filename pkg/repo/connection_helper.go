@@ -45,7 +45,7 @@ func (c *Connection) setupDatabase(t *testing.T) {
 	t.Helper()
 
 	cfg := sql.Config{
-		DataSourceName:  "postgres://goapp:secret@localhost/goapp?sslmode=disable",
+		DataSourceName:  "postgres://goapp:secret@localhost/goapp_development?sslmode=disable",
 		ConnMaxLifetime: 1 * time.Hour,
 		ConnMaxIdleTime: 5 * time.Minute,
 		MaxOpenConns:    10,
