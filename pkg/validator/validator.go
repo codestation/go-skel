@@ -12,12 +12,12 @@ import (
 )
 
 type CustomValidator struct {
-	validator *validator.Validate
+	Validator *validator.Validate
 }
 
 func NewCustomValidator() *CustomValidator {
-	v := &CustomValidator{validator: validator.New()}
-	v.validator.RegisterTagNameFunc(func(fld reflect.StructField) string {
+	v := &CustomValidator{Validator: validator.New()}
+	v.Validator.RegisterTagNameFunc(func(fld reflect.StructField) string {
 		name := strings.SplitN(fld.Tag.Get("json"), ",", 2)[0]
 		// skip if tag key says it should be ignored
 		if name == "-" {
@@ -30,5 +30,5 @@ func NewCustomValidator() *CustomValidator {
 }
 
 func (cv *CustomValidator) Validate(i any) error {
-	return cv.validator.Struct(i)
+	return cv.Validator.Struct(i)
 }
