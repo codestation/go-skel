@@ -12,6 +12,10 @@ steps:
     image: golangci/golangci-lint:v1.55.2
     commands:
      - golangci-lint run --no-config -v --timeout 10m ./...
+    resources:
+      limits:
+        cpu: 2000
+        memory: 1Gi
 
   - name: postgres-healthcheck
     image: postgres:16
@@ -29,6 +33,10 @@ steps:
       APP_DSN: postgres://postgres:secret@database/testdb?sslmode=disable
       GOPROXY:
         from_secret: goproxy_url
+    resources:
+      limits:
+        cpu: 2000
+        memory: 1Gi
 
   - name: build
     image: ghcr.io/codestation/drone-kaniko
@@ -49,6 +57,10 @@ steps:
     environment:
       goproxy:
         from_secret: goproxy_url
+    resources:
+      limits:
+        cpu: 2000
+        memory: 1Gi
 
     when:
       event:
