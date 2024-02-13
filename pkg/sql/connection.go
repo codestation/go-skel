@@ -7,9 +7,12 @@ package sql
 import (
 	"context"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
+
+var ErrTxClosed = pgx.ErrTxClosed
 
 type Executor interface {
 	Begin(ctx context.Context) (*PgxTx, error)
