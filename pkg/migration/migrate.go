@@ -12,9 +12,10 @@ import (
 	"log/slog"
 	"path"
 
-	migrate "github.com/heroiclabs/sql-migrate"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jackc/pgx/v5/stdlib"
+	migrate "github.com/rubenv/sql-migrate"
 	"go.megpoid.dev/go-skel/pkg/sql"
 )
 
@@ -57,16 +58,11 @@ func RunMigrations(ctx context.Context, pool *pgxpool.Pool, opts Options) error 
 
 	step := 0
 
-	conn, err := pool.Acquire(ctx)
-	if err != nil {
-		return err
-	}
-
-	defer conn.Release()
+	db := stdlib.OpenDBFromPool(pool)
 
 	if !opts.Reset && (opts.Rollback || opts.Redo) {
 		step = opts.Step
-		n, err := migration.ExecMax(ctx, conn.Conn(), migrations, migrate.Down, step)
+		n, err := migration.ExecMaxContext(ctx, db, "postgres", migrations, migrate.Down, step)
 		if err != nil {
 			return fmt.Errorf("failed to revert migrations: %w", err)
 		}
@@ -78,7 +74,7 @@ func RunMigrations(ctx context.Context, pool *pgxpool.Pool, opts Options) error 
 			step = opts.Step
 		}
 
-		n, err := migration.ExecMax(ctx, conn.Conn(), migrations, migrate.Up, step)
+		n, err := migration.ExecMaxContext(ctx, db, "postgres", migrations, migrate.Up, step)
 		if err != nil {
 			return fmt.Errorf("failed to apply migrations: %w", err)
 		}
