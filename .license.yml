@@ -1,5 +1,5 @@
 # Install license tool
-#   go install github.com/palantir/go-license@v1.31.0
+#   go install github.com/palantir/go-license@v1.35.0
 # Verify licences
 #   find -name "*.go" -not -name catalog.go -not -name "*_mock.go" -not -name "*.gen.go" -exec go-license --config .license.yml --verify {} \;
 # Add license to files
