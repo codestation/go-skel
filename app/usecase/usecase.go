@@ -17,7 +17,7 @@ type Auth interface {
 	Login(ctx context.Context, username, password string) (string, error)
 }
 
-//go:generate go run github.com/vektra/mockery/v2@v2.23.1 --name Profile
+//go:generate go run github.com/vektra/mockery/v2@v2.42.0 --name Profile
 type Profile interface {
 	GetProfile(ctx context.Context, id int64) (*model.Profile, error)
 	ListProfiles(ctx context.Context, query *request.QueryParams) (*response.ListResponse[*model.Profile], error)
@@ -26,7 +26,7 @@ type Profile interface {
 	RemoveProfile(ctx context.Context, id int64) error
 }
 
-//go:generate go run github.com/vektra/mockery/v2@v2.23.1 --name Healthcheck
+//go:generate go run github.com/vektra/mockery/v2@v2.42.0 --name Healthcheck
 type Healthcheck interface {
 	Execute(ctx context.Context) error
 }
