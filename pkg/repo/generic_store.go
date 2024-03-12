@@ -186,6 +186,26 @@ func (s *GenericStoreImpl[T]) Find(ctx context.Context, dest T, id int64) error 
 	}
 }
 
+func (s *GenericStoreImpl[T]) CountBy(ctx context.Context, expr Expression) (int64, error) {
+	queryBuilder := s.Builder.From(s.Table).Select(goqu.COUNT("*")).Where(expr)
+	if s.defaultFilters != nil && !s.defaultFilters.IsEmpty() {
+		queryBuilder = queryBuilder.Where(s.defaultFilters)
+	}
+
+	query, args, err := queryBuilder.Prepared(true).ToSQL()
+	if err != nil {
+		return 0, NewRepoError(ErrBackend, err)
+	}
+
+	var count int64
+	err = s.Conn.Get(ctx, &count, query, args...)
+	if err != nil {
+		return 0, NewRepoError(ErrBackend, err)
+	}
+
+	return count, nil
+}
+
 // Get returns a record from the database. If no record is found then a ErrNotFound is returned
 func (s *GenericStoreImpl[T]) Get(ctx context.Context, id int64) (T, error) {
 	return s.GetBy(ctx, Ex{"id": id})
@@ -339,7 +359,6 @@ func (s *GenericStoreImpl[T]) Insert(ctx context.Context, req T) error {
 	}
 
 	err = s.Conn.Get(ctx, req, query, args...)
-
 	if err != nil {
 		if sql.IsUniqueError(err) {
 			return NewRepoError(ErrDuplicated, err)
@@ -424,7 +443,6 @@ func (s *GenericStoreImpl[T]) Upsert(ctx context.Context, req T, target string) 
 
 	result := map[string]any{}
 	err = s.Conn.Get(ctx, &result, query, args...)
-
 	if err != nil {
 		if sql.IsUniqueError(err) {
 			return false, NewRepoError(ErrDuplicated, err)

@@ -174,6 +174,20 @@ func (s *storeSuite) TestStoreFind() {
 	}
 }
 
+func (s *storeSuite) TestStoreCount() {
+	st := NewStore[*testUser](s.conn.Store)
+	count, err := st.CountBy(context.Background(), Ex{})
+	s.NoError(err)
+	s.Equal(int64(5), count)
+}
+
+func (s *storeSuite) TestStoreCountBy() {
+	st := NewStore[*testUser](s.conn.Store)
+	count, err := st.CountBy(context.Background(), Ex{"name": "John Doe 1"})
+	s.NoError(err)
+	s.Equal(int64(1), count)
+}
+
 func (s *storeSuite) TestStoreFirst() {
 	st := NewStore[*testUser](s.conn.Store)
 	user, err := st.First(context.Background(), Ex{}, C("id").Asc())
