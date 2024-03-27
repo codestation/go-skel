@@ -140,6 +140,10 @@ func NewConnection(config Config) (*pgxpool.Pool, error) {
 	parseConfig.MaxConns = int32(config.MaxOpenConns)
 	parseConfig.MinConns = int32(config.MaxIdleConns)
 
+	if config.MaxOpenConns > 0 {
+		parseConfig.MaxConns = int32(config.MaxOpenConns)
+	}
+
 	pool, err := pgxpool.NewWithConfig(context.Background(), parseConfig)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database, aborting: %w", err)

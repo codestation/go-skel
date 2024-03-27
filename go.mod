@@ -4,10 +4,10 @@ go 1.22
 
 require (
 	filippo.io/edwards25519 v1.1.0
-	github.com/aws/aws-sdk-go v1.50.38
-	github.com/coreos/go-oidc/v3 v3.9.0
+	github.com/aws/aws-sdk-go v1.51.9
+	github.com/coreos/go-oidc/v3 v3.10.0
 	github.com/doug-martin/goqu/v9 v9.19.0
-	github.com/georgysavva/scany/v2 v2.1.0
+	github.com/georgysavva/scany/v2 v2.1.1
 	github.com/getkin/kin-openapi v0.123.0
 	github.com/go-playground/validator/v10 v10.19.0
 	github.com/gofrs/uuid v4.4.0+incompatible
@@ -26,7 +26,7 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.18.2
 	github.com/stretchr/testify v1.9.0
-	github.com/swaggest/swgui v1.8.0
+	github.com/swaggest/swgui v1.8.1
 	golang.org/x/crypto v0.21.0
 	golang.org/x/oauth2 v0.18.0
 	golang.org/x/text v0.14.0
@@ -40,7 +40,7 @@ require (
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/go-gorp/gorp/v3 v3.1.0 // indirect
-	github.com/go-jose/go-jose/v3 v3.0.1 // indirect
+	github.com/go-jose/go-jose/v4 v4.0.1 // indirect
 	github.com/go-openapi/jsonpointer v0.21.0 // indirect
 	github.com/go-openapi/swag v0.23.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
