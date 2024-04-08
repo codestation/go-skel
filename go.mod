@@ -4,11 +4,11 @@ go 1.22
 
 require (
 	filippo.io/edwards25519 v1.1.0
-	github.com/aws/aws-sdk-go v1.51.9
+	github.com/aws/aws-sdk-go v1.51.17
 	github.com/coreos/go-oidc/v3 v3.10.0
 	github.com/doug-martin/goqu/v9 v9.19.0
-	github.com/georgysavva/scany/v2 v2.1.1
-	github.com/getkin/kin-openapi v0.123.0
+	github.com/georgysavva/scany/v2 v2.1.3
+	github.com/getkin/kin-openapi v0.124.0
 	github.com/go-playground/validator/v10 v10.19.0
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/golang-jwt/jwt/v5 v5.2.1
@@ -27,8 +27,8 @@ require (
 	github.com/spf13/viper v1.18.2
 	github.com/stretchr/testify v1.9.0
 	github.com/swaggest/swgui v1.8.1
-	golang.org/x/crypto v0.21.0
-	golang.org/x/oauth2 v0.18.0
+	golang.org/x/crypto v0.22.0
+	golang.org/x/oauth2 v0.19.0
 	golang.org/x/text v0.14.0
 )
 
@@ -86,9 +86,8 @@ require (
 	golang.org/x/exp v0.0.0-20240222234643-814bf88cf225 // indirect
 	golang.org/x/net v0.22.0 // indirect
 	golang.org/x/sync v0.6.0 // indirect
-	golang.org/x/sys v0.18.0 // indirect
+	golang.org/x/sys v0.19.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
-	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
