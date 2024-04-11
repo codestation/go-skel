@@ -98,14 +98,14 @@ func GetClaims(c echo.Context) (Claims, error) {
 func (auth *Auth) RedirectHandler(e echo.Context) error {
 	state, err := crypto.GenerateRandomKey(16)
 	if err != nil {
-		return fmt.Errorf("failed to generate state cookie: %w", err)
+		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("failed to generate state cookie: %v", err))
 	}
 
 	stateValue := base64.RawURLEncoding.EncodeToString(state)
 
 	nonce, err := crypto.GenerateRandomKey(16)
 	if err != nil {
-		return fmt.Errorf("failed to generate nonce cookie: %w", err)
+		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("failed to generate nonce cookie: %v", err))
 	}
 
 	nonceValue := base64.RawURLEncoding.EncodeToString(nonce)

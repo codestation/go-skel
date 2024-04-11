@@ -74,7 +74,10 @@ func NewApp(cfg Config) (*App, error) {
 		Addr: cfg.General.RedisAddr,
 	}
 
-	oidcHandler, err := mwpkg.NewOIDCAuth(context.Background(), &mwpkg.Config{
+	ctx, cancel := context.WithTimeout(context.Background(), cfg.OIDC.ProviderTimeout)
+	defer cancel()
+
+	oidcHandler, err := mwpkg.NewOIDCAuth(ctx, &mwpkg.Config{
 		IssuerURL:    cfg.OIDC.IssuerURL,
 		ClientID:     cfg.OIDC.ClientID,
 		ClientSecret: cfg.OIDC.ClientSecret,

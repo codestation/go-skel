@@ -51,7 +51,7 @@ func (ctrl *AuthController) Login(ctx echo.Context) error {
 
 func (ctrl *AuthController) OAuthLogin(ctx echo.Context) error {
 	if err := ctrl.oidc.RedirectHandler(ctx); err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		return err
 	}
 
 	return ctx.JSON(http.StatusOK, "oAuth redirect")
@@ -67,7 +67,7 @@ func (ctrl *AuthController) OAuthRefresh(ctx echo.Context) error {
 
 func (ctrl *AuthController) OAuthCallback(ctx echo.Context) error {
 	if err := ctrl.oidc.CallbackHandler(ctx); err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		return err
 	}
 
 	return ctx.Redirect(http.StatusFound, "/")
