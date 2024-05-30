@@ -126,6 +126,8 @@ type Config struct {
 	ConnMaxLifetime time.Duration // Maximum amount of time a connection can be reused
 	ConnMaxIdleTime time.Duration // Maximum amount of time a connection can be idle
 	QueryLimit      uint          // Maximum number of rows to fetch in a single query
+	BeforeConnect   func(context.Context, *pgx.ConnConfig) error
+	AfterConnect    func(context.Context, *pgx.Conn) error
 }
 
 // NewConnection creates a new connection pool with the given configurationand returns a pointer to the pool.
@@ -139,6 +141,8 @@ func NewConnection(config Config) (*pgxpool.Pool, error) {
 	parseConfig.MaxConnIdleTime = config.ConnMaxIdleTime
 	parseConfig.MaxConns = int32(config.MaxOpenConns)
 	parseConfig.MinConns = int32(config.MaxIdleConns)
+	parseConfig.BeforeConnect = config.BeforeConnect
+	parseConfig.AfterConnect = config.AfterConnect
 
 	if config.MaxOpenConns > 0 {
 		parseConfig.MaxConns = int32(config.MaxOpenConns)
