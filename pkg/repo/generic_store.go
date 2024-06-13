@@ -432,7 +432,13 @@ func (s *GenericStoreImpl[T]) UpdateMapBy(ctx context.Context, req map[string]an
 }
 
 func (s *GenericStoreImpl[T]) Upsert(ctx context.Context, req T, target string) (bool, error) {
-	conflict := exp.NewDoUpdateConflictExpression(target, req)
+	var conflict exp.ConflictExpression
+	if target != "" {
+		conflict = exp.NewDoUpdateConflictExpression(target, req)
+	} else {
+		conflict = exp.NewDoNothingConflictExpression()
+	}
+
 	inserted := goqu.Case().When(goqu.L("xmax::text::int").Gt(0), "updated").Else("inserted").As("upsert_status")
 	queryBuilder := s.Builder.Insert(s.Table).Rows(req).Returning(append(s.returnFields, inserted)...).OnConflict(conflict)
 
