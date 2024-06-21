@@ -8,9 +8,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"time"
 
 	"github.com/doug-martin/goqu/v9"
+	"github.com/jackc/pgx/v5/tracelog"
+
 	// import postgres dialect for goqu library
 	_ "github.com/doug-martin/goqu/v9/dialect/postgres"
 	"github.com/georgysavva/scany/v2/dbscan"
@@ -125,9 +128,10 @@ type Config struct {
 	MaxOpenConns    int           // Maximum number of open connections in the pool
 	ConnMaxLifetime time.Duration // Maximum amount of time a connection can be reused
 	ConnMaxIdleTime time.Duration // Maximum amount of time a connection can be idle
-	QueryLimit      uint          // Maximum number of rows to fetch in a single query
 	BeforeConnect   func(context.Context, *pgx.ConnConfig) error
 	AfterConnect    func(context.Context, *pgx.Conn) error
+	Logger          *slog.Logger
+	OmitArgs        bool
 }
 
 // NewConnection creates a new connection pool with the given configurationand returns a pointer to the pool.
@@ -146,6 +150,15 @@ func NewConnection(config Config) (*pgxpool.Pool, error) {
 
 	if config.MaxOpenConns > 0 {
 		parseConfig.MaxConns = int32(config.MaxOpenConns)
+	}
+
+	if config.Logger != nil {
+		adapterLogger := NewLogger(config.Logger, config.OmitArgs)
+
+		parseConfig.ConnConfig.Tracer = &tracelog.TraceLog{
+			Logger:   adapterLogger,
+			LogLevel: tracelog.LogLevelTrace,
+		}
 	}
 
 	pool, err := pgxpool.NewWithConfig(context.Background(), parseConfig)

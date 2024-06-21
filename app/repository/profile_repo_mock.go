@@ -878,11 +878,11 @@ func (_c *MockProfileRepo_ListByEach_Call) RunAndReturn(run func(context.Context
 }
 
 // ListByIds provides a mock function with given fields: ctx, ids
-func (_m *MockProfileRepo) ListByIds(ctx context.Context, ids []int64) (*response.ListResponse[*model.Profile], error) {
+func (_m *MockProfileRepo) ListByIDs(ctx context.Context, ids []int64) (*response.ListResponse[*model.Profile], error) {
 	ret := _m.Called(ctx, ids)
 
 	if len(ret) == 0 {
-		panic("no return value specified for ListByIds")
+		panic("no return value specified for ListByIDs")
 	}
 
 	var r0 *response.ListResponse[*model.Profile]
@@ -907,7 +907,7 @@ func (_m *MockProfileRepo) ListByIds(ctx context.Context, ids []int64) (*respons
 	return r0, r1
 }
 
-// MockProfileRepo_ListByIds_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListByIds'
+// MockProfileRepo_ListByIds_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListByIDs'
 type MockProfileRepo_ListByIds_Call struct {
 	*mock.Call
 }
@@ -916,7 +916,7 @@ type MockProfileRepo_ListByIds_Call struct {
 //   - ctx context.Context
 //   - ids []int64
 func (_e *MockProfileRepo_Expecter) ListByIds(ctx interface{}, ids interface{}) *MockProfileRepo_ListByIds_Call {
-	return &MockProfileRepo_ListByIds_Call{Call: _e.mock.On("ListByIds", ctx, ids)}
+	return &MockProfileRepo_ListByIds_Call{Call: _e.mock.On("ListByIDs", ctx, ids)}
 }
 
 func (_c *MockProfileRepo_ListByIds_Call) Run(run func(ctx context.Context, ids []int64)) *MockProfileRepo_ListByIds_Call {

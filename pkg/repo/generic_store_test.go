@@ -117,7 +117,7 @@ func (s *userStore) Attach(ctx context.Context, results []*testUser, relation st
 		err = AttachRelation(ctx, results,
 			func(m *testUser) *int64 { return types.AsPointer(m.ProfileID) },
 			func(m *testUser, r *testProfile) { m.AttachProfile(r) },
-			s.profile.ListByIds)
+			s.profile.ListByIDs)
 	default:
 		return ErrBackend
 	}

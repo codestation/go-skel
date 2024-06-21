@@ -16,7 +16,7 @@ func AttachRelation[T, U model.Modelable](
 	entries []T,
 	getRelationId func(m T) *int64,
 	setRelation func(m T, r U),
-	listByIds func(ctx context.Context, ids []int64) (*response.ListResponse[U], error),
+	listByIDs func(ctx context.Context, ids []int64) (*response.ListResponse[U], error),
 ) error {
 	if len(entries) == 0 {
 		return nil
@@ -40,7 +40,7 @@ func AttachRelation[T, U model.Modelable](
 		return nil
 	}
 
-	results, err := listByIds(ctx, idList)
+	results, err := listByIDs(ctx, idList)
 	if err != nil {
 		return err
 	}

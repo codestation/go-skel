@@ -312,7 +312,7 @@ func (s *GenericStoreImpl[T]) ListBy(ctx context.Context, expr Expression, opts 
 	return response.NewListResponse[T](results, cur), nil
 }
 
-func (s *GenericStoreImpl[T]) ListByIds(ctx context.Context, ids []int64) (*response.ListResponse[T], error) {
+func (s *GenericStoreImpl[T]) ListByIDs(ctx context.Context, ids []int64) (*response.ListResponse[T], error) {
 	return s.ListBy(ctx, Ex{"id": ids})
 }
 

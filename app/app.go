@@ -55,8 +55,21 @@ type App struct {
 func NewApp(cfg Config) (*App, error) {
 	s := &App{cfg: cfg}
 
+	dbConfig := sql.Config{
+		DataSourceName:  cfg.Database.DataSourceName,
+		ConnMaxLifetime: cfg.Database.ConnMaxLifetime,
+		ConnMaxIdleTime: cfg.Database.ConnMaxIdleTime,
+		MaxOpenConns:    cfg.Database.MaxOpenConns,
+		MaxIdleConns:    cfg.Database.MaxIdleConns,
+	}
+
+	if cfg.General.Debug {
+		dbConfig.Logger = slog.Default()
+		dbConfig.OmitArgs = false
+	}
+
 	// Database initialization
-	pool, err := sql.NewConnection(sql.Config(cfg.Database))
+	pool, err := sql.NewConnection(dbConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +98,7 @@ func NewApp(cfg Config) (*App, error) {
 		Scopes:       cfg.OIDC.Scopes,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("error loading oidc auth: %w", err)
+		slog.Error("error loading oidc auth", slog.String("error", err.Error()))
 	}
 
 	// Usecase initialization

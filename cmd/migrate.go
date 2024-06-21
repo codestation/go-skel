@@ -61,7 +61,6 @@ var migrateCmd = &cobra.Command{
 			MaxOpenConns:    databaseSettings.MaxOpenConns,
 			ConnMaxLifetime: databaseSettings.ConnMaxLifetime,
 			ConnMaxIdleTime: databaseSettings.ConnMaxIdleTime,
-			QueryLimit:      databaseSettings.QueryLimit,
 		})
 		if err != nil {
 			return err

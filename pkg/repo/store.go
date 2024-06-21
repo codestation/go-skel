@@ -45,7 +45,7 @@ type GenericStore[T model.Modelable] interface {
 	Exists(ctx context.Context, expr Expression) (bool, error)
 	List(ctx context.Context, opts ...clause.FilterOption) (*response.ListResponse[T], error)
 	ListBy(ctx context.Context, expr Expression, opts ...clause.FilterOption) (*response.ListResponse[T], error)
-	ListByIds(ctx context.Context, ids []int64) (*response.ListResponse[T], error)
+	ListByIDs(ctx context.Context, ids []int64) (*response.ListResponse[T], error)
 	ListEach(ctx context.Context, fn func(item T) error, opts ...clause.FilterOption) error
 	ListByEach(ctx context.Context, expr Expression, fn func(item T) error, opts ...clause.FilterOption) error
 	Insert(ctx context.Context, req T) error
