@@ -29,6 +29,7 @@ require (
 	github.com/swaggest/swgui v1.8.1
 	golang.org/x/crypto v0.23.0
 	golang.org/x/oauth2 v0.20.0
+	golang.org/x/term v0.20.0
 	golang.org/x/text v0.15.0
 )
 

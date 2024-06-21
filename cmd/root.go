@@ -54,6 +54,9 @@ func init() {
 	rootCmd.PersistentFlags().BoolP("debug", "d", false, "Enable debug mode")
 	err := viper.BindPFlag("debug", rootCmd.PersistentFlags().Lookup("debug"))
 	cobra.CheckErr(err)
+	rootCmd.PersistentFlags().String("log-format", "", "Log format (json, logfmt)")
+	err = viper.BindPFlag("log-format", rootCmd.PersistentFlags().Lookup("log-format"))
+	cobra.CheckErr(err)
 }
 
 // initConfig reads in config file and ENV variables if set.

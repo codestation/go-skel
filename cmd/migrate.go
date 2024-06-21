@@ -17,6 +17,7 @@ import (
 	"go.megpoid.dev/go-skel/config"
 	"go.megpoid.dev/go-skel/db"
 	"go.megpoid.dev/go-skel/pkg/cfg"
+	"go.megpoid.dev/go-skel/pkg/logger"
 	"go.megpoid.dev/go-skel/pkg/migration"
 	"go.megpoid.dev/go-skel/pkg/sql"
 	"go.megpoid.dev/go-skel/testdata"
@@ -31,13 +32,7 @@ var migrateCmd = &cobra.Command{
 		cobra.CheckErr(viper.BindPFlags(cmd.Flags()))
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if viper.GetBool("debug") {
-			// Setup logger
-			handler := slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug})
-			slog.SetDefault(slog.New(handler))
-		} else {
-			slog.SetDefault(slog.New(slog.NewTextHandler(os.Stdout, nil)))
-		}
+		logger.InitLogger()
 
 		databaseSettings := config.DatabaseSettings{}
 		if err := cfg.ReadConfig(&databaseSettings); err != nil {

@@ -17,6 +17,7 @@ const (
 
 type GeneralSettings struct {
 	Debug         bool   `mapstructure:"debug"`
+	LogFormat     string `mapstructure:"log-format"`
 	RunMigrations bool   `mapstructure:"run-migrations"`
 	EncryptionKey []byte `mapstructure:"encryption-key"`
 	RedisAddr     string `mapstructure:"redis-addr"`
@@ -26,6 +27,10 @@ type GeneralSettings struct {
 func (cfg *GeneralSettings) Validate() error {
 	if len(cfg.EncryptionKey) > 0 && len(cfg.EncryptionKey) < 32 {
 		return errors.New("GeneralSettings: encryption key must have at least 32 bytes")
+	}
+
+	if cfg.LogFormat != "" && cfg.LogFormat != "json" && cfg.LogFormat != "logfmt" {
+		return errors.New("GeneralSettings: log format must be either json or text")
 	}
 
 	return nil
