@@ -9,7 +9,6 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -65,18 +64,7 @@ func TestGetStruct(t *testing.T) {
 	}
 	db.EXPECT().Query(mock.Anything, mock.Anything, mock.Anything).Return(rows, nil)
 	rows.EXPECT().Next().Return(true)
-	rows.EXPECT().Scan(mock.Anything).RunAndReturn(func(i ...any) error {
-		if len(i) != 1 {
-			return errors.New("scan: invalid arg count")
-		}
-		row, ok := i[0].(pgx.RowScanner)
-		if !ok {
-			return errors.New("scan: invalid scan type")
-		}
-
-		rows.EXPECT().FieldDescriptions().Return(fields)
-		return row.ScanRow(rows)
-	})
+	rows.EXPECT().FieldDescriptions().Return(fields)
 	rows.EXPECT().Scan(mock.Anything, mock.Anything).RunAndReturn(func(i ...any) error {
 		if len(i) != 2 {
 			return errors.New("scan: invalid arg count")
@@ -96,6 +84,7 @@ func TestGetStruct(t *testing.T) {
 
 		return nil
 	})
+
 	rows.EXPECT().Close()
 	rows.EXPECT().Err().Return(nil)
 
@@ -115,18 +104,7 @@ func TestSelectStruct(t *testing.T) {
 	db.EXPECT().Query(mock.Anything, mock.Anything, mock.Anything).Return(rows, nil)
 	rows.EXPECT().Next().Return(true).Times(3)
 	rows.EXPECT().Next().Return(false)
-	rows.EXPECT().Scan(mock.Anything).RunAndReturn(func(i ...any) error {
-		if len(i) != 1 {
-			return errors.New("scan: invalid arg count")
-		}
-		row, ok := i[0].(pgx.RowScanner)
-		if !ok {
-			return errors.New("scan: invalid scan type")
-		}
-
-		rows.EXPECT().FieldDescriptions().Return(fields)
-		return row.ScanRow(rows)
-	})
+	rows.EXPECT().FieldDescriptions().Return(fields)
 	rows.EXPECT().Scan(mock.Anything, mock.Anything).RunAndReturn(func(i ...any) error {
 		if len(i) != 2 {
 			return errors.New("scan: invalid arg count")

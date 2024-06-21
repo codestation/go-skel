@@ -4,12 +4,12 @@ go 1.22
 
 require (
 	filippo.io/edwards25519 v1.1.0
-	github.com/aws/aws-sdk-go v1.53.12
+	github.com/aws/aws-sdk-go v1.54.6
 	github.com/coreos/go-oidc/v3 v3.10.0
 	github.com/doug-martin/goqu/v9 v9.19.0
 	github.com/georgysavva/scany/v2 v2.1.3
-	github.com/getkin/kin-openapi v0.124.0
-	github.com/go-playground/validator/v10 v10.20.0
+	github.com/getkin/kin-openapi v0.125.0
+	github.com/go-playground/validator/v10 v10.22.0
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/hibiken/asynq v0.24.1
@@ -18,19 +18,19 @@ require (
 	github.com/labstack/echo-jwt/v4 v4.2.0
 	github.com/labstack/echo/v4 v4.12.0
 	github.com/mitchellh/mapstructure v1.5.0
-	github.com/oapi-codegen/echo-middleware v1.0.1
+	github.com/oapi-codegen/echo-middleware v1.0.2
 	github.com/oapi-codegen/runtime v1.1.1
 	github.com/rubenv/sql-migrate v1.6.1
 	github.com/shopspring/decimal v1.4.0
-	github.com/spf13/cobra v1.8.0
+	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.5
-	github.com/spf13/viper v1.18.2
+	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.9.0
 	github.com/swaggest/swgui v1.8.1
-	golang.org/x/crypto v0.23.0
-	golang.org/x/oauth2 v0.20.0
-	golang.org/x/term v0.20.0
-	golang.org/x/text v0.15.0
+	golang.org/x/crypto v0.24.0
+	golang.org/x/oauth2 v0.21.0
+	golang.org/x/term v0.21.0
+	golang.org/x/text v0.16.0
 )
 
 require (
@@ -67,7 +67,7 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
-	github.com/pelletier/go-toml/v2 v2.1.1 // indirect
+	github.com/pelletier/go-toml/v2 v2.2.2 // indirect
 	github.com/perimeterx/marshmallow v1.1.5 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/redis/go-redis/v9 v9.5.1 // indirect
@@ -86,8 +86,8 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/exp v0.0.0-20240222234643-814bf88cf225 // indirect
 	golang.org/x/net v0.24.0 // indirect
-	golang.org/x/sync v0.6.0 // indirect
-	golang.org/x/sys v0.20.0 // indirect
+	golang.org/x/sync v0.7.0 // indirect
+	golang.org/x/sys v0.21.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
