@@ -31,7 +31,7 @@ type AttachFunc[T model.Modelable] func(ctx context.Context, results []T, includ
 
 type JoinExpression struct {
 	Expression exp.Expression
-	Condition  exp.JoinOnCondition
+	Condition  exp.JoinCondition
 }
 
 type GenericStoreImpl[T model.Modelable] struct {

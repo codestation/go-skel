@@ -33,6 +33,8 @@ var (
 	And = goqu.And
 	// Or represent multiple OR operations together
 	Or = goqu.Or
+	// On represent a join condition
+	On = goqu.On
 )
 
 type GenericStore[T model.Modelable] interface {
