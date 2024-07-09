@@ -29,12 +29,18 @@ var (
 
 type AttachFunc[T model.Modelable] func(ctx context.Context, results []T, include string) error
 
+type JoinExpression struct {
+	Expression exp.Expression
+	Condition  exp.JoinOnCondition
+}
+
 type GenericStoreImpl[T model.Modelable] struct {
 	Conn           sql.Executor
 	Builder        goqu.DialectWrapper
 	Table          string
 	prefix         string
 	selectFields   []any
+	joins          []JoinExpression
 	returnFields   []any
 	defaultFilters exp.ExpressionList
 	sortKeys       []string
@@ -91,6 +97,12 @@ func WithTablePrefix[T model.Modelable](prefix string) StoreOption[T] {
 func WithReturnFields[T model.Modelable](fields ...any) StoreOption[T] {
 	return func(c *GenericStoreImpl[T]) {
 		c.returnFields = append(c.returnFields, fields...)
+	}
+}
+
+func WithJoins[T model.Modelable](joins ...JoinExpression) StoreOption[T] {
+	return func(c *GenericStoreImpl[T]) {
+		c.joins = joins
 	}
 }
 
@@ -281,6 +293,10 @@ func (s *GenericStoreImpl[T]) ListBy(ctx context.Context, expr Expression, opts 
 	query := s.Builder.From(s.Table).Select(s.selectFields...).Where(expr)
 	if s.defaultFilters != nil {
 		query = query.Where(s.defaultFilters)
+	}
+
+	for _, join := range s.joins {
+		query = query.Join(join.Expression, join.Condition)
 	}
 
 	cl := clause.NewClause(
