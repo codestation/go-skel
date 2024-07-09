@@ -23,6 +23,8 @@ type (
 )
 
 var (
+	// T represents a table
+	T = goqu.T
 	// I represent a schema, table, column or any combination separated by "."
 	I = goqu.I
 	// C represents a column
