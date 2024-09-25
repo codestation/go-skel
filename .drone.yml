@@ -9,7 +9,7 @@ platform:
 
 steps:
   - name: lint
-    image: golangci/golangci-lint:v1.59.1
+    image: golangci/golangci-lint:v1.61.0
     commands:
      - golangci-lint run --no-config -v --timeout 10m ./...
     resources:
@@ -23,14 +23,13 @@ steps:
       - while ! pg_isready -h database -U postgres; do sleep 1; done
 
   - name: test
-    image: golang:1.22
+    image: golang:1.23
     commands:
-      - go install github.com/rubenv/sql-migrate/sql-migrate@v1.6.1
-      - sql-migrate up -env production
+      - go run github.com/rubenv/sql-migrate/sql-migrate@v1.7.0 up -env production
       - go test -coverprofile cover.out -v ./...
       - go tool cover -func cover.out
     environment:
-      APP_DSN: postgres://postgres:secret@database/testdb?sslmode=disable
+      APP_DSN: postgres://postgres:secret@database/testdb
       GOPROXY:
         from_secret: goproxy_url
     resources:

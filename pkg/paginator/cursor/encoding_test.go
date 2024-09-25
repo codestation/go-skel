@@ -318,22 +318,22 @@ func (s *encodingSuite) TestEncodeDecodeCustomTypes() {
 	}{
 		{
 			"nil int",
-			reflect.PtrTo(reflect.TypeOf(0)),
+			reflect.PointerTo(reflect.TypeOf(0)),
 			(*int)(nil),
 		},
 		{
 			"nil float",
-			reflect.PtrTo(reflect.TypeOf(0.0)),
+			reflect.PointerTo(reflect.TypeOf(0.0)),
 			(*float64)(nil),
 		},
 		{
 			"nil string",
-			reflect.PtrTo(reflect.TypeOf("")),
+			reflect.PointerTo(reflect.TypeOf("")),
 			(*string)(nil),
 		},
 		{
 			"nil bool",
-			reflect.PtrTo(reflect.TypeOf(true)),
+			reflect.PointerTo(reflect.TypeOf(true)),
 			(*bool)(nil),
 		},
 		{

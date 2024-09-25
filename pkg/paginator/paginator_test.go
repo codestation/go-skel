@@ -49,7 +49,7 @@ func TestPaginatorDefault(t *testing.T) {
 	paginator := New()
 	query := goqu.Dialect("postgres").From("users").Select("id", "name")
 	db := sqlSelector{AssertSelect: func(dest any, query string, args ...any) error {
-		assert.Equal(t, `SELECT "id", "name" FROM "users" ORDER BY "id" ASC LIMIT $1`, query)
+		assert.Equal(t, `select "id", "name" from "users" order by "id" asc limit $1`, query)
 		assert.Equal(t, []any{int64(DefaultPaginatorLimit + 1)}, args)
 		return nil
 	}}
@@ -64,7 +64,7 @@ func TestPaginatorMultipleKeys(t *testing.T) {
 	paginator := New(WithKeys("Name", "ID"))
 	query := goqu.Dialect("postgres").From("users").Select("id", "name")
 	db := sqlSelector{AssertSelect: func(dest any, query string, args ...any) error {
-		assert.Equal(t, `SELECT "id", "name" FROM "users" ORDER BY "name" ASC, "id" ASC LIMIT $1`, query)
+		assert.Equal(t, `select "id", "name" from "users" order by "name" asc, "id" asc limit $1`, query)
 		assert.Equal(t, []any{int64(DefaultPaginatorLimit + 1)}, args)
 		return nil
 	}}
@@ -82,7 +82,7 @@ func TestPaginatorMultipleRules(t *testing.T) {
 	))
 	query := goqu.Dialect("postgres").From("users").Select("id", "name")
 	db := sqlSelector{AssertSelect: func(dest any, query string, args ...any) error {
-		assert.Equal(t, `SELECT "id", "name" FROM "users" ORDER BY "name" ASC, "users"."id" ASC LIMIT $1`, query)
+		assert.Equal(t, `select "id", "name" from "users" order by "name" asc, "users"."id" asc limit $1`, query)
 		assert.Equal(t, []any{int64(DefaultPaginatorLimit + 1)}, args)
 		return nil
 	}}
@@ -152,7 +152,7 @@ func TestPaginatorMultipleCursor(t *testing.T) {
 
 	query := goqu.Dialect("postgres").From("users").Select("id", "name")
 	db := sqlSelector{AssertSelect: func(dest any, query string, args ...any) error {
-		assert.Equal(t, `SELECT "id", "name" FROM "users" WHERE (("name" > $1) OR (("name" = $2) AND ("id" > $3))) ORDER BY "name" ASC, "id" ASC LIMIT $4`, query)
+		assert.Equal(t, `select "id", "name" from "users" where (("name" > $1) or (("name" = $2) and ("id" > $3))) order by "name" asc, "id" asc limit $4`, query)
 		assert.Equal(t, []any{"B", "B", int64(2), int64(3)}, args)
 		return nil
 	}}
@@ -198,27 +198,20 @@ func TestPaginatorPaginateOffset(t *testing.T) {
 		WithPage(1),
 	)
 
-	min := func(x, y int) int {
-		if x > y {
-			return y
-		}
-		return x
-	}
-
 	db := sqlSelector{
 		AssertSelect: func(dest any, query string, args ...any) error {
 			pDest := dest.(*[]*User)
 			if len(args) == 1 {
-				assert.Equal(t, `SELECT "id", "name" FROM "users" ORDER BY "name" ASC, "id" ASC LIMIT $1`, query)
+				assert.Equal(t, `select "id", "name" from "users" order by "name" asc, "id" asc limit $1`, query)
 				*pDest = users[0:args[0].(int64)]
 			} else {
-				assert.Equal(t, `SELECT "id", "name" FROM "users" ORDER BY "name" ASC, "id" ASC LIMIT $1 OFFSET $2`, query)
+				assert.Equal(t, `select "id", "name" from "users" order by "name" asc, "id" asc limit $1 offset $2`, query)
 				*pDest = users[args[0].(int64):min(len(users), int(args[0].(int64)+args[1].(int64)))]
 			}
 			return nil
 		},
 		AssertGet: func(dest any, query string, args ...any) error {
-			assert.Equal(t, `SELECT COUNT(*) AS "count" FROM "users"`, query)
+			assert.Equal(t, `select count(*) as "count" from "users"`, query)
 			pDest := dest.(*int)
 			*pDest = len(users)
 			return nil
