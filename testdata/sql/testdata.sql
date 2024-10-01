@@ -3,7 +3,6 @@ create table if not exists test_profiles
     id          integer generated always as identity,
     created_at  timestamptz not null,
     updated_at  timestamptz not null,
-    deleted_at  timestamptz,
     external_id uuid        not null,
     avatar      text,
     primary key (id)
@@ -14,7 +13,6 @@ create table if not exists test_users
     id          integer generated always as identity,
     created_at  timestamptz not null,
     updated_at  timestamptz not null,
-    deleted_at  timestamptz,
     external_id uuid        not null,
     name        text        not null,
     code        integer generated always as identity,

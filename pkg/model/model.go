@@ -14,10 +14,9 @@ import (
 
 // Model is the base that will be used by other model who need a primary key and timestamps.
 type Model struct {
-	ID        int64      `json:"id" goqu:"skipinsert,skipupdate"`
-	CreatedAt time.Time  `json:"created_at" goqu:"skipupdate"`
-	UpdatedAt time.Time  `json:"updated_at"`
-	DeletedAt *time.Time `json:"-"`
+	ID        int64     `json:"id" goqu:"skipinsert,skipupdate"`
+	CreatedAt time.Time `json:"created_at" goqu:"skipupdate"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type Modelable interface {
