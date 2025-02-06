@@ -130,6 +130,8 @@ type Config struct {
 	ConnMaxIdleTime time.Duration // Maximum amount of time a connection can be idle
 	BeforeConnect   func(context.Context, *pgx.ConnConfig) error
 	AfterConnect    func(context.Context, *pgx.Conn) error
+	BeforeAcquire   func(context.Context, *pgx.Conn) bool
+	AfterRelease    func(*pgx.Conn) bool
 	Logger          *slog.Logger
 	OmitArgs        bool
 }
@@ -147,6 +149,8 @@ func NewConnection(config Config) (*pgxpool.Pool, error) {
 	parseConfig.MinConns = int32(config.MaxIdleConns)
 	parseConfig.BeforeConnect = config.BeforeConnect
 	parseConfig.AfterConnect = config.AfterConnect
+	parseConfig.BeforeAcquire = config.BeforeAcquire
+	parseConfig.AfterRelease = config.AfterRelease
 
 	if config.MaxOpenConns > 0 {
 		parseConfig.MaxConns = int32(config.MaxOpenConns)
