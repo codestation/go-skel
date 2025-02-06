@@ -12,6 +12,10 @@ import (
 
 type SchemaKey struct{}
 
+func (s SchemaKey) String() string {
+	return "schemaKey"
+}
+
 func ChangeSchema(ctx context.Context, conn *pgx.Conn) bool {
 	var schemas []string
 	switch v := ctx.Value(SchemaKey{}).(type) {
