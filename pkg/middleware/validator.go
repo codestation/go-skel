@@ -84,6 +84,19 @@ func OpenIDConnect(auth *Auth) ValidatorOption {
 	}
 }
 
+func CustomAuth(fn func(echo.Context) error) ValidatorOption {
+	return func(o *Validator) {
+		o.custom = func(next echo.HandlerFunc) echo.HandlerFunc {
+			return func(c echo.Context) error {
+				if err := fn(c); err != nil {
+					return err
+				}
+				return next(c)
+			}
+		}
+	}
+}
+
 func OapiValidator(spec *openapi3.T, opts ...ValidatorOption) echo.MiddlewareFunc {
 	options := Validator{}
 
@@ -111,6 +124,7 @@ type Validator struct {
 	apiKey            echo.MiddlewareFunc
 	oauth2            echo.MiddlewareFunc
 	openIdConnect     echo.MiddlewareFunc
+	custom            echo.MiddlewareFunc
 	skipper           middleware.Skipper
 	multiError        bool
 	errorHandler      oapimw.ErrorHandler
@@ -162,6 +176,11 @@ func (v *Validator) AuthenticatorFunc() openapi3filter.AuthenticationFunc {
 			if v.openIdConnect != nil {
 				echoCtx := oapimw.GetEchoContext(ctx)
 				return v.openIdConnect(v.next)(echoCtx)
+			}
+		case "custom":
+			if v.custom != nil {
+				echoCtx := oapimw.GetEchoContext(ctx)
+				return v.custom(v.next)(echoCtx)
 			}
 		default:
 			return fmt.Errorf("unknown security scheme type: %s", input.SecurityScheme.Type)
