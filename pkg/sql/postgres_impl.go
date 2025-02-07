@@ -38,10 +38,19 @@ var (
 // PgxPool is a PostgreSQL wrapper that implements the Executor interface.
 type PgxPool struct {
 	*pgxpool.Pool
+	scanner *pgxscan.API
+}
+
+func must[T any](t T, err error) T {
+	if err != nil {
+		panic(err)
+	}
+	return t
 }
 
 func NewPgxPool(pool *pgxpool.Pool) *PgxPool {
-	return &PgxPool{pool}
+	api := must(pgxscan.NewAPI(must(pgxscan.NewDBScanAPI(dbscan.WithAllowUnknownColumns(true)))))
+	return &PgxPool{pool, api}
 }
 
 func (p *PgxPool) Begin(ctx context.Context) (*PgxTx, error) {
@@ -78,21 +87,23 @@ func (p *PgxPool) BeginTxFunc(ctx context.Context, txOptions pgx.TxOptions, f fu
 
 // Get fetches a single row from the database and stores the result in the given struct.
 func (p *PgxPool) Get(ctx context.Context, dst any, query string, args ...any) error {
-	return pgxscan.Get(ctx, p, dst, query, args...)
+	return p.scanner.Get(ctx, p, dst, query, args...)
 }
 
 // Select fetches multiple rows from the database and stores the results in the given slice of structs.
 func (p *PgxPool) Select(ctx context.Context, dest any, query string, args ...any) error {
-	return pgxscan.Select(ctx, p.Pool, dest, query, args...)
+	return p.scanner.Select(ctx, p.Pool, dest, query, args...)
 }
 
 // PgxTx is a PostgreSQL transaction wrapper that implements the Executor interface.
 type PgxTx struct {
 	pgx.Tx
+	scanner *pgxscan.API
 }
 
 func NewPgxTx(tx pgx.Tx) *PgxTx {
-	return &PgxTx{tx}
+	api := must(pgxscan.NewAPI(must(pgxscan.NewDBScanAPI(dbscan.WithAllowUnknownColumns(true)))))
+	return &PgxTx{tx, api}
 }
 
 func (p *PgxTx) Begin(ctx context.Context) (*PgxTx, error) {
@@ -101,7 +112,7 @@ func (p *PgxTx) Begin(ctx context.Context) (*PgxTx, error) {
 		return nil, err
 	}
 
-	return &PgxTx{tx}, nil
+	return &PgxTx{tx, p.scanner}, nil
 }
 
 // BeginFunc starts a nested transaction and executes the given function within that transaction.
@@ -113,12 +124,12 @@ func (p *PgxTx) BeginFunc(ctx context.Context, f func(conn Tx) error) error {
 
 // Get fetches a single row from the database within the transaction and stores the result in the given struct.
 func (p *PgxTx) Get(ctx context.Context, dst any, query string, args ...any) error {
-	return pgxscan.Get(ctx, p.Tx, dst, query, args...)
+	return p.scanner.Get(ctx, p.Tx, dst, query, args...)
 }
 
 // Select fetches multiple rows from the database within the transaction and stores the results in the given slice of structs.
 func (p *PgxTx) Select(ctx context.Context, dest any, query string, args ...any) error {
-	return pgxscan.Select(ctx, p.Tx, dest, query, args...)
+	return p.scanner.Select(ctx, p.Tx, dest, query, args...)
 }
 
 // Config represents the configuration for establishing a connection pool.
