@@ -84,16 +84,9 @@ func OpenIDConnect(auth *Auth) ValidatorOption {
 	}
 }
 
-func CustomAuth(fn func(echo.Context) error) ValidatorOption {
+func CustomAuth(fn echo.MiddlewareFunc) ValidatorOption {
 	return func(o *Validator) {
-		o.custom = func(next echo.HandlerFunc) echo.HandlerFunc {
-			return func(c echo.Context) error {
-				if err := fn(c); err != nil {
-					return err
-				}
-				return next(c)
-			}
-		}
+		o.custom = fn
 	}
 }
 
