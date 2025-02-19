@@ -1,6 +1,6 @@
 module go.megpoid.dev/go-skel
 
-go 1.23
+go 1.24
 
 require (
 	filippo.io/edwards25519 v1.1.0
@@ -9,7 +9,7 @@ require (
 	github.com/doug-martin/goqu/v9 v9.19.0
 	github.com/georgysavva/scany/v2 v2.1.3
 	github.com/getkin/kin-openapi v0.129.0
-	github.com/go-playground/validator/v10 v10.24.0
+	github.com/go-playground/validator/v10 v10.25.0
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/hibiken/asynq v0.25.1
@@ -22,12 +22,12 @@ require (
 	github.com/oapi-codegen/runtime v1.1.1
 	github.com/rubenv/sql-migrate v1.7.1
 	github.com/shopspring/decimal v1.4.0
-	github.com/spf13/cobra v1.8.1
+	github.com/spf13/cobra v1.9.1
 	github.com/spf13/pflag v1.0.6
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.10.0
 	github.com/swaggest/swgui v1.8.2
-	golang.org/x/crypto v0.32.0
+	golang.org/x/crypto v0.33.0
 	golang.org/x/oauth2 v0.26.0
 	golang.org/x/term v0.29.0
 	golang.org/x/text v0.22.0
