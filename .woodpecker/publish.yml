@@ -6,8 +6,11 @@ steps:
     backend_options:
       kubernetes:
         resources:
+          requests:
+              cpu: 10m
+              memory: 1Gi
           limits:
-            cpu: 2000
+            cpu: 2
             memory: 1Gi
 
   - name: postgres-healthcheck
@@ -22,14 +25,17 @@ steps:
       - go test -coverprofile cover.out -v ./...
       - go tool cover -func cover.out
     environment:
-      APP_DSN: postgres://postgres:secret@database/testdb
+      APP_DSN: postgres://postgres:secret@database/testdb?sslmode=disable
       GOPROXY:
         from_secret: goproxy_url
     backend_options:
       kubernetes:
         resources:
+          requests:
+              cpu: 10m
+              memory: 1Gi
           limits:
-            cpu: 2000
+            cpu: 2
             memory: 1Gi
 
   - name: build
@@ -41,27 +47,34 @@ steps:
       config:
         from_secret: registry_credentials
       build_args:
-        CI_COMMIT_TAG: ${DRONE_TAG}
+        CI_COMMIT_TAG: "${CI_COMMIT_TAG}"
       build_args_from_env:
         goproxy:
           from_secret: goproxy_url
     backend_options:
       kubernetes:
         resources:
+          requests:
+            cpu: 10m
+            memory: 1Gi
           limits:
-            cpu: 2000
+            cpu: 2
             memory: 1Gi
 
 services:
   - name: database
     image: postgres:16.7
+    ports:
+      - 5432
     environment:
       POSTGRES_DB: testdb
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: secret
 
 when:
-  - event: push
+  - event:
+      - push
+      - manual
     branch:
       - master
       - testing
