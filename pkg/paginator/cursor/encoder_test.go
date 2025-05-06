@@ -41,7 +41,7 @@ func (s *encoderSuite) TestGetCustomTypeValueError() {
 		{Key: "Data", Meta: -1},
 	})
 	_, err := e.Encode(struct{ Data MyJSON }{MyJSON{"key": "value"}})
-	s.Equal(MyJSONError, err)
+	s.Equal(ErrMyJSON, err)
 }
 
 func (s *encoderSuite) TestZeroValue() {

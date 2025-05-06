@@ -1,6 +1,6 @@
 steps:
   - name: lint
-    image: golangci/golangci-lint:v1.64.5
+    image: golangci/golangci-lint:v2.1.5
     commands:
       - golangci-lint run --no-config -v --timeout 10m ./...
     backend_options:
@@ -14,7 +14,7 @@ steps:
             memory: 1Gi
 
   - name: postgres-healthcheck
-    image: postgres:16.7
+    image: postgres:17.4
     commands:
       - while ! pg_isready -h database -U postgres; do sleep 1; done
 
@@ -39,7 +39,7 @@ steps:
             memory: 1Gi
 
   - name: build
-    image: woodpeckerci/plugin-docker-buildx:5.2.1
+    image: woodpeckerci/plugin-docker-buildx:5.2.2
     settings:
       repo: registry.megpoid.dev/codestation/goapp
       tags: latest
@@ -63,7 +63,7 @@ steps:
 
 services:
   - name: database
-    image: postgres:16.7
+    image: postgres:17.4
     ports:
       - 5432
     environment:

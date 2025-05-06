@@ -10,7 +10,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"slices"
 	"time"
 
 	"github.com/coreos/go-oidc/v3/oidc"
@@ -53,13 +52,6 @@ func NewOIDCAuth(ctx context.Context, config *Config) (*Auth, error) {
 
 	scopes := make([]string, 0)
 	scopes = append(scopes, config.Scopes...)
-
-	if !slices.Contains(scopes, "profile") {
-		scopes = append(scopes, "profile")
-	}
-	if !slices.Contains(scopes, "email") {
-		scopes = append(scopes, "email")
-	}
 
 	oauth2Config := oauth2.Config{
 		ClientID:     config.ClientID,

@@ -300,12 +300,12 @@ func (s *encodingSuite) decodeValuePtr(m any, c string) (any, error) {
 
 type MyJSON map[string]any
 
-var MyJSONError = errors.New("meta should be string")
+var ErrMyJSON = errors.New("meta should be string")
 
 func (t MyJSON) GetCustomTypeValue(meta any) (any, error) {
 	key, ok := meta.(string)
 	if !ok {
-		return nil, MyJSONError
+		return nil, ErrMyJSON
 	}
 	return t[key], nil
 }

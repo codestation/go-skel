@@ -13,13 +13,13 @@ import (
 
 var (
 	err         = errors.New("test error")
-	internalErr = errors.New("internal error")
+	errInternal = errors.New("internal error")
 )
 
 func TestNewRepoError(t *testing.T) {
 	t.Run("full message", func(t *testing.T) {
-		repoErr := NewRepoError(err, internalErr)
-		assert.Equal(t, repoErr.Error(), err.Error()+": "+internalErr.Error())
+		repoErr := NewRepoError(err, errInternal)
+		assert.Equal(t, repoErr.Error(), err.Error()+": "+errInternal.Error())
 	})
 	t.Run("no internal", func(t *testing.T) {
 		repoErr := NewRepoError(err, nil)
@@ -28,6 +28,6 @@ func TestNewRepoError(t *testing.T) {
 }
 
 func TestRepoError_Unwrap(t *testing.T) {
-	repoErr := NewRepoError(err, internalErr)
+	repoErr := NewRepoError(err, errInternal)
 	assert.ErrorIs(t, repoErr, err)
 }

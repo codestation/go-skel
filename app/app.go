@@ -99,6 +99,7 @@ func NewApp(cfg Config) (*App, error) {
 	})
 	if err != nil {
 		slog.Error("error loading oidc auth", slog.String("error", err.Error()))
+		oidcHandler = nil
 	}
 
 	// Usecase initialization

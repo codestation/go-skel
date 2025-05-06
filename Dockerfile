@@ -27,8 +27,9 @@ RUN set -eux; \
     addgroup -S runner -g 1000; \
     adduser -S runner -G runner -u 1000
 
-COPY --from=builder /src/release/goapp /usr/local/bin/goapp
+COPY --from=builder /src/release/goapp /usr//bin/goapp
 
 USER runner
 
-CMD ["/usr/local/bin/goapp", "serve"]
+ENTRYPOINT ["/usr/bin/goapp"]
+CMD ["serve"]

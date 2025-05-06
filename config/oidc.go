@@ -33,7 +33,7 @@ func LoadOIDCFlags(name string) *pflag.FlagSet {
 	fs.String("oidc-client-id", "", "OIDC client ID")
 	fs.String("oidc-client-secret", "", "OIDC client secret")
 	fs.String("oidc-redirect-url", "", "OIDC redirect URL")
-	fs.StringSlice("oidc-scopes", []string{}, "OIDC scopes")
+	fs.StringSlice("oidc-scopes", []string{"email", "profile"}, "OIDC scopes")
 
 	return fs
 }

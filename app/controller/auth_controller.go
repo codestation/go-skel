@@ -50,6 +50,10 @@ func (ctrl *AuthController) Login(ctx echo.Context) error {
 }
 
 func (ctrl *AuthController) OAuthLogin(ctx echo.Context) error {
+	if ctrl.oidc == nil {
+		return echo.NewHTTPError(http.StatusServiceUnavailable, "OIDC is not available")
+	}
+
 	if err := ctrl.oidc.RedirectHandler(ctx); err != nil {
 		return err
 	}
@@ -58,6 +62,10 @@ func (ctrl *AuthController) OAuthLogin(ctx echo.Context) error {
 }
 
 func (ctrl *AuthController) OAuthRefresh(ctx echo.Context) error {
+	if ctrl.oidc == nil {
+		return echo.NewHTTPError(http.StatusServiceUnavailable, "OIDC is not available")
+	}
+
 	if err := ctrl.oidc.RefreshHandler(ctx); err != nil {
 		return err
 	}
@@ -66,6 +74,10 @@ func (ctrl *AuthController) OAuthRefresh(ctx echo.Context) error {
 }
 
 func (ctrl *AuthController) OAuthCallback(ctx echo.Context) error {
+	if ctrl.oidc == nil {
+		return echo.NewHTTPError(http.StatusServiceUnavailable, "OIDC is not available")
+	}
+
 	if err := ctrl.oidc.CallbackHandler(ctx); err != nil {
 		return err
 	}

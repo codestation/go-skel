@@ -38,8 +38,8 @@ func TestNewListResponseCursor(t *testing.T) {
 	assert.Equal(t, 1, len(response.Items))
 	assert.NotNil(t, response.Pagination)
 	assert.Equal(t, "cursor", response.Pagination.Type)
-	assert.Equal(t, "after", *response.Pagination.PaginationCursor.NextCursor)
-	assert.Equal(t, "before", *response.Pagination.PaginationCursor.PrevCursor)
+	assert.Equal(t, "after", *response.Pagination.NextCursor)
+	assert.Equal(t, "before", *response.Pagination.PrevCursor)
 }
 
 func TestNewListResponseOffset(t *testing.T) {
@@ -57,8 +57,8 @@ func TestNewListResponseOffset(t *testing.T) {
 	assert.Equal(t, 1, len(response.Items))
 	assert.NotNil(t, response.Pagination)
 	assert.Equal(t, "offset", response.Pagination.Type)
-	assert.Equal(t, 4, *response.Pagination.PaginationOffset.MaxPage)
-	assert.Equal(t, 10, *response.Pagination.PaginationOffset.TotalRecords)
-	assert.Equal(t, 4, *response.Pagination.PaginationOffset.CurrentPage)
-	assert.Equal(t, 3, *response.Pagination.PaginationOffset.RecordsPerPage)
+	assert.Equal(t, 4, *response.Pagination.MaxPage)
+	assert.Equal(t, 10, *response.Pagination.TotalRecords)
+	assert.Equal(t, 4, *response.Pagination.CurrentPage)
+	assert.Equal(t, 3, *response.Pagination.RecordsPerPage)
 }
