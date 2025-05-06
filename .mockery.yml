@@ -1,0 +1,43 @@
+all: false
+dir: '{{.InterfaceDir}}'
+filename: mocks_test.go
+force-file-write: true
+formatter: goimports
+log-level: info
+structname: '{{.Mock}}{{.InterfaceName}}'
+pkgname: '{{.SrcPackageName}}'
+recursive: false
+require-template-schema-exists: true
+template: testify
+template-schema: '{{.Template}}.schema.json'
+packages:
+  go.megpoid.dev/go-skel/app/repository:
+    config:
+      filename: repository_mock.go
+    interfaces:
+      HealthcheckRepo:
+      ProfileRepo:
+  go.megpoid.dev/go-skel/app/repository/uow:
+    config:
+      filename: uow_mock.go
+    interfaces:
+      UnitOfWorkStore:
+      UnitOfWork:
+  go.megpoid.dev/go-skel/app/usecase:
+    config:
+      filename: usecase_mock.go
+    interfaces:
+      Profile:
+      Healthcheck:
+  go.megpoid.dev/go-skel/pkg/sql:
+    config:
+      filename: sql_test.go
+    interfaces:
+      Querier:
+  github.com/jackc/pgx/v5:
+    interfaces:
+      Rows:
+    config:
+      dir: 'pkg/sql'
+      pkgname: sql
+      filename: pgx_test.go

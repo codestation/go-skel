@@ -12,7 +12,6 @@ import (
 	"go.megpoid.dev/go-skel/pkg/sql"
 )
 
-//go:generate go run github.com/vektra/mockery/v2@v2.42.0 --name UnitOfWorkStore
 type UnitOfWorkStore interface {
 	Profiles() repository.ProfileRepo
 }
@@ -34,7 +33,6 @@ func (u uowStore) Profiles() repository.ProfileRepo {
 
 type UnitOfWorkBlock func(UnitOfWork) error
 
-//go:generate go run github.com/vektra/mockery/v2@v2.42.0 --name UnitOfWork
 type UnitOfWork interface {
 	Do(ctx context.Context, fn UnitOfWorkBlock) error
 	Commit(ctx context.Context) error

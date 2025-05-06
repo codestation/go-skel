@@ -250,8 +250,6 @@ func WithConstraintName(name string) Option {
 	}
 }
 
-//go:generate go run github.com/vektra/mockery/v2@v2.42.0 --name Querier
-//go:generate go run github.com/vektra/mockery/v2@v2.42.0 --srcpkg github.com/jackc/pgx/v5 --inpackage=false --output . --outpkg=sql --filename=rows_mock.go --name Rows --structname MockRows
 type Querier interface {
 	Query(ctx context.Context, query string, args ...interface{}) (pgx.Rows, error)
 }

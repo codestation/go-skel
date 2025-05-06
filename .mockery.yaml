@@ -1,5 +1,0 @@
-inpackage: True
-testonly: False
-inpackage-suffix: True
-with-expecter: True
-case: underscore
